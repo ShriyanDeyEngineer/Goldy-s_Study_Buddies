@@ -2,11 +2,11 @@
 
 ## Introduction
 
-UMN Study Connect is a dynamic web platform that helps University of Minnesota students find study partners and form or join study groups for their courses. The platform addresses a common challenge at UMN: students struggle to connect with peers for collaborative learning, especially in large general education and "weed out" STEM courses where resources from instructors may be limited. Students can authenticate via their @umn.edu email, discover study groups for their classes, connect with peers, coordinate meetups, and communicate through group chat. The platform is designed to scale to other universities in the future.
+Goldy's Study Buddies is a dynamic web platform that helps University of Minnesota students find study partners and form or join study groups for their courses. The platform addresses a common challenge at UMN: students struggle to connect with peers for collaborative learning, especially in large general education and "weed out" STEM courses where resources from instructors may be limited. Students can authenticate via their @umn.edu email, discover study groups for their classes, connect with peers, coordinate meetups, and communicate through group chat. The platform is designed to scale to other universities in the future.
 
 ## Glossary
 
-- **Platform**: The UMN Study Connect web application as a whole.
+- **Platform**: The Goldy's Study Buddies web application as a whole.
 - **User**: A registered student who has authenticated with a verified @umn.edu email address.
 - **Guest**: An unauthenticated visitor browsing the public-facing pages of the Platform.
 - **Group_Manager**: The User who created a Study Group and holds administrative permissions over it.
