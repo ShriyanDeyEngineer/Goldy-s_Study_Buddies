@@ -21,12 +21,12 @@ A website that helps students find other students to study with. Students can ma
 
 2. Account connected by UMN email and user chosen password (password must meet certain criteria). Perhaps we should look to integrate an already existing service that deals with these security things and storing user account data.
 
-3. <ins>Dashboard:</ins>
+3. Dashboard
 - When the user opens the dashboard, they should first see which classes are open for forming study groups.
 - Once a class is selected, they can choose to form a new group or join a currently existing one for that class.
 - If the user chooses to join a currently existing study group, they can request to join if the group is set to closed (sends a notification by email or something else to the group manager), otherwise they are immediately included into the group if the group is open.
 
-- <ins>Search for people/view profiles:</ins>
+- Search for people/view profiles
 -There should be a search button on the dashboard that takes the user to a place to search (search by username or email). Profiles matching the search shall appear for the user to click on. 
 - When a user searches, show suggested people (for some examples, people that share the same classes as the user or people that graduate during the same year as the user) for quick connections.
 
@@ -34,7 +34,7 @@ A website that helps students find other students to study with. Students can ma
 
 - Create a study group option (can only be done after the user selects a class).
 
-4. <ins>Creating a study group (should send the user to another page). The user can:</ins>
+4. Creating a study group (should send the user to another page). The user can:
 - Name the study group.
 - Select the study group size (Let’s put a cap on this number).
 - Select people to send an invite to as soon as the group is created (of course, they will still be able to send invites to others after the group is created). People can join as they - wish if the study group status/mode is set to open.
@@ -43,13 +43,13 @@ A website that helps students find other students to study with. Students can ma
 
 5. Find a study buddy, (this can be done for all subjects, but someone can just find someone they want to study with).
 
-6. <ins>What to do when a user selects one of the study groups that they are enrolled in:</ins>
+6. What to do when a user selects one of the study groups that they are enrolled in
 - Opens a new kind of dashboard specific to things one can do with a study group.
 - Schedule meet ups. Build in a calendar for the user to look at and pick dates/times from OR integrate When2Meet.com or timeful.app (this one integrates Google Calendar).
 - See currently scheduled meet ups (online/in person, location, number of people saying they will attend and who).
 - A group chat specific to that study group.
 
-7. <ins>User profiles:</ins>
+7. User profiles
 - Their college 
 - Major 
 - Classes
