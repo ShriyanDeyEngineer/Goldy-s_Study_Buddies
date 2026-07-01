@@ -68,8 +68,8 @@ A website that helps students find other students to study with. Students can ma
 
 
 ## Our Tech Stack
-<ins>Front End</ins>
-1. 
+<ins>Front End:</ins>
 
-<ins>Back End</ins>
-1. 
+
+<ins>Back End:</ins>
+
