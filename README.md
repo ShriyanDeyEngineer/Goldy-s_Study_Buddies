@@ -64,12 +64,12 @@ A website that helps students find other students to study with. Students can ma
 - Graduation date
 - Social media links
 
-8. Reporting system in case we need to ban/suspend any troublemakers.
+8. Reporting system in case we need to ban/suspend any troublemakers. 
 
 
 ## Our Tech Stack
 <ins>Front End</ins>
--
+1. 
 
 <ins>Back End</ins>
--
+1. 
