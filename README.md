@@ -5,4 +5,4 @@ A website that helps students find other students to study with. Students can ma
 
 
 ## Contributors
-ShriyanDeyEngineer (Shriyan Dey), __________, __________, __________, & __________
+ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), __________, & __________.
