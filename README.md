@@ -65,3 +65,11 @@ A website that helps students find other students to study with. Students can ma
 - Social media links
 
 8. Reporting system in case we need to ban/suspend any troublemakers.
+
+
+## Our Tech Stack
+**Front End**
+-
+
+**Back End**
+-
