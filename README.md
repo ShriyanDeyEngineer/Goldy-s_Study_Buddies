@@ -3,8 +3,6 @@
 ## Contributors
 ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), joydeng-code (Joy Deng), & mightymixsal (Hmoov Her). 
 
-HELLO
-
 
 ## Description
 A website that helps students find other students to study with. Students can make and/or join study groups for separate courses.
