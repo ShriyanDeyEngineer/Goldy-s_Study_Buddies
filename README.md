@@ -1,8 +1,7 @@
 # Goldy-s_Study_Buddies
 
 ## Contributors
-ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), joydeng-code (Joy Deng), & __________.
-
+ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), joydeng-code (Joy Deng), & mightymixsal (Hmoov Her).
 
 
 ## Description
