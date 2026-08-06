@@ -1,0 +1,40 @@
+{
+  // TypeScript configuration for the whole project.
+  //
+  // The important choices, in plain English:
+  //   - "strict": true       → TypeScript points out every place a value could
+  //                            be null/undefined or the wrong shape. Painful at
+  //                            first, but it catches real bugs before runtime.
+  //   - "paths": {"@/*"}     → lets us write  import { Button } from "@/components/ui/button"
+  //                            instead of fragile ../../.. relative paths.
+  //   - "noEmit": true       → Next.js does the actual compiling; `tsc` is only
+  //                            used as a type checker (npm run typecheck).
+  //
+  // Touch this file only if you are adding a path alias or changing compiler
+  // strictness — and talk to the team before loosening anything.
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", "scripts/import-courses.ts"]
+}

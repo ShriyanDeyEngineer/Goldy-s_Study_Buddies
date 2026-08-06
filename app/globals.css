@@ -1,0 +1,69 @@
+/**
+ * Global stylesheet + the entire design system configuration.
+ *
+ * Tailwind v4 is configured in CSS (this file), not in a JS config file.
+ * The @theme block below defines every design token the app is allowed to
+ * use. If you use a color that is not in this list, you are off-brand —
+ * add a token here first and talk to the team.
+ *
+ * The palette is University of Minnesota–inspired (maroon + gold), but we
+ * deliberately do NOT use official UMN artwork or trademarks anywhere.
+ *
+ * CONTRAST RULE (do not break this): never put gold text on the cream
+ * background — it fails WCAG AA. Gold text is only readable on maroon.
+ * All interactive elements must meet a 4.5:1 contrast ratio.
+ *
+ * Touch this file to: add a design token, adjust global element defaults,
+ * or add a small global utility. Do not put page-specific styles here.
+ */
+@import "tailwindcss";
+
+@theme {
+  /* ── Brand colors ─────────────────────────────────────────────────── */
+  --color-maroon: #7a0019; /* primary brand: headers, primary buttons   */
+  --color-maroon-dark: #5b0013; /* hover states, footer background          */
+  --color-gold: #ffcc33; /* accents, CTAs, focus rings               */
+  --color-gold-light: #ffde7a; /* badges, subtle highlights                */
+
+  /* ── Surfaces & text ──────────────────────────────────────────────── */
+  --color-cream: #fffaf0; /* page background                          */
+  --color-surface: #ffffff; /* cards                                    */
+  --color-ink: #1a1a1a; /* body text                                */
+  --color-ink-muted: #6b6b6b; /* secondary text                           */
+  --color-line: #ede6dc; /* borders                                  */
+
+  /* ── Semantic status colors ───────────────────────────────────────── */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  /* ── Typography ───────────────────────────────────────────────────── */
+  /* The CSS variables --font-inter / --font-dm-serif are injected by
+     next/font in app/layout.tsx. Fallbacks cover the moment before the
+     web fonts load. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-dm-serif), ui-serif, Georgia, serif;
+}
+
+/* Element defaults. Kept tiny on purpose — components style themselves. */
+@layer base {
+  html {
+    /* 16px base per the design spec; rem units scale from this. */
+    font-size: 16px;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Every keyboard-focused element gets the visible gold ring the
+     accessibility spec requires. Components can layer their own ring on
+     top, but nothing may remove focus visibility. */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+}
