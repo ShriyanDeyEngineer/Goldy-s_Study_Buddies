@@ -1,0 +1,61 @@
+# Supabase CLI configuration — used by the LOCAL development stack
+# (`supabase start`, requires Docker). The hosted project is configured in
+# the dashboard instead; SETUP.md walks through matching these settings
+# there. Keys here mirror the auth rules the app depends on.
+
+project_id = "goldys-study-buddies"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+# Local email testing: signup/reset emails are captured here instead of
+# being sent — open http://localhost:54324 to click confirmation links.
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+# Sessions last a week; tokens refresh automatically via middleware.
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+# The password policy — MUST match lib/validation/auth.ts (12+ chars,
+# upper + lower + digit + symbol). Both layers enforcing the same rule is
+# intentional: ours gives the friendly checklist, this one is the backstop.
+minimum_password_length = 12
+password_requirements = "lower_upper_letters_digits_symbols"
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+# Email verification is REQUIRED before the account works (spec §5.2)…
+enable_confirmations = true
+# …and links die after 24 hours (86400 seconds).
+otp_expiry = 86400
+
+# Google SSO for LOCAL development. The env vars referenced here go in
+# supabase/.env (gitignored) if you want to test Google locally; most of
+# the time testing SSO against the hosted project is easier.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_GOOGLE_SECRET)"
+redirect_uri = "http://localhost:54321/auth/v1/callback"
