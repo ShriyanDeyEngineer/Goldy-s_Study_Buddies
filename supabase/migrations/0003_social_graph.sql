@@ -176,6 +176,13 @@ create policy "participants read buddy requests"
   to authenticated
   using (sender_id = (select auth.uid()) or recipient_id = (select auth.uid()));
 
+-- Read grants for the five social tables (see the grants note in 0001).
+-- All writes go through the SECURITY DEFINER functions below, so SELECT
+-- is the only privilege clients get.
+grant select on public.blocks, public.friends, public.friend_requests,
+                public.study_buddy_connections, public.study_buddy_requests
+  to authenticated;
+
 -- ── Shared guard used by every people-to-people function ────────────────────
 
 -- Raises unless the caller is a real, onboarded, non-suspended account.

@@ -49,6 +49,15 @@ create policy "universities are readable by everyone"
   to anon, authenticated
   using (true);
 
+-- GRANTS, EXPLAINED ONCE (applies to every table in every migration):
+-- Supabase no longer grants table privileges to anon/authenticated by
+-- default — an RLS policy alone does nothing without a GRANT underneath
+-- it. So each table states its grants explicitly: the GRANT says which
+-- OPERATIONS a role may attempt, the RLS policy says which ROWS those
+-- operations may touch. Both are required; missing either = permission
+-- denied.
+grant select on public.universities to anon, authenticated;
+
 -- ── Profiles: one row per student ───────────────────────────────────────────
 
 create table if not exists public.profiles (
@@ -139,9 +148,12 @@ create policy "users update own profile"
   using (id = (select auth.uid()))
   with check (id = (select auth.uid()));
 
+-- Reading your own row (RLS narrows SELECT to it).
+grant select on public.profiles to authenticated;
+
 -- Column-level lockdown: even on your own row you may not touch moderation
 -- or identity-critical columns (account_status, is_admin, email, university).
--- RLS is row-level only, so this is done with column grants.
+-- RLS is row-level only, so UPDATE is granted per-column instead.
 revoke update on public.profiles from authenticated;
 grant update (display_name, avatar_url, bio, college, major, class_standing,
               graduation_month, graduation_year, social_links, privacy,
@@ -210,6 +222,7 @@ create policy "users mark own notifications read"
   using (recipient_id = (select auth.uid()))
   with check (recipient_id = (select auth.uid()));
 
+grant select on public.notifications to authenticated;
 revoke insert, delete on public.notifications from authenticated;
 revoke update on public.notifications from authenticated;
 grant update (read_at) on public.notifications to authenticated;

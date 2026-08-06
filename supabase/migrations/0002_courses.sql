@@ -52,6 +52,9 @@ create policy "authenticated users read courses"
   to authenticated
   using (true);
 
+-- Grant + policy pair (see the grants note in 0001).
+grant select on public.courses to authenticated;
+
 -- ── Enrollments ─────────────────────────────────────────────────────────────
 
 create table if not exists public.user_courses (
@@ -101,6 +104,8 @@ create policy "users remove own enrollments"
   on public.user_courses for delete
   to authenticated
   using (user_id = (select auth.uid()));
+
+grant select, insert, delete on public.user_courses to authenticated;
 
 -- ── create_course: the "Add a missing course" write path ────────────────────
 

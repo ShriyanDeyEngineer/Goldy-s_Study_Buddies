@@ -68,6 +68,10 @@ create policy "admins update reports"
   using (public.is_admin())
   with check (public.is_admin());
 
+-- Grants (see the note in 0001): the RLS policies above narrow these to
+-- admins; filing reports goes through report_user(), so no INSERT grant.
+grant select, update on public.reports to authenticated;
+
 -- ── report_user ─────────────────────────────────────────────────────────────
 
 -- Files a report. Returns the new report id (the server action includes it

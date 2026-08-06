@@ -151,7 +151,12 @@ create policy "members read votes"
     (select auth.uid())
   ));
 
--- No write policies — all writes via the functions below.
+-- No write policies — all writes via the functions below. SELECT is the
+-- only privilege clients get (see the grants note in 0001).
+grant select on public.meetups, public.meetup_attendance,
+                public.availability_polls, public.availability_slots,
+                public.availability_votes
+  to authenticated;
 
 -- ── create_meetup ───────────────────────────────────────────────────────────
 

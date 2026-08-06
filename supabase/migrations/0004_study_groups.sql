@@ -215,8 +215,11 @@ create policy "participants read invitations"
 
 -- No INSERT/UPDATE/DELETE policies on any of the four tables: every write
 -- goes through the functions below. This is the "revoke direct writes"
--- requirement from the spec — with RLS enabled and no write policies,
--- client writes are refused no matter what grants exist.
+-- requirement from the spec — clients get SELECT and nothing else (and
+-- RLS's lack of write policies refuses writes even if a grant appeared).
+grant select on public.study_groups, public.study_group_members,
+                public.join_requests, public.group_invitations
+  to authenticated;
 
 -- ── Internal helpers (not callable by clients) ──────────────────────────────
 

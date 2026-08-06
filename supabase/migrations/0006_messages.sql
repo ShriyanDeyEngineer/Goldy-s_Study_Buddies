@@ -82,7 +82,9 @@ create policy "participants read direct messages"
   );
 
 -- No write policies: sending goes through the functions below, and
--- mark_thread_read is the only path that flips is_read.
+-- mark_thread_read is the only path that flips is_read. SELECT is the
+-- only privilege clients get (see the grants note in 0001).
+grant select on public.group_messages, public.direct_messages to authenticated;
 
 -- ── Realtime wiring ─────────────────────────────────────────────────────────
 -- Chat panels subscribe to INSERTs on group_messages (filtered by group)
@@ -142,7 +144,12 @@ begin
     raise exception 'MESSAGE_TOO_LONG';
   end if;
 
-  update public.study_groups set last_activity_at = now() where id = p_group_id;
+  -- NOTE the table-qualified "study_groups.id": this function's RETURNS
+  -- TABLE declares an output variable also named "id", and plpgsql treats
+  -- an unqualified "id" inside queries as ambiguous. Qualify or it breaks.
+  update public.study_groups
+    set last_activity_at = now()
+    where study_groups.id = p_group_id;
 
   return query
   insert into public.group_messages (group_id, sender_id, content)
