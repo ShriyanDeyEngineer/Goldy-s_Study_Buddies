@@ -45,5 +45,9 @@
     "tsx": "^4.23.9",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "sharp": "^0.35.2",
+    "postcss": "^8.5.23"
   }
 }

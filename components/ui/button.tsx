@@ -75,8 +75,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={asChild ? undefined : disabled || loading}
         {...props}
       >
-        {loading && <Loader2 aria-hidden className="h-4 w-4 animate-spin" />}
-        {children}
+        {asChild ? (
+          // Radix Slot demands EXACTLY one element child (it merges props
+          // onto it) — so no loader sibling in asChild mode. asChild is
+          // for links, which never show a loading spinner anyway.
+          children
+        ) : (
+          <>
+            {loading && <Loader2 aria-hidden className="h-4 w-4 animate-spin" />}
+            {children}
+          </>
+        )}
       </Comp>
     );
   },
