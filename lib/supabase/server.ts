@@ -11,6 +11,7 @@
  * routes are), and the middleware refreshes sessions anyway, so
  * swallowing that specific failure is correct — do not "fix" it.
  */
+import { cache } from "react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -44,8 +45,12 @@ export async function createClient() {
  * Convenience for pages that need the signed-in user's id + profile in one
  * call. Returns nulls when signed out — callers decide whether that means
  * "redirect to login" or "render the public view".
+ *
+ * Wrapped in React's cache() so the layout AND the page asking during the
+ * same request share one auth check + one profiles query instead of
+ * hitting Supabase twice per screen.
  */
-export async function getSessionProfile() {
+export const getSessionProfile = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -58,5 +63,5 @@ export async function getSessionProfile() {
     .eq("id", user.id)
     .maybeSingle();
 
-  return { supabase, user, profile };
-}
+  return { supabase, user, profile: profile ?? null };
+});
