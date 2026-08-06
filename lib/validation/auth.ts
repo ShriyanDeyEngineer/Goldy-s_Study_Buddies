@@ -78,10 +78,13 @@ export function isPasswordValid(password: string): boolean {
  * Is this email on an allowed university domain? Case-insensitive, exact
  * domain match — "student@umn.edu.evil.com" must NOT pass, which is why
  * we compare the full domain instead of using endsWith on the raw string.
+ * Also demands a non-empty local part ("@umn.edu" alone is not an email),
+ * so the helper is safe even when called outside the zod email check.
  */
 export function isAllowedUniversityEmail(email: string): boolean {
-  const domain = email.trim().toLowerCase().split("@")[1];
-  if (!domain) return false;
+  const [localPart, domain, ...rest] = email.trim().toLowerCase().split("@");
+  // rest catches multiple @s ("a@b@umn.edu") — never a valid address.
+  if (!localPart || !domain || rest.length > 0) return false;
   return ALLOWED_EMAIL_DOMAINS.some((allowed) => domain === allowed.toLowerCase());
 }
 
