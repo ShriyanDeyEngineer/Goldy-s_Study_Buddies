@@ -1,0 +1,242 @@
+/**
+ * Study-group server actions. Thin by design: validate with zod, call
+ * the database function that owns the rule, translate errors to friendly
+ * copy. If you're tempted to add group logic HERE (capacity checks,
+ * manager checks…), stop — it belongs in supabase/migrations/0004, where
+ * concurrent clicks can't outrun it. The functions there are the only
+ * write path; these actions are just the doorway.
+ */
+"use server";
+
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import {
+  createGroupSchema,
+  createGroupWithCourseSchema,
+  updateGroupSettingsSchema,
+} from "@/lib/validation/group";
+import { friendlyError } from "@/lib/errors";
+import type { ActionResult } from "@/lib/actions/types";
+
+export async function createGroupAction(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const parsed = createGroupSchema.safeParse({
+    course_id: formData.get("course_id"),
+    name: formData.get("name"),
+    capacity: formData.get("capacity"),
+    mode: formData.get("mode"),
+    invitee_ids: formData.getAll("invitee_ids").map(String),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  const supabase = await createClient();
+  const { data: groupId, error } = await supabase.rpc("create_study_group", {
+    p_course_id: parsed.data.course_id,
+    p_name: parsed.data.name,
+    p_capacity: parsed.data.capacity,
+    p_mode: parsed.data.mode,
+    p_invitee_ids: parsed.data.invitee_ids,
+  });
+  if (error) {
+    // NAME_TAKEN belongs on the name field specifically (inline, per-field
+    // errors are a §5.6 requirement); everything else is form-level.
+    const message = friendlyError(error);
+    if (String(error.message).includes("NAME_TAKEN")) {
+      return { fieldErrors: { name: [message] } };
+    }
+    return { error: message };
+  }
+
+  redirect(`/groups/${groupId}`);
+}
+
+/**
+ * Creating a group for a course that isn't in the catalog (spec §5.6):
+ * find-or-create the course, then create the group in it. The creator is
+ * also enrolled in the new course as 'current' — you don't start a study
+ * group for a class you're not taking (judgment call, README).
+ */
+export async function createGroupWithCourseAction(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const parsed = createGroupWithCourseSchema.safeParse({
+    department_code: formData.get("department_code"),
+    course_number: formData.get("course_number"),
+    course_name: formData.get("course_name"),
+    name: formData.get("name"),
+    capacity: formData.get("capacity"),
+    mode: formData.get("mode"),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  const supabase = await createClient();
+
+  const { data: courseRows, error: courseError } = await supabase.rpc("create_course", {
+    p_department_code: parsed.data.department_code,
+    p_course_number: parsed.data.course_number,
+    p_course_name: parsed.data.course_name,
+  });
+  if (courseError) return { error: friendlyError(courseError) };
+  const courseId = (courseRows as { course_id: string }[] | null)?.[0]?.course_id;
+  if (!courseId) return { error: friendlyError(null) };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.from("user_courses").upsert(
+      { user_id: user.id, course_id: courseId, enrollment_type: "current" },
+      { ignoreDuplicates: true },
+    );
+  }
+
+  const { data: groupId, error } = await supabase.rpc("create_study_group", {
+    p_course_id: courseId,
+    p_name: parsed.data.name,
+    p_capacity: parsed.data.capacity,
+    p_mode: parsed.data.mode,
+    p_invitee_ids: [],
+  });
+  if (error) {
+    const message = friendlyError(error);
+    if (String(error.message).includes("NAME_TAKEN")) {
+      return { fieldErrors: { name: [message] } };
+    }
+    return { error: message };
+  }
+
+  redirect(`/groups/${groupId}`);
+}
+
+/** The join button. Returns what happened so the UI can toast it:
+ *  'joined' (open group) or 'requested' (closed group). */
+export async function joinGroupAction(
+  groupId: string,
+): Promise<{ result?: "joined" | "requested"; error?: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("join_group", { p_group_id: groupId });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath("/dashboard");
+  return { result: data as "joined" | "requested" };
+}
+
+export async function withdrawJoinRequestAction(
+  groupId: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("withdraw_join_request", { p_group_id: groupId });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath(`/groups/${groupId}`);
+  return {};
+}
+
+/** Manager approves a request. 'cancelled_full' means the group filled
+ *  while it waited — the requester was told; the UI tells the manager. */
+export async function approveJoinRequestAction(
+  requestId: string,
+  groupId: string,
+): Promise<{ result?: "approved" | "cancelled_full"; error?: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("approve_join_request", {
+    p_request_id: requestId,
+  });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath(`/groups/${groupId}`);
+  return { result: data as "approved" | "cancelled_full" };
+}
+
+export async function denyJoinRequestAction(
+  requestId: string,
+  groupId: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("deny_join_request", { p_request_id: requestId });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath(`/groups/${groupId}`);
+  return {};
+}
+
+export async function respondToInvitationAction(
+  invitationId: string,
+  accept: boolean,
+): Promise<{ result?: "joined" | "declined" | "cancelled_full"; error?: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("respond_to_invitation", {
+    p_invitation_id: invitationId,
+    p_accept: accept,
+  });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath("/dashboard");
+  revalidatePath("/notifications");
+  return { result: data as "joined" | "declined" | "cancelled_full" };
+}
+
+export async function leaveGroupAction(groupId: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("leave_group", { p_group_id: groupId });
+  if (error) return { error: friendlyError(error) };
+  // The group page is now the non-member preview; dashboard loses a card.
+  revalidatePath(`/groups/${groupId}`);
+  redirect("/dashboard");
+}
+
+export async function removeMemberAction(
+  groupId: string,
+  memberId: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("remove_member", {
+    p_group_id: groupId,
+    p_member_id: memberId,
+  });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath(`/groups/${groupId}`);
+  return {};
+}
+
+export async function updateGroupSettingsAction(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const parsed = updateGroupSettingsSchema.safeParse({
+    group_id: formData.get("group_id"),
+    name: formData.get("name"),
+    mode: formData.get("mode"),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_group_settings", {
+    p_group_id: parsed.data.group_id,
+    p_name: parsed.data.name,
+    p_mode: parsed.data.mode,
+  });
+  if (error) {
+    const message = friendlyError(error);
+    if (String(error.message).includes("NAME_TAKEN")) {
+      return { fieldErrors: { name: [message] } };
+    }
+    return { error: message };
+  }
+
+  revalidatePath(`/groups/${parsed.data.group_id}`);
+  return { success: "Settings saved." };
+}
+
+export async function disbandGroupAction(groupId: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("disband_group", { p_group_id: groupId });
+  if (error) return { error: friendlyError(error) };
+  redirect("/dashboard");
+}

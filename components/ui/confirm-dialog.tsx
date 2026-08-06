@@ -32,6 +32,7 @@ export function ConfirmDialog({
   confirmLabel = "Confirm",
   destructive = true,
   onConfirm,
+  body,
   children,
 }: {
   title: string;
@@ -40,6 +41,9 @@ export function ConfirmDialog({
   confirmLabel?: string;
   destructive?: boolean;
   onConfirm: () => Promise<void>;
+  /** Optional extra content between the description and the buttons —
+   *  e.g. the "reason" input when cancelling a meetup. */
+  body?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = React.useState(false);
@@ -63,6 +67,7 @@ export function ConfirmDialog({
       <DialogContent>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{description}</DialogDescription>
+        {body && <div className="mt-4">{body}</div>}
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
             Never mind

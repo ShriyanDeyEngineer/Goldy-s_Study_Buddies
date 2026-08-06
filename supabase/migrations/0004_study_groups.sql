@@ -116,8 +116,9 @@ create table if not exists public.group_invitations (
 );
 
 comment on table public.group_invitations is
-  'Invitations sent when creating a group (and later from the members '
-  'panel). Same one-pending-per-(group,user) rule as join requests.';
+  'Invitations sent while creating a group. Same one-pending-per-'
+  '(group,user) rule as join requests. (Inviting from an existing '
+  'group''s members panel is a future feature — see README.)';
 
 create unique index if not exists group_invitations_one_pending
   on public.group_invitations (group_id, invited_user_id)
