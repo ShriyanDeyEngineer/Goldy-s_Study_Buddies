@@ -28,6 +28,7 @@ import {
   type StudyGroupRow,
 } from "@/lib/types";
 import { JoinButton } from "@/components/groups/join-button";
+import { InvitationBanner } from "@/components/groups/invitation-banner";
 import { GroupChat } from "@/components/groups/group-chat";
 import { MeetupsPanel } from "@/components/groups/meetups-panel";
 import { MembersPanel } from "@/components/groups/members-panel";
@@ -70,7 +71,7 @@ export default async function GroupPage({
 
   /* ── Non-member: the preview ──────────────────────────────────────── */
   if (!isMember) {
-    const [managerRes, myRequestRes] = await Promise.all([
+    const [managerRes, myRequestRes, myInvitationRes] = await Promise.all([
       supabase
         .from("public_profiles")
         .select("*")
@@ -83,8 +84,27 @@ export default async function GroupPage({
         .eq("user_id", profile.id)
         .eq("status", "pending")
         .maybeSingle(),
+      supabase
+        .from("group_invitations")
+        .select("id, inviter_id")
+        .eq("group_id", groupId)
+        .eq("invited_user_id", profile.id)
+        .eq("status", "pending")
+        .maybeSingle(),
     ]);
     const manager = managerRes.data as PublicProfile | null;
+    const invitation = myInvitationRes.data as { id: string; inviter_id: string } | null;
+
+    // Resolve the inviter's name for the invitation banner.
+    let inviterName: string | null = null;
+    if (invitation) {
+      const inviterRes = await supabase
+        .from("public_profiles")
+        .select("display_name")
+        .eq("id", invitation.inviter_id)
+        .maybeSingle();
+      inviterName = (inviterRes.data?.display_name as string | null) ?? null;
+    }
 
     const state = getJoinState({
       groupStatus: group.status,
@@ -122,9 +142,20 @@ export default async function GroupPage({
               </div>
             )}
 
-            <div className="mt-6 flex justify-center">
-              <JoinButton groupId={group.id} state={state} size="md" />
-            </div>
+            {/* A pending invitation replaces the ordinary join control —
+                accepting seats you even in a closed group. */}
+            {invitation && group.status === "active" ? (
+              <div className="mt-6">
+                <InvitationBanner
+                  invitationId={invitation.id}
+                  inviterName={inviterName}
+                />
+              </div>
+            ) : (
+              <div className="mt-6 flex justify-center">
+                <JoinButton groupId={group.id} state={state} size="md" />
+              </div>
+            )}
             <p className="mt-4 text-xs text-ink-muted">
               Chat, meetups, and the member list unlock when you join.
             </p>
