@@ -80,22 +80,22 @@ Two halves: a Google Cloud OAuth client, pasted into Supabase.
      users while it's in Testing).
 2. **APIs & Services → Credentials → Create credentials → OAuth client ID**:
    - Application type **Web application**.
-   - **Authorized JavaScript origins**: `https://YOUR-PROJECT-REF.supabase.co`
-   - **Authorized redirect URIs**:
-     `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`
+   - **Authorized JavaScript origins** — add both:
+     - `https://YOUR-PROJECT-REF.supabase.co`  (hosted)
+     - `http://localhost:54321`                (local stack)
+   - **Authorized redirect URIs** — add both:
+     - `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`
+     - `http://localhost:54321/auth/v1/callback`
 3. Copy the **Client ID** and **Client secret**.
+
+ONE client covers hosted and local — Google allows several redirect URIs
+per client, so there's no need to manage two sets of credentials.
 
 **Supabase:** dashboard → **Authentication → Providers →
 Google** → enable, paste the Client ID + secret, save.
 
-**Local development needs its own client** (one shared client for the
-whole team is fine): repeat step 2 with
-
-- **Authorized JavaScript origins**: `http://localhost:54321`
-- **Authorized redirect URIs**: `http://localhost:54321/auth/v1/callback`
-
-then put its credentials in `supabase/.env` (gitignored, next to
-`config.toml`):
+**For the local stack**, put the SAME credentials in `supabase/.env`
+(gitignored, next to `config.toml`):
 
 ```
 SUPABASE_AUTH_GOOGLE_CLIENT_ID=...
@@ -174,10 +174,11 @@ CSCI,1133,Introduction to Computing and Programming Concepts
 MATH,1371,CSE Calculus I
 ```
 
-Then, with `.env.local` populated (the script needs the service-role key):
+Then, with `.env.local` populated (the script needs the service-role
+key — it loads `.env.local` for you):
 
 ```bash
-npx dotenv -e .env.local -- npm run import-courses -- fall-2026.csv
+npm run import-courses -- fall-2026.csv
 ```
 
 Existing courses are skipped; malformed rows are listed and skipped. Run
