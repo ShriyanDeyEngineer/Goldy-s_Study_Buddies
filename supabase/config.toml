@@ -14,7 +14,17 @@ max_rows = 1000
 
 [db]
 port = 54322
-major_version = 15
+# Must match the HOSTED project's Postgres major version. After you run
+# `supabase link`, the CLI records the remote version in
+# supabase/.temp/postgres-version and starts the local stack to match —
+# it will override this number, so keeping them in sync avoids surprises.
+#
+# If `supabase start` ever fails with "database files are incompatible
+# with server", your local volume was created by a different major
+# version. Discard it and start clean:
+#     npx supabase stop --no-backup && npx supabase start
+# (Local data is throwaway — migrations and seed.sql rebuild it.)
+major_version = 17
 
 # The starter course catalog. This path is the CLI's default anyway, but
 # stating it explicitly means `supabase db push --include-seed` (used to

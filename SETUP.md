@@ -163,6 +163,19 @@ npm run build        # production build
 npx supabase start   # local Postgres + auth + storage + email catcher
 ```
 
+**"database files are incompatible with server"** — you linked to a
+hosted project whose Postgres major version differs from your existing
+local volume, and the CLI now matches local to production (it records the
+remote version in `supabase/.temp/postgres-version`). Throw the stale
+volume away and start clean:
+
+```bash
+npx supabase stop --no-backup && npx supabase start
+```
+
+Local data is disposable — the migrations and `seed.sql` rebuild it on
+the next start. Nothing in your hosted project is touched.
+
 Point `.env.local` at the printed local URL/anon key. Signup emails are
 captured at http://localhost:54324 (nothing is actually sent). The local
 auth config in `supabase/config.toml` already mirrors the settings from
