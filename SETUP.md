@@ -47,20 +47,14 @@ Functions** should list `join_group`, `approve_join_request`, etc.
 
 ## 3. Auth settings (dashboard → Authentication)
 
-These must match the app's own validation — the spec's rules live in both
-layers on purpose.
+Auth is **Google-only** (team decision, 2026-08-06) — there are no
+passwords, so most auth settings stay untouched. Two things matter:
 
 Under **Sign In / Up → Email**:
 
-- **Enable email provider**: on.
-- **Confirm email**: **ON** (required — accounts must verify before use).
-- **Secure email change**: on.
-
-Under **Rate Limits / Sessions** (defaults are fine), and under
-**Passwords**:
-
-- **Minimum password length**: `12`.
-- **Password requirements**: *lowercase, uppercase, digits, symbols*.
+- **Enable email provider**: **OFF**. This is what makes Google the only
+  door in. (The @umn.edu rule itself is enforced by the database trigger
+  from migration `0001`, not by any dashboard setting.)
 
 Under **URL Configuration**:
 
@@ -71,14 +65,10 @@ Under **URL Configuration**:
   - plus each Vercel preview pattern you use, e.g.
     `https://*-your-team.vercel.app/auth/callback`.
 
-Under **Emails → Templates** (optional but recommended): the defaults
-work with our `/auth/callback` route as-is. **Link expiry**: set *Email
-OTP expiry* to `86400` seconds (24 hours) — the spec's link lifetime.
-
 ## 4. Google SSO ("Continue with UMN Google") — REQUIRED
 
-The app's second sign-in method. Two halves: a Google Cloud OAuth client,
-pasted into Supabase.
+The ONLY sign-in method — without this configured, nobody can get in.
+Two halves: a Google Cloud OAuth client, pasted into Supabase.
 
 **Google Cloud:**
 
@@ -97,6 +87,25 @@ pasted into Supabase.
 
 **Supabase:** dashboard → **Authentication → Providers →
 Google** → enable, paste the Client ID + secret, save.
+
+**Local development needs its own client** (one shared client for the
+whole team is fine): repeat step 2 with
+
+- **Authorized JavaScript origins**: `http://localhost:54321`
+- **Authorized redirect URIs**: `http://localhost:54321/auth/v1/callback`
+
+then put its credentials in `supabase/.env` (gitignored, next to
+`config.toml`):
+
+```
+SUPABASE_AUTH_GOOGLE_CLIENT_ID=...
+SUPABASE_AUTH_GOOGLE_SECRET=...
+```
+
+Restart the stack (`npx supabase stop && npx supabase start`) and sign
+in locally with your REAL @umn.edu Google account — personal Gmails are
+rejected by the database trigger even locally. Share the client with
+teammates via your team password manager, not the repo.
 
 **How the UMN-only rule works with Google — read this once:** the app
 sends Google an `hd=umn.edu` hint so university accounts surface first,

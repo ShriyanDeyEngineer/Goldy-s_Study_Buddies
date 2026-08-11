@@ -35,7 +35,7 @@ const PROTECTED_PREFIXES = [
 ];
 
 /** Signed-in users get bounced OFF these (already signed in = nothing to do). */
-const AUTH_PAGES = ["/login", "/register", "/forgot-password"];
+const AUTH_PAGES = ["/login", "/register"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

@@ -17,42 +17,22 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       /dashboard, /groups, /people, /messages, etc.
 - [ ] Everything usable at 375px, 768px, 1024px, 1440px.
 
-## Registration — email & password
+## Sign-in — UMN Google (the only method)
 
-- [ ] Live checklist: each of the 5 rules flips green as you type.
-- [ ] Submitting a weak password lists EXACTLY the unmet rules — no
-      more, no fewer.
-- [ ] `you@gmail.com` is rejected with the friendly domain message.
-- [ ] Valid signup lands on "Check your inbox" showing the address and
-      the 24-hour warning.
-- [ ] Unverified login attempt bounces back to the verify screen.
-- [ ] Resend button reports the same neutral message whether or not the
-      address exists.
-- [ ] The emailed link signs you in and opens onboarding.
-- [ ] Clicking the SAME link again shows the friendly expired/used-link
-      page with resend options (not a raw error).
-- [ ] Registering an email that already has an account behaves exactly
-      like a fresh signup (no "account exists" hint).
-
-## Registration — Google
-
-- [ ] "Continue with UMN Google" opens Google with UMN accounts surfaced.
-- [ ] A umn.edu Google account lands directly in onboarding (no email
-      verification step).
+- [ ] /login and /register both show ONLY "Continue with UMN Google" —
+      no password fields anywhere in the app.
+- [ ] The button opens Google's chooser with UMN accounts surfaced first.
+- [ ] A umn.edu Google account lands directly in onboarding on first
+      sign-in (no verification step), /dashboard on later sign-ins.
 - [ ] A personal Gmail is REJECTED and the login page shows "Only
       @umn.edu accounts can join" — not a raw database error.
-
-## Login & reset
-
-- [ ] Wrong password and nonexistent email produce the IDENTICAL
-      "Email or password is incorrect." message.
-- [ ] Forgot-password always says "if that email has an account…" —
-      same response either way.
-- [ ] Reset link opens the new-password form (with live checklist);
-      saving signs you in.
+- [ ] Cancelling at Google's screen lands on the friendly "didn't
+      finish" page, with a working "try again".
 - [ ] Signed-in users hitting /login or /register are bounced to
       /dashboard; signed-out users hitting /dashboard are bounced to
       /login and return to their target after signing in.
+- [ ] Old bookmarks to /forgot-password, /reset-password, /verify-email
+      404 (the routes are gone, nothing crashes).
 
 ## Onboarding
 
