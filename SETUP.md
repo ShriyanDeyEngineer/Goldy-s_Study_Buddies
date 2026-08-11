@@ -13,10 +13,22 @@ independently re-runnable.
 2. Pick the team, name it (e.g. `goldys-study-buddies`), choose a strong
    database password (save it — you'll need it for `db push` and the
    invariant tests), region `us-east-1` or similar.
-3. When it finishes provisioning, open **Project Settings → API** and copy:
-   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY` (keep secret!)
+3. When it finishes provisioning, collect three values. The **Connect**
+   button at the top of the dashboard shows all of them at once, which is
+   easier than hunting through settings:
+
+   | Value | Where | Goes to |
+   |---|---|---|
+   | Project URL | Settings → **API** (not API Keys), or read your project ref straight out of the dashboard's address bar — the URL is always `https://<project-ref>.supabase.co` | `NEXT_PUBLIC_SUPABASE_URL` |
+   | Publishable key (`sb_publishable_…`) | Settings → **API Keys** | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+   | Secret key (`sb_secret_…`) | Settings → **API Keys** — reveal it | `SUPABASE_SERVICE_ROLE_KEY` (keep secret!) |
+
+   Supabase split the old "API" settings page into **API** (URL and config)
+   and **API Keys** (keys only), and replaced the `anon`/`service_role` JWTs
+   with publishable/secret keys. The old JWTs still work and still sit under
+   a **Legacy API Keys** tab, but they're deprecated at the end of 2026 —
+   use the new ones. Both map to the same Postgres roles, so the app code is
+   identical either way.
 
 ## 2. Run the migrations and seed
 
