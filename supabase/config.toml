@@ -16,6 +16,13 @@ max_rows = 1000
 port = 54322
 major_version = 15
 
+# The starter course catalog. This path is the CLI's default anyway, but
+# stating it explicitly means `supabase db push --include-seed` (used to
+# seed the HOSTED project) can never be ambiguous about what it loads.
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
 [studio]
 enabled = true
 port = 54323

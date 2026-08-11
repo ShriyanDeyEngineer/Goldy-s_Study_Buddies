@@ -35,17 +35,21 @@ independently re-runnable.
 The schema lives in `supabase/migrations/` (ordered, idempotent) and the
 starter course catalog in `supabase/seed.sql`.
 
-**Option A — Supabase CLI (recommended):**
+**Option A — Supabase CLI (recommended). No psql needed:**
 
 ```bash
 npx supabase login                 # one-time, opens the browser
 npx supabase link --project-ref YOUR-PROJECT-REF
-npx supabase db push               # applies every migration in order
-psql "$DATABASE_URL" -f supabase/seed.sql   # or paste seed.sql into the SQL editor
+npx supabase db push --include-seed   # migrations in order, then seed.sql
 ```
 
-(`YOUR-PROJECT-REF` is the random string in your project URL. The CLI
-asks for the database password from step 1.)
+(`YOUR-PROJECT-REF` is the string in your dashboard's address bar. The
+CLI asks for the database password from step 1.)
+
+`--include-seed` loads `supabase/seed.sql` through the CLI's own
+connection, so **you do not need `psql` installed** — macOS doesn't ship
+it. If you ever want it anyway: `brew install libpq` and add its `bin`
+to your PATH.
 
 **Option B — SQL editor (no CLI):** open the dashboard's **SQL Editor**
 and run each file's contents in order: `0001` → `0010`, then `seed.sql`.
@@ -166,8 +170,16 @@ step 3.
 
 ### Database invariant tests
 
-With a database available (local stack or hosted — the script rolls back
-everything it does):
+The script rolls back everything it does, so it is safe against any
+database. Against the local stack, run it through the container's own
+`psql` — again, nothing to install:
+
+```bash
+docker exec -i supabase_db_goldys-study-buddies \
+  psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/invariants.sql
+```
+
+If you do have `psql` on your PATH, this is equivalent:
 
 ```bash
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" \
