@@ -9,7 +9,7 @@ STEM courses (physics, chem, calc, intro CS) front and center.
 
 ## Contributors
 
-Shriyan Dey, Angad Virdi, Aadi Sharma, Joy Deng, and Hmoov Her.
+Shriyan Dey, Angad Virdi, Aadi Sharma, and Joy Deng.
 
 ## What it does
 
