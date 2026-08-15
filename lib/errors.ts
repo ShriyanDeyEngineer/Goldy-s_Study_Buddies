@@ -14,7 +14,7 @@
 export const FRIENDLY_MESSAGES: Record<string, string> = {
   // ── Auth / accounts ──────────────────────────────────────────────────
   EMAIL_DOMAIN_NOT_ALLOWED:
-    "Only @umn.edu accounts can join right now. Sign in with your university email.",
+    "Only @umn.edu accounts can join right now. Pick your university Google account and try again.",
   NOT_AUTHENTICATED: "You need to be signed in to do that.",
   NOT_ONBOARDED: "Finish setting up your profile first.",
   ACCOUNT_DISABLED: "Your account is currently suspended.",

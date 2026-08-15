@@ -68,9 +68,13 @@ async function main() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) {
     console.error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.\n" +
-        "Run with your env loaded, e.g.:  npx dotenv -e .env.local -- npm run import-courses -- courses.csv\n" +
-        "or export both variables first.",
+      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.\n\n" +
+        "The npm script loads .env.local automatically, so this usually means\n" +
+        "the file doesn't exist yet or is missing the service-role key:\n" +
+        "  cp .env.example .env.local     # then fill in both values\n\n" +
+        "Find the service_role key in the Supabase dashboard under\n" +
+        "Project Settings → API. (Alternatively, export both variables\n" +
+        "into your shell before running.)",
     );
     process.exit(1);
   }

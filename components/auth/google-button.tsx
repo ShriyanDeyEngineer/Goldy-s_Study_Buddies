@@ -1,6 +1,7 @@
 /**
- * "Continue with UMN Google" — the SSO half of our two required sign-in
- * methods. Appears on both the login and register pages.
+ * "Continue with UMN Google" — THE sign-in method (auth is Google-only
+ * by product decision, 2026-08-06). Appears on the login and register
+ * pages.
  *
  * It's a tiny form (not a link) because starting OAuth is a server action:
  * the server builds the Google URL with our hd=umn.edu hint and redirects.
@@ -37,21 +38,11 @@ export function GoogleButton({ next }: { next?: string }) {
   return (
     <form action={signInWithGoogleAction}>
       {next && <input type="hidden" name="next" value={next} />}
-      <Button type="submit" variant="outline" className="w-full">
+      {/* The one and only way in, so it gets primary styling. */}
+      <Button type="submit" className="w-full">
         <GoogleG />
         Continue with UMN Google
       </Button>
     </form>
-  );
-}
-
-/** The "──── or ────" separator between the two sign-in methods. */
-export function AuthDivider() {
-  return (
-    <div className="my-5 flex items-center gap-3" aria-hidden="true">
-      <span className="h-px flex-1 bg-line" />
-      <span className="text-xs uppercase tracking-wide text-ink-muted">or</span>
-      <span className="h-px flex-1 bg-line" />
-    </div>
   );
 }

@@ -1,8 +1,7 @@
 /**
- * Layout for the auth pages (login, register, forgot/reset password,
- * verify email): a centered card on cream with the logo up top. These
- * pages intentionally have no site nav — the only job here is finishing
- * the auth task at hand.
+ * Layout for the auth pages (login and register): a centered card on
+ * cream with the logo up top. These pages intentionally have no site
+ * nav — the only job here is finishing the sign-in at hand.
  */
 import Link from "next/link";
 import { LogoLockup } from "@/components/gopher-logo";

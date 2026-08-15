@@ -13,27 +13,43 @@ independently re-runnable.
 2. Pick the team, name it (e.g. `goldys-study-buddies`), choose a strong
    database password (save it — you'll need it for `db push` and the
    invariant tests), region `us-east-1` or similar.
-3. When it finishes provisioning, open **Project Settings → API** and copy:
-   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY` (keep secret!)
+3. When it finishes provisioning, collect three values. The **Connect**
+   button at the top of the dashboard shows all of them at once, which is
+   easier than hunting through settings:
+
+   | Value | Where | Goes to |
+   |---|---|---|
+   | Project URL | Settings → **API** (not API Keys), or read your project ref straight out of the dashboard's address bar — the URL is always `https://<project-ref>.supabase.co` | `NEXT_PUBLIC_SUPABASE_URL` |
+   | Publishable key (`sb_publishable_…`) | Settings → **API Keys** | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+   | Secret key (`sb_secret_…`) | Settings → **API Keys** — reveal it | `SUPABASE_SERVICE_ROLE_KEY` (keep secret!) |
+
+   Supabase split the old "API" settings page into **API** (URL and config)
+   and **API Keys** (keys only), and replaced the `anon`/`service_role` JWTs
+   with publishable/secret keys. The old JWTs still work and still sit under
+   a **Legacy API Keys** tab, but they're deprecated at the end of 2026 —
+   use the new ones. Both map to the same Postgres roles, so the app code is
+   identical either way.
 
 ## 2. Run the migrations and seed
 
 The schema lives in `supabase/migrations/` (ordered, idempotent) and the
 starter course catalog in `supabase/seed.sql`.
 
-**Option A — Supabase CLI (recommended):**
+**Option A — Supabase CLI (recommended). No psql needed:**
 
 ```bash
 npx supabase login                 # one-time, opens the browser
 npx supabase link --project-ref YOUR-PROJECT-REF
-npx supabase db push               # applies every migration in order
-psql "$DATABASE_URL" -f supabase/seed.sql   # or paste seed.sql into the SQL editor
+npx supabase db push --include-seed   # migrations in order, then seed.sql
 ```
 
-(`YOUR-PROJECT-REF` is the random string in your project URL. The CLI
-asks for the database password from step 1.)
+(`YOUR-PROJECT-REF` is the string in your dashboard's address bar. The
+CLI asks for the database password from step 1.)
+
+`--include-seed` loads `supabase/seed.sql` through the CLI's own
+connection, so **you do not need `psql` installed** — macOS doesn't ship
+it. If you ever want it anyway: `brew install libpq` and add its `bin`
+to your PATH.
 
 **Option B — SQL editor (no CLI):** open the dashboard's **SQL Editor**
 and run each file's contents in order: `0001` → `0010`, then `seed.sql`.
@@ -47,20 +63,14 @@ Functions** should list `join_group`, `approve_join_request`, etc.
 
 ## 3. Auth settings (dashboard → Authentication)
 
-These must match the app's own validation — the spec's rules live in both
-layers on purpose.
+Auth is **Google-only** (team decision, 2026-08-06) — there are no
+passwords, so most auth settings stay untouched. Two things matter:
 
 Under **Sign In / Up → Email**:
 
-- **Enable email provider**: on.
-- **Confirm email**: **ON** (required — accounts must verify before use).
-- **Secure email change**: on.
-
-Under **Rate Limits / Sessions** (defaults are fine), and under
-**Passwords**:
-
-- **Minimum password length**: `12`.
-- **Password requirements**: *lowercase, uppercase, digits, symbols*.
+- **Enable email provider**: **OFF**. This is what makes Google the only
+  door in. (The @umn.edu rule itself is enforced by the database trigger
+  from migration `0001`, not by any dashboard setting.)
 
 Under **URL Configuration**:
 
@@ -71,14 +81,10 @@ Under **URL Configuration**:
   - plus each Vercel preview pattern you use, e.g.
     `https://*-your-team.vercel.app/auth/callback`.
 
-Under **Emails → Templates** (optional but recommended): the defaults
-work with our `/auth/callback` route as-is. **Link expiry**: set *Email
-OTP expiry* to `86400` seconds (24 hours) — the spec's link lifetime.
-
 ## 4. Google SSO ("Continue with UMN Google") — REQUIRED
 
-The app's second sign-in method. Two halves: a Google Cloud OAuth client,
-pasted into Supabase.
+The ONLY sign-in method — without this configured, nobody can get in.
+Two halves: a Google Cloud OAuth client, pasted into Supabase.
 
 **Google Cloud:**
 
@@ -90,13 +96,32 @@ pasted into Supabase.
      users while it's in Testing).
 2. **APIs & Services → Credentials → Create credentials → OAuth client ID**:
    - Application type **Web application**.
-   - **Authorized JavaScript origins**: `https://YOUR-PROJECT-REF.supabase.co`
-   - **Authorized redirect URIs**:
-     `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`
+   - **Authorized JavaScript origins** — add both:
+     - `https://YOUR-PROJECT-REF.supabase.co`  (hosted)
+     - `http://localhost:54321`                (local stack)
+   - **Authorized redirect URIs** — add both:
+     - `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`
+     - `http://localhost:54321/auth/v1/callback`
 3. Copy the **Client ID** and **Client secret**.
+
+ONE client covers hosted and local — Google allows several redirect URIs
+per client, so there's no need to manage two sets of credentials.
 
 **Supabase:** dashboard → **Authentication → Providers →
 Google** → enable, paste the Client ID + secret, save.
+
+**For the local stack**, put the SAME credentials in `supabase/.env`
+(gitignored, next to `config.toml`):
+
+```
+SUPABASE_AUTH_GOOGLE_CLIENT_ID=...
+SUPABASE_AUTH_GOOGLE_SECRET=...
+```
+
+Restart the stack (`npx supabase stop && npx supabase start`) and sign
+in locally with your REAL @umn.edu Google account — personal Gmails are
+rejected by the database trigger even locally. Share the client with
+teammates via your team password manager, not the repo.
 
 **How the UMN-only rule works with Google — read this once:** the app
 sends Google an `hd=umn.edu` hint so university accounts surface first,
@@ -138,6 +163,19 @@ npm run build        # production build
 npx supabase start   # local Postgres + auth + storage + email catcher
 ```
 
+**"database files are incompatible with server"** — you linked to a
+hosted project whose Postgres major version differs from your existing
+local volume, and the CLI now matches local to production (it records the
+remote version in `supabase/.temp/postgres-version`). Throw the stale
+volume away and start clean:
+
+```bash
+npx supabase stop --no-backup && npx supabase start
+```
+
+Local data is disposable — the migrations and `seed.sql` rebuild it on
+the next start. Nothing in your hosted project is touched.
+
 Point `.env.local` at the printed local URL/anon key. Signup emails are
 captured at http://localhost:54324 (nothing is actually sent). The local
 auth config in `supabase/config.toml` already mirrors the settings from
@@ -145,8 +183,16 @@ step 3.
 
 ### Database invariant tests
 
-With a database available (local stack or hosted — the script rolls back
-everything it does):
+The script rolls back everything it does, so it is safe against any
+database. Against the local stack, run it through the container's own
+`psql` — again, nothing to install:
+
+```bash
+docker exec -i supabase_db_goldys-study-buddies \
+  psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/invariants.sql
+```
+
+If you do have `psql` on your PATH, this is equivalent:
 
 ```bash
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" \
@@ -165,10 +211,11 @@ CSCI,1133,Introduction to Computing and Programming Concepts
 MATH,1371,CSE Calculus I
 ```
 
-Then, with `.env.local` populated (the script needs the service-role key):
+Then, with `.env.local` populated (the script needs the service-role
+key — it loads `.env.local` for you):
 
 ```bash
-npx dotenv -e .env.local -- npm run import-courses -- fall-2026.csv
+npm run import-courses -- fall-2026.csv
 ```
 
 Existing courses are skipped; malformed rows are listed and skipped. Run

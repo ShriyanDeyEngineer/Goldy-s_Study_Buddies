@@ -9,14 +9,16 @@ STEM courses (physics, chem, calc, intro CS) front and center.
 
 ## Contributors
 
-Shriyan Dey, Angad Virdi, Aadi Sharma, Joy Deng, and Hmoov Her.
+Shriyan Dey, Angad Virdi, Aadi Sharma, and Joy Deng.
 
 ## What it does
 
-- **Verified UMN accounts** — sign up with an `@umn.edu` email (verified,
-  24-hour links) or "Continue with UMN Google". The domain rule is enforced
-  by a database trigger reading an allow-list table, so launching at a
-  second university is one inserted row, not a code change.
+- **Verified UMN accounts, Google-only** — one button: "Continue with
+  UMN Google". No passwords to forget, no verification emails to chase.
+  The @umn.edu rule is enforced by a database trigger reading an
+  allow-list table (it rejects personal Gmails no matter what the Google
+  account chooser says), so launching at a second university is one
+  inserted row, not a code change.
 - **Study groups per course** — open (join instantly) or closed (manager
   approves), 2–50 seats, invite classmates at creation. Capacity and
   approvals are enforced under database row locks, so simultaneous clicks
@@ -105,6 +107,14 @@ CodingDevelopmentPlans/  Early planning docs (pre-build history)
 The old `frontEnd/`/`backEnd/` prototype this repo started with was
 replaced wholesale by this app (it used a separate Express server, which
 the spec explicitly rules out); see git history if you're curious.
+
+## Changes after the original spec
+
+- **Auth is Google-only** (team decision, 2026-08-06). The build prompt's
+  §5.2 required email/password alongside Google; the team dropped
+  email/password entirely, which removed the password policy UI, email
+  verification, and reset flows. The database domain trigger — the real
+  @umn.edu boundary — is unchanged and now guards the one remaining door.
 
 ## Judgment calls (where the spec left room)
 

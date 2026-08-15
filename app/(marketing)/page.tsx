@@ -19,8 +19,8 @@ import { GopherLogo } from "@/components/gopher-logo";
 
 const STEPS = [
   {
-    title: "Verify your UMN email",
-    body: "Sign up with your @umn.edu address (or UMN Google) — everyone here is a real U of M student.",
+    title: "Sign in with UMN Google",
+    body: "One click with your @umn.edu Google account — everyone here is a real U of M student.",
   },
   {
     title: "Pick your courses",

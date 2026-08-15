@@ -1,15 +1,14 @@
 /**
- * Sign-in page — both methods again (Google, then email/password).
+ * Sign-in page. One method only: "Continue with UMN Google" (product
+ * decision, 2026-08-06 — passwords are gone entirely).
  *
  * Also where OAuth failures land: /auth/callback redirects here with
- * ?error=<friendly text> (most importantly the "Only @umn.edu accounts"
- * message when someone tried a personal Gmail).
+ * ?error=<friendly text> — most importantly the "Only @umn.edu accounts"
+ * message when someone picked a personal Gmail in Google's chooser.
  */
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { GoogleButton, AuthDivider } from "@/components/auth/google-button";
-import { LoginForm } from "./login-form";
+import { GoogleButton } from "@/components/auth/google-button";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -24,7 +23,9 @@ export default async function LoginPage({
     <Card>
       <CardContent>
         <h1 className="font-display text-2xl text-ink">Welcome back</h1>
-        <p className="mt-1 mb-6 text-sm text-ink-muted">Sign in to find your people.</p>
+        <p className="mt-1 mb-6 text-sm text-ink-muted">
+          Sign in with your UMN Google account to find your people.
+        </p>
 
         {/* OAuth error handoff (e.g. non-UMN Google account rejected). */}
         {params.error && (
@@ -34,14 +35,10 @@ export default async function LoginPage({
         )}
 
         <GoogleButton next={params.next} />
-        <AuthDivider />
-        <LoginForm next={params.next} />
 
         <p className="mt-6 text-center text-sm text-ink-muted">
-          New here?{" "}
-          <Link href="/register" className="font-medium text-maroon underline underline-offset-2">
-            Create an account
-          </Link>
+          First time here? Same button — your account is created the moment
+          you sign in.
         </p>
       </CardContent>
     </Card>
