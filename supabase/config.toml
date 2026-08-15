@@ -1,0 +1,79 @@
+# Supabase CLI configuration — used by the LOCAL development stack
+# (`supabase start`, requires Docker). The hosted project is configured in
+# the dashboard instead; SETUP.md walks through matching these settings
+# there. Keys here mirror the auth rules the app depends on.
+
+project_id = "goldys-study-buddies"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 54322
+# Must match the HOSTED project's Postgres major version. After you run
+# `supabase link`, the CLI records the remote version in
+# supabase/.temp/postgres-version and starts the local stack to match —
+# it will override this number, so keeping them in sync avoids surprises.
+#
+# If `supabase start` ever fails with "database files are incompatible
+# with server", your local volume was created by a different major
+# version. Discard it and start clean:
+#     npx supabase stop --no-backup && npx supabase start
+# (Local data is throwaway — migrations and seed.sql rebuild it.)
+major_version = 17
+
+# The starter course catalog. This path is the CLI's default anyway, but
+# stating it explicitly means `supabase db push --include-seed` (used to
+# seed the HOSTED project) can never be ambiguous about what it loads.
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+# Local email testing: signup/reset emails are captured here instead of
+# being sent — open http://localhost:54324 to click confirmation links.
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+# Sessions last a week; tokens refresh automatically via middleware.
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+
+# AUTH IS GOOGLE-ONLY (product decision, 2026-08-06). Email/password
+# signup is disabled so nothing can create an account except the Google
+# flow below — mirror this in the hosted dashboard by turning the Email
+# provider OFF (SETUP.md §3). The @umn.edu restriction itself lives in
+# the database trigger (migrations/0001), which checks EVERY new user
+# regardless of provider.
+[auth.email]
+enable_signup = false
+enable_confirmations = false
+
+# Google SSO — the only way in. For local development the env vars
+# referenced here must exist in supabase/.env (gitignored):
+#   SUPABASE_AUTH_GOOGLE_CLIENT_ID=…
+#   SUPABASE_AUTH_GOOGLE_SECRET=…
+# using the "local dev" OAuth client from SETUP.md §4. Sign in with your
+# real @umn.edu Google account — personal Gmails are rejected by the
+# database trigger even locally.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_GOOGLE_SECRET)"
+redirect_uri = "http://localhost:54321/auth/v1/callback"

@@ -141,3 +141,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Supabase CLI local-stack state
+supabase/.branches/
+supabase/.temp/
+
+# macOS
+.DS_Store

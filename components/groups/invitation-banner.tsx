@@ -1,0 +1,56 @@
+/**
+ * Accept / Decline controls shown on a group's preview when YOU have a
+ * pending invitation to it (spec §5.6: invitees can accept or decline).
+ * Replaces the ordinary join control — accepting an invitation seats you
+ * even in a closed group, no request needed.
+ */
+"use client";
+
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { MailOpen } from "lucide-react";
+import { toast } from "sonner";
+import { respondToInvitationAction } from "@/lib/actions/groups";
+import { Button } from "@/components/ui/button";
+
+export function InvitationBanner({
+  invitationId,
+  inviterName,
+}: {
+  invitationId: string;
+  inviterName: string | null;
+}) {
+  const router = useRouter();
+  const [busy, setBusy] = React.useState(false);
+
+  async function respond(accept: boolean) {
+    setBusy(true);
+    const { result, error } = await respondToInvitationAction(invitationId, accept);
+    setBusy(false);
+    if (error) {
+      toast.error(error);
+    } else if (result === "joined") {
+      toast.success("Welcome to the group!");
+    } else if (result === "cancelled_full") {
+      toast.warning("Ah, bad luck — the group filled up before you accepted.");
+    }
+    router.refresh();
+  }
+
+  return (
+    <div className="rounded-xl bg-gold-light/50 p-4 text-center">
+      <p className="flex items-center justify-center gap-2 text-sm font-medium text-maroon">
+        <MailOpen aria-hidden className="h-4 w-4" />
+        {inviterName ?? "A member"} invited you to this group
+      </p>
+      <div className="mt-3 flex justify-center gap-3">
+        <Button loading={busy} onClick={() => respond(true)}>
+          Accept invitation
+        </Button>
+        <Button variant="outline" disabled={busy} onClick={() => respond(false)}>
+          Decline
+        </Button>
+      </div>
+    </div>
+  );
+}

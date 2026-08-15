@@ -1,0 +1,303 @@
+/**
+ * The dashboard (/dashboard) — the signed-in home. Five sections, per
+ * spec §5.4:
+ *   1. My study groups (cards, or an empty state that fixes it)
+ *   2. Your courses, each with its count of available groups
+ *   3. Explore: most-active courses + link to the catalog
+ *   4. People search box (min 2 chars — goes to /people)
+ *   5. Suggested people (max 10, course-sharers ranked before
+ *      grad-year-sharers — the ranking lives in the database function)
+ */
+import Link from "next/link";
+import { Search, Sparkles } from "lucide-react";
+import { getSessionProfile } from "@/lib/supabase/server";
+import { courseCode, type CourseRow, type MeetupRow, type StudyGroupRow } from "@/lib/types";
+import { GroupCard } from "@/components/groups/group-card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { SEARCH_MAX_LENGTH, SEARCH_MIN_LENGTH } from "@/lib/constants";
+import { pluralize } from "@/lib/utils";
+
+/** Row shapes for this page's joined queries (see lib/types.ts for why
+ *  results are cast). */
+type GroupWithCourse = StudyGroupRow & { courses: CourseRow };
+type SuggestedPerson = {
+  id: string;
+  display_name: string;
+  avatar_url: string | null;
+  college: string | null;
+  major: string | null;
+  shared_courses: number;
+  same_grad_year: boolean;
+};
+
+export default async function DashboardPage() {
+  const { supabase, profile } = await getSessionProfile();
+  if (!profile) return null; // layout already handled every broken state
+
+  // My memberships → groups (+course), my current courses, and catalog
+  // activity — fetched in parallel; nothing here depends on anything else.
+  const [membershipsRes, myCoursesRes, activeGroupsRes, suggestedRes] =
+    await Promise.all([
+      supabase.from("study_group_members").select("group_id").eq("user_id", profile.id),
+      supabase
+        .from("user_courses")
+        .select("course_id, courses(*)")
+        .eq("user_id", profile.id)
+        .eq("enrollment_type", "current"),
+      supabase.from("study_groups").select("id, course_id, courses(*)").eq("status", "active"),
+      supabase.rpc("suggested_people"),
+    ]);
+
+  const myGroupIds = (membershipsRes.data ?? []).map((m) => m.group_id as string);
+
+  let myGroups: GroupWithCourse[] = [];
+  let upcomingByGroup = new Map<string, MeetupRow>();
+  if (myGroupIds.length > 0) {
+    const [groupsRes, meetupsRes] = await Promise.all([
+      supabase
+        .from("study_groups")
+        .select("*, courses(*)")
+        .in("id", myGroupIds)
+        .eq("status", "active")
+        .order("last_activity_at", { ascending: false }),
+      supabase
+        .from("meetups")
+        .select("*")
+        .in("group_id", myGroupIds)
+        .eq("is_cancelled", false)
+        .gt("scheduled_at", new Date().toISOString())
+        .order("scheduled_at", { ascending: true }),
+    ]);
+    myGroups = (groupsRes.data ?? []) as GroupWithCourse[];
+    // First upcoming meetup per group (list is already time-ordered).
+    upcomingByGroup = new Map();
+    for (const meetup of (meetupsRes.data ?? []) as MeetupRow[]) {
+      if (!upcomingByGroup.has(meetup.group_id)) {
+        upcomingByGroup.set(meetup.group_id, meetup);
+      }
+    }
+  }
+
+  const myCourses = (myCoursesRes.data ?? []) as unknown as {
+    course_id: string;
+    courses: CourseRow;
+  }[];
+
+  // Active-group counts per course, shared by sections 2 and 3.
+  const activeGroups = (activeGroupsRes.data ?? []) as unknown as {
+    id: string;
+    course_id: string;
+    courses: CourseRow;
+  }[];
+  const groupCountByCourse = new Map<string, { course: CourseRow; count: number }>();
+  for (const row of activeGroups) {
+    const entry = groupCountByCourse.get(row.course_id);
+    if (entry) entry.count += 1;
+    else groupCountByCourse.set(row.course_id, { course: row.courses, count: 1 });
+  }
+  const mostActiveCourses = [...groupCountByCourse.values()]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
+
+  const suggested = (suggestedRes.data ?? []) as SuggestedPerson[];
+
+  return (
+    <div className="space-y-10">
+      <div>
+        <h1 className="font-display text-3xl text-ink">
+          Hey, {profile.display_name?.split(" ")[0]} 👋
+        </h1>
+        <p className="mt-1 text-ink-muted">Here&rsquo;s what&rsquo;s happening with your studies.</p>
+      </div>
+
+      {/* ── 1. My study groups ─────────────────────────────────────────── */}
+      <section aria-labelledby="my-groups-heading">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 id="my-groups-heading" className="font-display text-xl text-ink">
+            My study groups
+          </h2>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/courses">Find a group</Link>
+          </Button>
+        </div>
+        {myGroups.length === 0 ? (
+          <EmptyState
+            title="You're not in any groups yet"
+            description="Pick one of your courses and join an open group — or start your own and let classmates come to you."
+            action={
+              <Button asChild>
+                <Link href="/courses">Browse courses</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {myGroups.map((group) => (
+              <div key={group.id} className="relative">
+                <GroupCard
+                  groupId={group.id}
+                  name={group.name}
+                  courseLabel={courseCode(group.courses)}
+                  memberCount={group.member_count}
+                  capacity={group.capacity}
+                  mode={group.mode}
+                  status={group.status}
+                  nextMeetup={upcomingByGroup.get(group.id) ?? null}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ── 2. Your courses ────────────────────────────────────────────── */}
+      <section aria-labelledby="my-courses-heading">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 id="my-courses-heading" className="font-display text-xl text-ink">
+            Your courses
+          </h2>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/settings/courses">Manage courses</Link>
+          </Button>
+        </div>
+        {myCourses.length === 0 ? (
+          <EmptyState
+            title="No courses on your profile yet"
+            description="Add what you're taking this term so we can match you with classmates and groups."
+            action={
+              <Button asChild>
+                <Link href="/settings/courses">Add your courses</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {myCourses.map(({ course_id, courses: course }) => {
+              const availableGroups = groupCountByCourse.get(course_id)?.count ?? 0;
+              return (
+                <li key={course_id}>
+                  <Card>
+                    <CardContent className="flex items-center justify-between gap-3 p-4">
+                      <div className="min-w-0">
+                        <p className="font-medium text-ink">{courseCode(course)}</p>
+                        <p className="truncate text-sm text-ink-muted">{course.course_name}</p>
+                        <p className="mt-1 text-xs text-ink-muted">
+                          {availableGroups === 0
+                            ? "No groups yet — start the first!"
+                            : pluralize(availableGroups, "group")}
+                        </p>
+                      </div>
+                      <Button asChild variant="secondary" size="sm">
+                        <Link href={`/courses/${course_id}`}>Find a group</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      {/* ── 3. Explore courses ─────────────────────────────────────────── */}
+      <section aria-labelledby="explore-heading">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 id="explore-heading" className="font-display text-xl text-ink">
+            Explore courses
+          </h2>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/courses">Full catalog</Link>
+          </Button>
+        </div>
+        {mostActiveCourses.length === 0 ? (
+          <EmptyState
+            title="No study groups exist yet — anywhere"
+            description="Someone has to be first, and 'first' looks great on you. Create the very first group and your classmates will find it."
+            action={
+              <Button asChild>
+                <Link href="/courses">Create the first group</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {mostActiveCourses.map(({ course, count }) => (
+              <li key={course.id}>
+                <Link
+                  href={`/courses/${course.id}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-gold"
+                >
+                  <span className="min-w-0">
+                    <span className="block font-medium text-ink">{courseCode(course)}</span>
+                    <span className="block truncate text-sm text-ink-muted">
+                      {course.course_name}
+                    </span>
+                  </span>
+                  <span className="shrink-0 rounded-full bg-gold-light px-2.5 py-1 text-xs font-medium text-maroon">
+                    {pluralize(count, "group")}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* ── 4 + 5. Find people ─────────────────────────────────────────── */}
+      <section aria-labelledby="people-heading">
+        <h2 id="people-heading" className="mb-4 font-display text-xl text-ink">
+          Find people
+        </h2>
+        {/* Plain GET form → /people?q=…; the people page does the search. */}
+        <form action="/people" method="get" className="relative max-w-md">
+          <Search
+            aria-hidden
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+          />
+          <Input
+            type="search"
+            name="q"
+            placeholder="Search classmates by name…"
+            aria-label="Search people (at least 2 characters)"
+            minLength={SEARCH_MIN_LENGTH}
+            maxLength={SEARCH_MAX_LENGTH}
+            className="pl-9"
+          />
+        </form>
+
+        {suggested.length > 0 && (
+          <>
+            <h3 className="mb-3 mt-6 flex items-center gap-2 text-sm font-medium text-ink-muted">
+              <Sparkles aria-hidden className="h-4 w-4 text-gold" />
+              Suggested for you
+            </h3>
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {suggested.map((person) => (
+                <li key={person.id}>
+                  <Link
+                    href={`/profile/${person.id}`}
+                    className="flex flex-col items-center gap-2 rounded-xl border border-line bg-surface p-4 text-center shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-gold"
+                  >
+                    <Avatar src={person.avatar_url} name={person.display_name} size="lg" />
+                    <span className="w-full truncate text-sm font-medium text-ink">
+                      {person.display_name}
+                    </span>
+                    <span className="text-xs text-ink-muted">
+                      {person.shared_courses > 0
+                        ? pluralize(person.shared_courses, "shared class", "shared classes")
+                        : "Same grad year"}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}

@@ -1,74 +1,174 @@
-# Goldy-s_Study_Buddies
+# Goldy's Study Buddies
+
+Never study alone at the U again. A website for University of Minnesota
+students to find study partners and create or join study groups for their
+specific courses — built by students, for students, with the big intro
+STEM courses (physics, chem, calc, intro CS) front and center.
+
+**Not officially affiliated with the University of Minnesota.**
 
 ## Contributors
+<<<<<<< HEAD
 ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), & joydeng-code (Joy Deng). 
+=======
+>>>>>>> claude/full-app
 
+Shriyan Dey, Angad Virdi, Aadi Sharma, and Joy Deng.
 
-## Description
-A website that helps students find other students to study with. Students can make and/or join study groups for separate courses.
+## What it does
 
-## Why this idea
-1. Many students at UMN have trouble finding study groups or people to study with. This will help people better connect with new people and approach others, improving academic performance and potentially starting long lasting friendships. This website can be used by any student but it would best serve students such as freshmen who have just begun their college journey and may need help finding new friends, especially if they are not from Minnesota.
-2. Tutoring rooms/office hours are non enforceable, while they are popular within the first couple of weeks, towards the end of the year usage declines. Additionally, sometimes the set office hours are not compatiable with a student's schedule. This website will give students another study oppurtunity that they will be in more control of by coordinating with other students in their study group to set compatiable schedules for meetings/study sessions.
-3. Most students only really make friends/talk to people in lectures during the first few weeks, after that communication generally declines. This website can serve as a talking point during those initial conversations, leading to a more stronger connection with between strangers.
-4. Not all sections of classes (especially STEM) have TAs/Professors that provide resources, this app plans to make the experience more interconnected between students in different sections, as students will have more control over scheduling.
-5. Some people are very shy and many people only use social media to better connect with friends they already have, not to make new friends. This will help with combating social anxiety and making connecting with new people much easier because study groups can be set to open (anyone can join the group).
+- **Verified UMN accounts, Google-only** — one button: "Continue with
+  UMN Google". No passwords to forget, no verification emails to chase.
+  The @umn.edu rule is enforced by a database trigger reading an
+  allow-list table (it rejects personal Gmails no matter what the Google
+  account chooser says), so launching at a second university is one
+  inserted row, not a code change.
+- **Study groups per course** — open (join instantly) or closed (manager
+  approves), 2–50 seats, invite classmates at creation. Capacity and
+  approvals are enforced under database row locks, so simultaneous clicks
+  can never overfill a group.
+- **Group chat** — realtime, full history, 2,000-character limit enforced
+  in three layers (form counter, server validation, DB constraint).
+- **Meetups** — online (link required) or in person (location required),
+  RSVP with live attending counts derived from rows, add-to-Google-Calendar
+  links, cancellation with notifications. Times stored UTC, shown local.
+- **Availability polls** — built-in When2Meet-style voting; the winning
+  slot converts to a meetup in one click.
+- **Find people** — search + server-side filters (course, major, college,
+  standing, grad year, study-buddy availability) that live in the URL;
+  suggestions ranked shared-courses-first; 1-on-1 study-buddy matching.
+- **Per-field privacy** — hide college, major, standing, bio, graduation,
+  links, or any class list. Hidden fields are stripped in the database AND
+  exclude you from that filter (so filtering can't leak them either).
+- **Friends, DMs, blocking** — mutual friendships, realtime direct
+  messages with unread counts, and blocking that atomically severs
+  everything (spec'd and invariant-tested).
+- **Notifications** — realtime bell, full inbox page, every group/social
+  event covered.
+- **Moderation** — categorized reports (optionally emailed to the team),
+  suspended/banned lockout screens, `is_admin` groundwork.
 
+## Tech stack
 
-## Features
-1. Home page leading to other sections (ie. About Us, Why You Should Use Goldy’s Study Buddies, Testimonies page when applicable, etc.). Place buttons at the top including sign in/sign up.
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 15 (App Router, Server Components + Server Actions), TypeScript strict |
+| Styling | Tailwind CSS v4 (CSS-first `@theme` in `app/globals.css` — no JS config) |
+| UI | Hand-rolled shadcn-style components on Radix primitives (`components/ui/`) |
+| Validation | Zod — one schema per form, shared by client and server |
+| Backend | Supabase (Postgres, Auth, Realtime, Storage) — no separate API server |
+| Tests | Vitest (pure logic) + a SQL invariant script (`supabase/tests/`) |
+| Email (optional) | Resend via REST — silent no-op when unconfigured |
+| Hosting | Vercel (`main` → production, PRs → previews) |
 
-2. Account connected by UMN email and user chosen password (password must meet certain criteria). Perhaps we should look to integrate an already existing service that deals with these security things and storing user account data.
+**Architecture in one paragraph:** reads happen in Server Components with
+the user's session (row-level security scopes every query). Writes go
+through Server Actions that validate with Zod, then call `SECURITY
+DEFINER` Postgres functions for anything with a correctness rule — those
+functions lock the group row first, re-check invariants inside the lock,
+and fail with machine codes (`GROUP_FULL`, `NOT_MANAGER`…) that
+`lib/errors.ts` maps to friendly copy. Realtime subscriptions (chat, DMs,
+notifications) respect RLS, so the websocket can't leak what a query
+couldn't return.
 
-3. Dashboard
-- When the user opens the dashboard, they should first see which classes are open for forming study groups.
-- Once a class is selected, they can choose to form a new group or join a currently existing one for that class.
-- If the user chooses to join a currently existing study group, they can request to join if the group is set to closed (sends a notification by email or something else to the group manager), otherwise they are immediately included into the group if the group is open.
+## Run it locally
 
-- Search for people/view profiles
--There should be a search button on the dashboard that takes the user to a place to search (search by username or email). Profiles matching the search shall appear for the user to click on. 
-- When a user searches, show suggested people (for some examples, people that share the same classes as the user or people that graduate during the same year as the user) for quick connections.
+```bash
+npm install
+cp .env.example .env.local   # fill in Supabase keys — see SETUP.md
+npm run dev                  # http://localhost:3000
+```
 
-- View current/enrolled study groups in an orderly manner with relevant information such as the name and number of people enrolled into that specific study group. Users should be able to select a study group to enter a new page that lets them do things with that study group.
+Full instructions — creating the Supabase project, migrations, auth
+settings, Google OAuth, course imports, Vercel — live in **[SETUP.md](SETUP.md)**.
 
-- Create a study group option (can only be done after the user selects a class).
+Quality gates:
 
-4. Creating a study group (should send the user to another page). The user can:
-- Name the study group.
-- Select the study group size (Let’s put a cap on this number).
-- Select people to send an invite to as soon as the group is created (of course, they will still be able to send invites to others after the group is created). People can join as they - wish if the study group status/mode is set to open.
-- Set the prior mode (open/closed).
-- Might need to change how this feature actually works a little.
+```bash
+npm run typecheck   # tsc, zero errors
+npm test            # 94 unit tests
+npm run build       # production build
+# database invariants (needs a database; rolls itself back):
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/invariants.sql
+```
 
-5. Find a study buddy, (this can be done for all subjects, but someone can just find someone they want to study with).
+## Repo map
 
-6. What to do when a user selects one of the study groups that they are enrolled in
-- Opens a new kind of dashboard specific to things one can do with a study group.
-- Schedule meet ups. Build in a calendar for the user to look at and pick dates/times from OR integrate When2Meet.com or timeful.app (this one integrates Google Calendar).
-- See currently scheduled meet ups (online/in person, location, number of people saying they will attend and who).
-- A group chat specific to that study group.
+```
+app/                  Routes: (marketing) public pages, (auth) sign-in/up,
+                      (app) the signed-in product, onboarding/, auth/ callbacks
+components/ui/        The design system (button, dialog, inputs, states…)
+components/…          Feature components (chat, meetups, filters, panels)
+lib/                  Validation schemas, server actions, pure logic, clients
+supabase/migrations/  The database: schema, RLS, SECURITY DEFINER functions
+supabase/seed.sql     Verified UMN course catalog starter
+supabase/tests/       The §7 invariant test script
+scripts/              Admin CSV course importer
+docs/                 BUILD_PROMPT.md (the spec) + GLOSSARY.md
+CodingDevelopmentPlans/  Early planning docs (pre-build history)
+```
 
-7. User profiles
-- Their college 
-- Major 
-- Classes
-- Classes Taken
-- Future classes 
-- A brief user bio
-- Number of connections
-- Send request to connect
-- Send message
-- Block/remove connection
-- Profile picture
-- Graduation date
-- Social media links
+The old `frontEnd/`/`backEnd/` prototype this repo started with was
+replaced wholesale by this app (it used a separate Express server, which
+the spec explicitly rules out); see git history if you're curious.
 
-8. Reporting system in case we need to ban/suspend any troublemakers. 
+## Changes after the original spec
 
+- **Auth is Google-only** (team decision, 2026-08-06). The build prompt's
+  §5.2 required email/password alongside Google; the team dropped
+  email/password entirely, which removed the password policy UI, email
+  verification, and reset flows. The database domain trigger — the real
+  @umn.edu boundary — is unchanged and now guards the one remaining door.
 
-## Our Tech Stack
-<ins>Front End:</ins>
+## Judgment calls (where the spec left room)
 
+Decisions we made and why — each is also commented at the code site:
 
-<ins>Back End:</ins>
+1. **Crossing requests auto-accept.** If A requests B while B's request to
+   A is pending, we connect them instead of stacking two requests — both
+   clearly want it. (Friends and buddies both; `0003_social_graph.sql`.)
+2. **Full groups sweep their queues.** When a group hits capacity, ALL
+   still-pending requests/invites are cancelled with the
+   "group filled" notification, not left dangling forever. Re-requesting
+   after someone leaves is allowed. (`cancel_pending_on_full`.)
+3. **Buddy requests require the toggle.** You can only send a buddy
+   request to someone currently marked available — the toggle is their
+   consent to being asked. Friend requests have no such gate.
+4. **Blocker can still see the blocked profile** (with an Unblock button);
+   the blocked person gets a 404 for the blocker. One-way visibility lets
+   the blocker manage the block where they expect to find it.
+5. **Meetup creators auto-RSVP "attending"** — you planned it; making you
+   click a second button is noise. (`create_meetup`.)
+6. **Calendar links default to one hour** — meetups have no duration
+   field; an hour is the least-wrong default. (`lib/calendar.ts`.)
+7. **Manager succession ties break by user id** after account-creation
+   date — guarantees full determinism even for same-instant signups.
+8. **Course `term` labels: not implemented.** The spec made terms
+   optional; uniqueness is per (university, department, number). Simpler
+   to operate; revisit if per-term groups become a real need.
+9. **College filter on the catalog is approximate** — UMN course numbers
+   don't encode college, so `lib/courses.ts` keeps a hand-maintained
+   department→college map. Unmapped departments just don't match college
+   filters.
+10. **Suspended vs. banned are functionally identical today** — different
+    copy, same lockout. Distinction is groundwork for future moderation
+    tooling.
+11. **Invite-later (from an existing group's members panel) is future
+    work** — invitations currently happen at group creation. The schema
+    already supports more.
+12. **Group previews are visible to any signed-in student** (name, course,
+    counts, manager, mode) — that's what makes groups discoverable; chat,
+    meetups, and the roster stay members-only via RLS.
+13. **Emails are matched in people-search but never displayed** — the spec
+    allows matching as a server-side convenience; output columns simply
+    don't include email.
+14. **Footer contact address is a placeholder** —
+    `team@goldysstudybuddies.example` isn't routable; swap in the team's
+    real shared inbox before launch (`components/marketing/site-footer.tsx`).
 
+## Documentation
+
+- **[SETUP.md](SETUP.md)** — zero-to-running runbook (Supabase, OAuth, Vercel).
+- **[QA.md](QA.md)** — the manual test checklist for releases.
+- **[docs/GLOSSARY.md](docs/GLOSSARY.md)** — the product's vocabulary.
+- **[docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md)** — the full spec this app implements.
