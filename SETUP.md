@@ -74,12 +74,21 @@ Under **Sign In / Up → Email**:
 
 Under **URL Configuration**:
 
-- **Site URL**: your production URL (locally, `http://localhost:3000`).
-- **Redirect URLs**: add BOTH
-  - `http://localhost:3000/auth/callback`
-  - `https://YOUR-PRODUCTION-DOMAIN/auth/callback`
-  - plus each Vercel preview pattern you use, e.g.
-    `https://*-your-team.vercel.app/auth/callback`.
+- **Site URL**: your production origin, **including `https://`** and with
+  no trailing slash — e.g. `https://your-app.vercel.app`. Omitting the
+  scheme is a silent trap: the browser resolves a scheme-less redirect
+  relative to the Supabase host and you get a 404 after signing in.
+- **Redirect URLs**: end every entry with `/**`, not an exact path —
+  - `http://localhost:3000/**`
+  - `https://YOUR-PRODUCTION-DOMAIN/**`
+  - `https://your-app-*.vercel.app/**`  (preview deploys)
+
+  **Why `/**` matters:** the app requests
+  `/auth/callback?next=/dashboard`, and Supabase matches the *entire* URL
+  including the query string. An exact `…/auth/callback` entry does NOT
+  match, so the request silently falls back to the Site URL instead.
+  Supabase treats `.` and `/` as separators: `*` matches one segment,
+  `**` matches across them.
 
 ## 4. Google SSO ("Continue with UMN Google") — REQUIRED
 
