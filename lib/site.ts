@@ -9,12 +9,32 @@
  */
 export function getSiteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+    return normalizeOrigin(process.env.NEXT_PUBLIC_SITE_URL);
   }
   if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+    return normalizeOrigin(process.env.NEXT_PUBLIC_VERCEL_URL);
   }
   return "http://localhost:3000";
+}
+
+/**
+ * Cleans up a hand-entered origin so a small typo can't break sign-in.
+ *
+ * WHY THIS EXISTS (learned the hard way): NEXT_PUBLIC_SITE_URL is typed
+ * into a dashboard by a human, and "goldy-s-study-buddies.vercel.app"
+ * (no scheme) is an easy thing to paste. Without a scheme the OAuth
+ * redirect_to we build is not a valid absolute URL, so Supabase rejects
+ * it, silently falls back to its own Site URL, and the student lands on
+ * the homepage holding an unusable ?code= — with no error anywhere.
+ *
+ * So: strip whitespace and any trailing slash, and add https:// when the
+ * scheme is missing (http:// for localhost, which has no certificate).
+ */
+export function normalizeOrigin(raw: string): string {
+  const trimmed = raw.trim().replace(/\/+$/, "");
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  const isLocal = /^(localhost|127\.0\.0\.1)(:\d+)?$/i.test(trimmed);
+  return `${isLocal ? "http" : "https"}://${trimmed}`;
 }
 
 /**

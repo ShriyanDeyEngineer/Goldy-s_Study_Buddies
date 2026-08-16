@@ -38,6 +38,28 @@ const PROTECTED_PREFIXES = [
 const AUTH_PAGES = ["/login", "/register"];
 
 export async function updateSession(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  // ── Rescue a misdirected OAuth code ────────────────────────────────
+  // When the redirect_to we send does not match Supabase's allow list,
+  // Supabase does not error — it quietly redirects to its configured
+  // Site URL instead, which is our homepage. The student then sits on
+  // "/" holding a ?code= that nothing consumes, looking signed out with
+  // no explanation.
+  //
+  // Rather than depend on three dashboards being perfectly in sync, we
+  // forward any auth code (or auth error) that lands on the root to the
+  // route built to handle it. Costs nothing when everything is
+  // configured correctly, because then the code never arrives here.
+  if (path === "/") {
+    const params = request.nextUrl.searchParams;
+    if (params.has("code") || params.has("error_description")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/callback";
+      return NextResponse.redirect(url);
+    }
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -67,8 +89,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const path = request.nextUrl.pathname;
 
   if (!user && PROTECTED_PREFIXES.some((p) => path === p || path.startsWith(p + "/"))) {
     const url = request.nextUrl.clone();
