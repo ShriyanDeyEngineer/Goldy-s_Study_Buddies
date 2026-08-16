@@ -283,14 +283,21 @@ export function OnboardingWizard({
               Back
             </Button>
             {step < 2 ? (
-              // type defaults to "button" in our Button — advancing can
-              // never submit early.
-              <Button onClick={next}>
+              // The `key`s below are load-bearing — do not remove them.
+              // Without keys, React reuses ONE <button> DOM node for both
+              // branches and just mutates its `type`. Clicking "Almost
+              // done" then advances the step, React synchronously flips
+              // the node to type="submit", and THEN the browser runs the
+              // click's default action against the button's NEW type —
+              // submitting the form and skipping step 3 entirely (bio and
+              // photo lost). Distinct keys force a fresh DOM node per
+              // branch, so the old click can't detonate the new button.
+              <Button key="advance" onClick={next}>
                 {step === 1 ? "Almost done" : "Next"}
                 <ArrowRight aria-hidden className="h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" loading={pending}>
+              <Button key="finish" type="submit" loading={pending}>
                 Finish — take me in
               </Button>
             )}
