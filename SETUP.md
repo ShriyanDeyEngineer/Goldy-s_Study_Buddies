@@ -141,6 +141,30 @@ allow-list — a personal-Gmail signup fails there, and the app shows
 `insert into universities (name, email_domain) values ('X University',
 'x.edu');` — that's the entire rollout.
 
+### Making Google's consent screen say your name, not the project ref
+
+Out of the box Google shows *"Sign in to xluzbgksvhybziysweph.supabase.co"* —
+accurate (that IS where auth happens) but it looks like a phishing page to
+a student. Three ways to improve it, cheapest first:
+
+1. **Google brand verification — free.** In the OAuth consent screen set
+   **App name** ("Goldy's Study Buddies"), a logo, and a support email, then
+   submit for verification. Once approved, Google shows your name and logo
+   instead of the domain. Google emails you to verify ownership of the
+   authorized domains; for `supabase.co` reply that it is a third-party
+   service you integrate with. Review takes days to weeks, so start early.
+2. **Vanity subdomain — needs a paid Supabase plan.** Turns the host into
+   something readable like `goldys-study-buddies.supabase.co`. No DNS work.
+3. **Custom domain — paid Supabase add-on + a domain you own.** Auth runs at
+   e.g. `auth.goldysstudybuddies.com`. After enabling it, add the new
+   callback URL to the Google OAuth client (keep the old one during the
+   switchover).
+
+Separately, the APP's own address (`*.vercel.app`) can be replaced for just
+the cost of a domain: Vercel → Settings → Domains. That is independent of
+the auth host above — changing it means updating `NEXT_PUBLIC_SITE_URL`,
+the Supabase Site URL, and the redirect list.
+
 ## 5. Environment variables
 
 ```bash
