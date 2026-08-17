@@ -21,11 +21,6 @@ export const metadata: Metadata = {
 
 const ARGUMENTS = [
   {
-    icon: Clock,
-    title: "Week three is real",
-    body: "Everyone talks in lecture during week one. By week three, the room goes quiet and it feels too late to ask anyone. A study group gives you a standing reason to keep showing up for each other.",
-  },
-  {
     icon: Landmark,
     title: "Office hours don't fit everyone",
     body: "Tutoring rooms and office hours run on fixed schedules — and attendance collapses right when the material gets hard. Your group meets when YOUR schedules line up.",
