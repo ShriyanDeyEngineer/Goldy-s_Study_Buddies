@@ -14,9 +14,8 @@ export const metadata: Metadata = {
 const FOUNDERS = [
   { name: "Shriyan Dey", role: "Co-founder" },
   { name: "Angad Virdi", role: "Co-founder" },
-  { name: "Aadi Sharma", role: "Co-founder" },
-  { name: "Joy Deng", role: "Co-founder" },
-  { name: "Hmoov Her", role: "Co-founder" },
+  { name: "Aadi Sharma", role: "Developer" },
+  { name: "Joy Deng", role: "Developer" },
 ];
 
 export default function AboutPage() {
@@ -25,7 +24,7 @@ export default function AboutPage() {
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl text-ink">About us</h1>
         <p className="mt-4 text-ink-muted">
-          We&rsquo;re five UMN students who kept watching the same thing happen: lecture
+          We&rsquo;re a group of UMN students who kept watching the same thing happen: lecture
           halls full of people quietly struggling with the same problem sets, none of
           them studying together. Office hours that don&rsquo;t fit your schedule.
           Sign-up spreadsheets that die by week three. Friends made in week one,
