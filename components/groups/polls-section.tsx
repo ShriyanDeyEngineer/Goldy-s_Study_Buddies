@@ -110,7 +110,7 @@ export function PollsSection({
           const voterCount = new Set(pollVotes.map((v) => v.user_id)).size;
 
           return (
-            <div key={poll.id} className="mt-3 rounded-xl border border-line p-3">
+            <div key={poll.id} className="mt-3 rounded-xl border border-line p-2 sm:p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <h4 className="font-medium text-ink">{poll.title}</h4>

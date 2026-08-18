@@ -1,7 +1,10 @@
 /**
  * Meetups panel (spec §5.8): upcoming and past meetups, RSVP with a live
- * attendee count, Add-to-Google-Calendar, cancel (creator/manager), and
- * the availability-polls section.
+ * attendee count, Add-to-Google-Calendar, cancel (creator/manager).
+ *
+ * The availability POLLS used to live at the bottom of this panel. They
+ * moved to their own full-width row on the group page: a day × time grid
+ * squeezed into a one-third column was unreadable past ~4 days.
  *
  * "Upcoming" vs "past" is decided by comparing scheduled_at to now AT
  * RENDER TIME — there is no status column and no background job, on
@@ -27,15 +30,12 @@ import { cancelMeetupAction, rsvpAction } from "@/lib/actions/meetups";
 import { googleCalendarUrl } from "@/lib/calendar";
 import { formatDuration } from "@/lib/format";
 import type {
-  AvailabilityPollRow,
-  AvailabilitySlotRow,
   MeetupAttendanceRow,
   MeetupRow,
 } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MeetupFormDialog } from "@/components/groups/meetup-form-dialog";
-import { PollsSection } from "@/components/groups/polls-section";
 import { cn, pluralize } from "@/lib/utils";
 
 const RSVP_OPTIONS = [
@@ -50,25 +50,16 @@ export function MeetupsPanel({
   isManager,
   meetups,
   attendance,
-  polls,
-  slots,
-  votes,
   groupName,
   courseLabel,
-  memberProfiles,
 }: {
   groupId: string;
   currentUserId: string;
   isManager: boolean;
   meetups: MeetupRow[];
   attendance: MeetupAttendanceRow[];
-  polls: AvailabilityPollRow[];
-  slots: AvailabilitySlotRow[];
-  votes: { slot_id: string; user_id: string }[];
   groupName: string;
   courseLabel: string;
-  /** id + name for every member — the grid shows who is free on hover. */
-  memberProfiles: { id: string; display_name: string | null }[];
 }) {
   const router = useRouter();
   const now = Date.now();
@@ -138,16 +129,6 @@ export function MeetupsPanel({
           )}
         </>
       )}
-
-      <PollsSection
-        groupId={groupId}
-        currentUserId={currentUserId}
-        isManager={isManager}
-        polls={polls}
-        slots={slots}
-        votes={votes}
-        members={memberProfiles}
-      />
     </section>
   );
 }

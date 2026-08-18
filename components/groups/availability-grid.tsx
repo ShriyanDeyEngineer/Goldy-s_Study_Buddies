@@ -111,6 +111,17 @@ export function AvailabilityGrid({
 
   const shown = preview ?? mine;
 
+  // Phone vs. laptop, for the responsive column width below. Matches
+  // Tailwind's `md` breakpoint so it agrees with the rest of the layout.
+  const [isNarrow, setIsNarrow] = React.useState(false);
+  React.useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   function cellAt(target: EventTarget | null) {
     const el = (target as HTMLElement | null)?.closest?.("[data-day][data-row]") as
       | HTMLElement
@@ -209,6 +220,23 @@ export function AvailabilityGrid({
     return <p className="text-sm text-ink-muted">This poll has no upcoming times.</p>;
   }
 
+  // SIZING — the "not congested" rules, per the team's feedback:
+  //   - Columns STRETCH to fill the available width (minmax(MIN, 1fr)), so a
+  //     3-day poll gets three wide columns instead of three skinny ones
+  //     with dead space to the right.
+  //   - MIN column width is responsive. On a laptop the full-width row is
+  //     ~1050 px, so 120 px/day fits 8 days with NO horizontal scroll (the
+  //     ask was "at least 5"). On a phone the row is ~280 px, where 120 px
+  //     would fit ONE day — so we drop to 72 px there: 3 days visible, a
+  //     5-day poll is one short swipe. Past that the grid scrolls sideways;
+  //     the page itself never does.
+  //   - Rows are 36 px, not 24: tall enough that a fingertip lands on the
+  //     half-hour it meant to.
+  const TIME_COL = isNarrow ? 52 : 72; // px, the "9:00 AM" gutter
+  const MIN_COL = isNarrow ? 64 : 120; // px, per day
+  const ROW_H = "h-9"; // 36 px per half-hour
+  const template = `${TIME_COL}px repeat(${grid.columns.length}, minmax(${MIN_COL}px, 1fr))`;
+
   // Legend steps for the heat map.
   const shade = (count: number) => {
     if (count === 0) return "bg-surface";
@@ -240,7 +268,7 @@ export function AvailabilityGrid({
           role="grid"
           aria-label="Availability grid — drag to mark when you're free"
           className="select-none touch-none"
-          style={{ minWidth: `${64 + grid.columns.length * 56}px` }}
+          style={{ minWidth: `${TIME_COL + grid.columns.length * MIN_COL}px` }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -251,17 +279,17 @@ export function AvailabilityGrid({
           <div
             role="row"
             className="grid border-b border-line bg-cream/60"
-            style={{ gridTemplateColumns: `64px repeat(${grid.columns.length}, minmax(56px, 1fr))` }}
+            style={{ gridTemplateColumns: template }}
           >
-            <div aria-hidden className="h-10" />
+            <div aria-hidden className="h-12" />
             {grid.columns.map((col) => (
               <div
                 key={col.dayKey}
                 role="columnheader"
-                className="flex h-10 flex-col items-center justify-center text-[11px] leading-tight text-ink"
+                className="flex h-12 flex-col items-center justify-center text-xs leading-tight text-ink"
               >
                 <span className="font-medium">{format(col.date, "EEE")}</span>
-                <span className="text-ink-muted">{format(col.date, "M/d")}</span>
+                <span className="text-ink-muted">{format(col.date, "MMM d")}</span>
               </div>
             ))}
           </div>
@@ -274,12 +302,16 @@ export function AvailabilityGrid({
                 key={row.minuteOfDay}
                 role="row"
                 className="grid"
-                style={{ gridTemplateColumns: `64px repeat(${grid.columns.length}, minmax(56px, 1fr))` }}
+                style={{ gridTemplateColumns: template }}
               >
                 <div
                   role="rowheader"
                   className={cn(
-                    "flex h-6 items-start justify-end pr-2 text-[10px] leading-6 text-ink-muted",
+                    "flex items-start justify-end pr-2 text-[11px] text-ink-muted",
+                    ROW_H,
+                    // Label sits at the top edge of its hour row (like a
+                    // calendar); half-hour rows are unlabeled to reduce noise.
+                    "-translate-y-2",
                     !isHour && "text-transparent",
                   )}
                 >
@@ -293,7 +325,7 @@ export function AvailabilityGrid({
                         key={col.dayKey}
                         role="gridcell"
                         aria-disabled="true"
-                        className="h-6 border-b border-l border-line/60 bg-line/30"
+                        className={cn(ROW_H, "border-b border-l border-line/60 bg-line/30")}
                       />
                     );
                   }
@@ -313,7 +345,8 @@ export function AvailabilityGrid({
                       onKeyDown={(e) => onCellKey(e, id)}
                       onPointerEnter={() => setHover(id)}
                       className={cn(
-                        "h-6 border-b border-l border-line/60 transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold",
+                        ROW_H,
+                        "border-b border-l border-line/60 transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold",
                         isHour ? "border-b-line" : "border-b-line/40",
                         shade(count),
                         isMine && "shadow-[inset_0_0_0_2px_var(--color-maroon)]",

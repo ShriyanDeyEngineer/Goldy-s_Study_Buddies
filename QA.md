@@ -238,8 +238,16 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       line reads "N days × 9 AM–9 PM = M half-hour slots". Past times on
       today are skipped. End hour ≤ start hour shows an inline error and
       disables Open. Over 400 slots shows the cap and disables Open.
-- [ ] **Grid renders**: days as columns (Thu 8/20 …), half-hour rows with
-      hour labels; cells with no slot are greyed/disabled.
+- [ ] **Grid renders**: days as columns (Thu · Aug 20 …), half-hour rows
+      with hour labels; cells with no slot are greyed/disabled.
+- [ ] **Room to breathe**: polls sit in their own full-width row UNDER the
+      Chat/Meetups/Members columns, not inside Meetups. On a laptop a
+      poll of up to 8 days shows every column with NO horizontal scroll
+      (requirement: at least 5); columns stretch to fill the width, so a
+      3-day poll has three wide columns. On a phone 3 days fit without
+      scrolling; a 5-day poll is one short sideways swipe of the grid
+      only — the page itself never scrolls sideways. Cells are 36 px
+      tall.
 - [ ] **Drag to paint**: press on an empty cell and drag → every cell in
       the rectangle marks instantly (maroon outline), one request on
       release. Start on a MARKED cell → the drag REMOVES instead. Works

@@ -32,6 +32,7 @@ import { InvitationBanner } from "@/components/groups/invitation-banner";
 import { GroupChat } from "@/components/groups/group-chat";
 import { MeetupsPanel } from "@/components/groups/meetups-panel";
 import { MembersPanel } from "@/components/groups/members-panel";
+import { PollsSection } from "@/components/groups/polls-section";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
@@ -278,15 +279,8 @@ export default async function GroupPage({
           isManager={isManager}
           meetups={meetups}
           attendance={attendance}
-          polls={polls}
-          slots={slots}
-          votes={votes}
           groupName={group.name}
           courseLabel={courseCode(group.courses)}
-          memberProfiles={members.map((m) => ({
-            id: m.user_id,
-            display_name: profilesById[m.user_id]?.display_name ?? null,
-          }))}
         />
         <MembersPanel
           groupId={group.id}
@@ -299,6 +293,24 @@ export default async function GroupPage({
           isManager={isManager}
         />
       </div>
+
+      {/* Availability polls get the FULL page width — a day × time grid
+          needs room to breathe. Up to 7 days fit without any horizontal
+          scroll on a laptop; the grid only scrolls sideways past that. */}
+      <section className="mt-6 rounded-xl border border-line bg-surface p-4 shadow-sm">
+        <PollsSection
+          groupId={group.id}
+          currentUserId={profile.id}
+          isManager={isManager}
+          polls={polls}
+          slots={slots}
+          votes={votes}
+          members={members.map((m) => ({
+            id: m.user_id,
+            display_name: profilesById[m.user_id]?.display_name ?? null,
+          }))}
+        />
+      </section>
     </div>
   );
 }
