@@ -73,7 +73,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-20 text-center sm:py-28">
           <GopherLogo className="mb-6 h-16 w-16 text-gold" />
           <h1 className="max-w-2xl font-display text-4xl leading-tight sm:text-5xl">
-            Never study alone at the U again.
+            Find your study buddies
           </h1>
           <p className="mt-4 max-w-xl text-lg text-white/85">
             Find study partners and join study groups for your exact UMN courses —

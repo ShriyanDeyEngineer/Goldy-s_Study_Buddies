@@ -18,7 +18,7 @@ export function SiteFooter() {
         <div>
           <LogoLockup dark />
           <p className="mt-3 text-sm text-white/70">
-            Never study alone at the U again.
+            Find your study buddies!
           </p>
         </div>
 

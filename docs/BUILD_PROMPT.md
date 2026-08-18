@@ -47,7 +47,7 @@ designed so that adding a second university later is a configuration change
 (one database row), never a code change.
 
 **Tone and personality:** Warm, encouraging, student-to-student. Not corporate.
-Copy should sound like a helpful classmate, e.g. "Never study alone at the U
+Copy should sound like a helpful classmate, e.g. "Find your study buddies!
 again," "Break the ice — even a 'hey' works." Never use fake urgency or
 growth-hack language.
 

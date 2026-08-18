@@ -52,7 +52,7 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href="/friends">
             <ShieldBan aria-hidden className="h-4 w-4" />
-            Friends &amp; blocked
+            Friends &amp; Buddies
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
