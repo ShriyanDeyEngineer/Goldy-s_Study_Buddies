@@ -283,6 +283,10 @@ export default async function GroupPage({
           votes={votes}
           groupName={group.name}
           courseLabel={courseCode(group.courses)}
+          memberProfiles={members.map((m) => ({
+            id: m.user_id,
+            display_name: profilesById[m.user_id]?.display_name ?? null,
+          }))}
         />
         <MembersPanel
           groupId={group.id}

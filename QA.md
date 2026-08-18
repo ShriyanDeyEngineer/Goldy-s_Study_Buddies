@@ -231,3 +231,26 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       "What are you taking?" (step 2); Back shows the prefilled name with
       the "from your Google account" hint; nameless accounts start at
       step 1.
+
+## Availability grid (When2Meet-style) — 2026-08-18
+
+- [ ] **Create**: New poll → pick From/To dates and daily hours; the live
+      line reads "N days × 9 AM–9 PM = M half-hour slots". Past times on
+      today are skipped. End hour ≤ start hour shows an inline error and
+      disables Open. Over 400 slots shows the cap and disables Open.
+- [ ] **Grid renders**: days as columns (Thu 8/20 …), half-hour rows with
+      hour labels; cells with no slot are greyed/disabled.
+- [ ] **Drag to paint**: press on an empty cell and drag → every cell in
+      the rectangle marks instantly (maroon outline), one request on
+      release. Start on a MARKED cell → the drag REMOVES instead. Works
+      with a finger on mobile (page doesn't scroll under the drag).
+- [ ] **Keyboard**: Tab to a cell, Space/Enter toggles it.
+- [ ] **Heat map**: with two+ voters, overlap cells are darker green;
+      hover a cell → "Free: You, Grid Buddy"; aria-label reads "2 people
+      free, including you".
+- [ ] **Winner**: banner shows the best time and "works for N people —
+      everyone!" when unanimous; "Schedule this time" opens the meetup
+      form prefilled to that slot.
+- [ ] **Live**: a second member's painting appears without refresh.
+- [ ] **Security**: sending a slot id from ANOTHER poll to
+      set_availability_votes is ignored (not an error, not a vote).

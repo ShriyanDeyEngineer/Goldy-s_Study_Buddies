@@ -113,10 +113,15 @@ describe("availability poll schema", () => {
     });
   }
 
-  it("2 slots pass; 1 fails; 21 fails (2–20 range)", () => {
+  // The grid UI generates up to ~2 weeks of 30-minute cells, so the cap
+  // is 400 (was 20 when slots were hand-typed).
+  it("2 slots pass; 1 fails; 400 passes; 401 fails", () => {
     expect(poll([slot(24), slot(48)]).success).toBe(true);
     expect(poll([slot(24)]).success).toBe(false);
-    expect(poll(Array.from({ length: 21 }, (_, i) => slot(24 + i))).success).toBe(false);
+    // Half-hour steps so 400 slots stay well within the future window.
+    const many = (n: number) => Array.from({ length: n }, (_, i) => slot(24 + i * 0.5));
+    expect(poll(many(400)).success).toBe(true);
+    expect(poll(many(401)).success).toBe(false);
   });
 
   it("a slot ending before it starts fails", () => {

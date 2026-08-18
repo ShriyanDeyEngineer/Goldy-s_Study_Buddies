@@ -55,6 +55,7 @@ export function MeetupsPanel({
   votes,
   groupName,
   courseLabel,
+  memberProfiles,
 }: {
   groupId: string;
   currentUserId: string;
@@ -66,6 +67,8 @@ export function MeetupsPanel({
   votes: { slot_id: string; user_id: string }[];
   groupName: string;
   courseLabel: string;
+  /** id + name for every member — the grid shows who is free on hover. */
+  memberProfiles: { id: string; display_name: string | null }[];
 }) {
   const router = useRouter();
   const now = Date.now();
@@ -143,6 +146,7 @@ export function MeetupsPanel({
         polls={polls}
         slots={slots}
         votes={votes}
+        members={memberProfiles}
       />
     </section>
   );

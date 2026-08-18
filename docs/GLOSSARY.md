@@ -81,9 +81,17 @@ these words are the contract.
 - **Upcoming vs. past** — derived by comparing the meetup's time to "now"
   whenever it's displayed. There is no status column to flip and no cron
   job — on purpose.
-- **Availability poll** — our built-in When2Meet: a member proposes 2–20
-  time slots, members check the ones that work, the slot with the most
-  votes is highlighted with a one-click "Schedule" button.
+- **Availability poll** — our built-in When2Meet. A member picks a date
+  range and daily hours ("next week, 9 AM–9 PM"); the poll becomes a
+  **grid** of 30-minute slots (days across, times down). Members **drag
+  across the grid** to paint when they're free; cells shade darker as
+  more people can make it, and hovering shows who. The slot most people
+  can make is highlighted with a one-click "Schedule this time" button
+  that opens the meetup form prefilled. Built natively (no When2Meet
+  embed) so it stays inside the single sign-in and feeds straight into
+  meetups.
+- **Slot** — one 30-minute cell of a poll's grid. A vote is one row per
+  (slot, member); "I'm free 2–4 PM" is four slot votes.
 
 ## Messaging & notifications
 

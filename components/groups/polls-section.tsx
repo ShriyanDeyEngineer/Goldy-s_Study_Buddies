@@ -1,12 +1,19 @@
 /**
- * Availability polls (spec §5.8) — our native When2Meet. A member opens
- * a poll with candidate slots; members check the slots that work for
- * them; the slot with the most votes is highlighted with a "Schedule
- * this slot" button that opens the meetup dialog prefilled.
+ * Availability polls (spec §5.8) — our native When2Meet.
+ *
+ * A member opens a poll by picking a DATE RANGE and DAILY HOURS ("next
+ * week, 9 AM–9 PM"); the poll becomes a grid of 30-minute slots. Members
+ * drag across the grid to paint when they're free (AvailabilityGrid). The
+ * cell most people can make gets highlighted with a one-click "Schedule"
+ * button that opens the meetup form prefilled with that time.
  *
  * Built natively on purpose: embedding When2Meet/Calendly would force
  * external accounts and break the single-sign-in experience (the spec
- * forbids it explicitly).
+ * forbids it explicitly). The grid interaction is theirs; the data,
+ * accounts, and the "turn the winner into a real meetup" step are ours.
+ *
+ * Realtime: useLiveRefresh on availability_votes so other members'
+ * painting shows up without a manual reload.
  */
 "use client";
 
@@ -14,17 +21,16 @@ import * as React from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { ListPlus, Plus, Trash2, Trophy } from "lucide-react";
+import { CalendarRange, ListPlus, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import {
   closeAvailabilityPollAction,
   createAvailabilityPollAction,
-  voteAvailabilityAction,
 } from "@/lib/actions/meetups";
-import { POLL_SLOTS_MAX, POLL_SLOTS_MIN } from "@/lib/constants";
+import { generateGridSlots } from "@/lib/availability-grid";
+import { POLL_SLOTS_MAX } from "@/lib/constants";
 import type { AvailabilityPollRow, AvailabilitySlotRow } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -35,9 +41,16 @@ import {
 import { FieldError } from "@/components/ui/field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { AvailabilityGrid } from "@/components/groups/availability-grid";
 import { MeetupFormDialog } from "@/components/groups/meetup-form-dialog";
 import { useLiveRefresh } from "@/lib/hooks/use-live-refresh";
-import { cn, pluralize } from "@/lib/utils";
+import { pluralize } from "@/lib/utils";
+
+interface Vote {
+  slot_id: string;
+  user_id: string;
+}
 
 export function PollsSection({
   groupId,
@@ -46,45 +59,21 @@ export function PollsSection({
   polls,
   slots,
   votes,
+  members,
 }: {
   groupId: string;
   currentUserId: string;
   isManager: boolean;
   polls: AvailabilityPollRow[];
   slots: AvailabilitySlotRow[];
-  votes: { slot_id: string; user_id: string }[];
+  votes: Vote[];
+  members: { id: string; display_name: string | null }[];
 }) {
   const router = useRouter();
   const openPolls = polls.filter((p) => p.status === "open");
 
-  // OPTIMISTIC VOTES (bug report #5). The checkbox used to be driven
-  // purely by server data + router.refresh(): tick it, and it snapped
-  // back to unticked for the ~300 ms until the refreshed page arrived —
-  // which read as "the poll won't let me vote," and on a slow connection
-  // looked permanently broken. Now a click flips local state instantly
-  // and the server catches up in the background; if the server says no,
-  // we roll back and toast the reason.
-  const [optimisticVotes, setOptimisticVotes] = React.useState(votes);
-  React.useEffect(() => setOptimisticVotes(votes), [votes]);
-
-  // Other members' votes appear live (this table's RLS = group members).
+  // Other members' painting appears live (RLS: this table = group members).
   useLiveRefresh({ table: "availability_votes" });
-
-  async function toggleVote(slotId: string, checked: boolean) {
-    const previous = optimisticVotes;
-    setOptimisticVotes((current) =>
-      checked
-        ? [...current, { slot_id: slotId, user_id: currentUserId }]
-        : current.filter((v) => !(v.slot_id === slotId && v.user_id === currentUserId)),
-    );
-    const { error } = await voteAvailabilityAction(slotId, groupId, checked);
-    if (error) {
-      setOptimisticVotes(previous);
-      toast.error(error);
-      return;
-    }
-    router.refresh();
-  }
 
   return (
     <div className="border-t border-line pt-4">
@@ -95,21 +84,41 @@ export function PollsSection({
 
       {openPolls.length === 0 ? (
         <p className="mt-2 text-sm text-ink-muted">
-          Can&rsquo;t agree on a time? Open a poll and let the votes decide.
+          Can&rsquo;t agree on a time? Open a poll — everyone paints when they&rsquo;re
+          free and the best slot rises to the top.
         </p>
       ) : (
         openPolls.map((poll) => {
           const pollSlots = slots
             .filter((s) => s.poll_id === poll.id)
             .sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-          const countFor = (slotId: string) =>
-            optimisticVotes.filter((v) => v.slot_id === slotId).length;
-          const bestCount = Math.max(0, ...pollSlots.map((s) => countFor(s.id)));
+          const slotIds = new Set(pollSlots.map((s) => s.id));
+          const pollVotes = votes.filter((v) => slotIds.has(v.slot_id));
+
+          // The winner: most votes; ties go to the earliest slot.
+          const countBySlot = new Map<string, number>();
+          for (const v of pollVotes) countBySlot.set(v.slot_id, (countBySlot.get(v.slot_id) ?? 0) + 1);
+          let best: AvailabilitySlotRow | null = null;
+          let bestCount = 0;
+          for (const s of pollSlots) {
+            const c = countBySlot.get(s.id) ?? 0;
+            if (c > bestCount) {
+              best = s;
+              bestCount = c;
+            }
+          }
+          const voterCount = new Set(pollVotes.map((v) => v.user_id)).size;
 
           return (
             <div key={poll.id} className="mt-3 rounded-xl border border-line p-3">
-              <div className="flex items-center justify-between gap-2">
-                <h4 className="font-medium text-ink">{poll.title}</h4>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h4 className="font-medium text-ink">{poll.title}</h4>
+                  <p className="text-xs text-ink-muted">
+                    {pluralize(voterCount, "person has", "people have")} responded ·{" "}
+                    {pluralize(pollSlots.length, "time slot")}
+                  </p>
+                </div>
                 {(poll.creator_id === currentUserId || isManager) && (
                   <Button
                     size="sm"
@@ -125,55 +134,43 @@ export function PollsSection({
                   </Button>
                 )}
               </div>
-              <p className="mb-2 mt-0.5 text-xs text-ink-muted">
-                Check every slot that works for you.
-              </p>
-              <ul className="space-y-1.5">
-                {pollSlots.map((slot) => {
-                  const count = countFor(slot.id);
-                  const mine = optimisticVotes.some(
-                    (v) => v.slot_id === slot.id && v.user_id === currentUserId,
-                  );
-                  const isBest = count > 0 && count === bestCount;
-                  return (
-                    <li
-                      key={slot.id}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded-lg px-2 py-1.5",
-                        isBest && "bg-gold-light/40",
-                      )}
-                    >
-                      <Checkbox
-                        checked={mine}
-                        aria-label={`${format(new Date(slot.starts_at), "EEE MMM d, h:mm a")} works for me`}
-                        onCheckedChange={(checked) => void toggleVote(slot.id, checked === true)}
-                      />
-                      <span className="min-w-0 flex-1 text-sm text-ink">
-                        {format(new Date(slot.starts_at), "EEE, MMM d · h:mm a")}
-                        {" – "}
-                        {format(new Date(slot.ends_at), "h:mm a")}
-                      </span>
-                      <span className="text-xs text-ink-muted">
-                        {pluralize(count, "vote")}
-                      </span>
-                      {isBest && (
-                        <>
-                          <Trophy aria-hidden className="h-3.5 w-3.5 text-gold" />
-                          <MeetupFormDialog
-                            groupId={groupId}
-                            prefillStart={slot.starts_at}
-                            trigger={
-                              <Button size="sm" variant="secondary">
-                                Schedule
-                              </Button>
-                            }
-                          />
-                        </>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+
+              <div className="mt-3">
+                <AvailabilityGrid
+                  pollId={poll.id}
+                  groupId={groupId}
+                  slots={pollSlots}
+                  votes={pollVotes}
+                  currentUserId={currentUserId}
+                  members={members}
+                  onCommitted={() => router.refresh()}
+                />
+              </div>
+
+              {/* The winning slot → one click to a real meetup */}
+              {best && bestCount > 0 && (
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-gold-light/40 px-3 py-2">
+                  <p className="flex items-center gap-1.5 text-sm text-ink">
+                    <Trophy aria-hidden className="h-4 w-4 shrink-0 text-gold" />
+                    <span>
+                      <span className="font-medium">
+                        {format(new Date(best.starts_at), "EEE, MMM d · h:mm a")}
+                      </span>{" "}
+                      works for {pluralize(bestCount, "person", "people")}
+                      {voterCount > 0 && bestCount === voterCount ? " — everyone!" : ""}
+                    </span>
+                  </p>
+                  <MeetupFormDialog
+                    groupId={groupId}
+                    prefillStart={best.starts_at}
+                    trigger={
+                      <Button size="sm" variant="secondary">
+                        Schedule this time
+                      </Button>
+                    }
+                  />
+                </div>
+              )}
             </div>
           );
         })
@@ -182,32 +179,65 @@ export function PollsSection({
   );
 }
 
+// ── New poll: date range + daily hours → auto-generated grid ────────────────
+
+const HOUR_OPTIONS = Array.from({ length: 25 }, (_, h) => h); // 0..24
+
+function hourLabel(h: number) {
+  if (h === 0 || h === 24) return "12 AM";
+  if (h === 12) return "12 PM";
+  return h < 12 ? `${h} AM` : `${h - 12} PM`;
+}
+
+function toDateInput(d: Date) {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
 /**
- * The "new poll" dialog: title + a growing list of local datetime slots
- * (each slot = start + duration). Slots convert to UTC ISO on submit,
- * same rule as meetups: the browser is the only place that knows the
- * student's timezone.
+ * The "new poll" dialog. Instead of typing individual times, the creator
+ * picks a date range and the hours of the day worth polling; the slots
+ * are generated in the browser (which is the only place that knows the
+ * student's timezone) and posted as one JSON list — the same wire format
+ * the old dialog used, so nothing server-side changed except the cap.
  */
 function NewPollDialog({ groupId }: { groupId: string }) {
   const [state, formAction, pending] = useActionState(createAvailabilityPollAction, {});
   const [open, setOpen] = React.useState(false);
-  const [slotInputs, setSlotInputs] = React.useState<string[]>(["", ""]);
-  const [durationMinutes, setDurationMinutes] = React.useState(60);
   const router = useRouter();
+
+  // Sensible defaults: today through +6 days, 9 AM–9 PM.
+  const today = React.useMemo(() => new Date(), []);
+  const [startDate, setStartDate] = React.useState(toDateInput(today));
+  const [endDate, setEndDate] = React.useState(
+    toDateInput(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6)),
+  );
+  const [startHour, setStartHour] = React.useState(9);
+  const [endHour, setEndHour] = React.useState(21);
+  const [clientError, setClientError] = React.useState<string | null>(null);
+
+  // Live preview of the grid size, so the cap is never a surprise.
+  const previewSlots = React.useMemo(
+    () => generateGridSlots(startDate, endDate, startHour, endHour),
+    [startDate, endDate, startHour, endHour],
+  );
+  const dayCount =
+    startDate && endDate
+      ? Math.max(0, Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86_400_000) + 1)
+      : 0;
 
   React.useEffect(() => {
     if (state.success && open) {
       toast.success(state.success);
       setOpen(false);
-      setSlotInputs(["", ""]);
       router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reacting to action completion
   }, [state]);
 
-  function updateSlot(index: number, value: string) {
-    setSlotInputs((current) => current.map((s, i) => (i === index ? value : s)));
-  }
+  const tooMany = previewSlots.length > POLL_SLOTS_MAX;
+  const tooFew = previewSlots.length < 2;
+  const hoursInverted = endHour <= startHour;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -220,21 +250,28 @@ function NewPollDialog({ groupId }: { groupId: string }) {
       <DialogContent>
         <DialogTitle>Find a time that works</DialogTitle>
         <DialogDescription>
-          Propose {POLL_SLOTS_MIN}–{POLL_SLOTS_MAX} time options; the group votes on
-          which ones work.
+          Pick the days and hours to consider. Everyone then drags across a grid to
+          mark when they&rsquo;re free — the best time rises to the top.
         </DialogDescription>
 
         <form
           action={(formData) => {
-            // Local wall-clock inputs → UTC slots (start + chosen length).
-            const slotsJson = slotInputs
-              .filter(Boolean)
-              .map((local) => {
-                const start = new Date(local);
-                const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
-                return { starts_at: start.toISOString(), ends_at: end.toISOString() };
-              });
-            formData.set("slots", JSON.stringify(slotsJson));
+            if (hoursInverted) {
+              setClientError("The end hour has to be after the start hour.");
+              return;
+            }
+            if (tooFew) {
+              setClientError("That range has no upcoming times — pick a later day or hours.");
+              return;
+            }
+            if (tooMany) {
+              setClientError(
+                `That's ${previewSlots.length} half-hour slots — the limit is ${POLL_SLOTS_MAX}. Narrow the days or hours.`,
+              );
+              return;
+            }
+            setClientError(null);
+            formData.set("slots", JSON.stringify(previewSlots));
             formAction(formData);
           }}
           noValidate
@@ -256,71 +293,94 @@ function NewPollDialog({ groupId }: { groupId: string }) {
             <FieldError id="poll-title-error" error={state.fieldErrors?.title} />
           </div>
 
-          <div>
-            <Label htmlFor="poll-duration">Session length</Label>
-            <select
-              id="poll-duration"
-              value={durationMinutes}
-              onChange={(e) => setDurationMinutes(Number(e.target.value))}
-              className="h-10 w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink focus-visible:outline-2 focus-visible:outline-gold"
-            >
-              <option value={30}>30 minutes</option>
-              <option value={60}>1 hour</option>
-              <option value={90}>1.5 hours</option>
-              <option value={120}>2 hours</option>
-            </select>
-          </div>
-
           <fieldset>
-            <legend className="mb-1.5 block text-sm font-medium text-ink">
-              Time options (your local time)
+            <legend className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-ink">
+              <CalendarRange aria-hidden className="h-4 w-4 text-ink-muted" />
+              Which days?
             </legend>
-            <div className="space-y-2">
-              {slotInputs.map((value, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    type="datetime-local"
-                    value={value}
-                    onChange={(e) => updateSlot(index, e.target.value)}
-                    aria-label={`Time option ${index + 1}`}
-                  />
-                  {slotInputs.length > POLL_SLOTS_MIN && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-9 w-9 shrink-0 text-ink-muted hover:text-danger"
-                      aria-label={`Remove time option ${index + 1}`}
-                      onClick={() =>
-                        setSlotInputs((current) => current.filter((_, i) => i !== index))
-                      }
-                    >
-                      <Trash2 aria-hidden className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label htmlFor="poll-start-date" className="text-xs text-ink-muted">
+                  From
+                </Label>
+                <Input
+                  id="poll-start-date"
+                  type="date"
+                  value={startDate}
+                  min={toDateInput(today)}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="poll-end-date" className="text-xs text-ink-muted">
+                  To
+                </Label>
+                <Input
+                  id="poll-end-date"
+                  type="date"
+                  value={endDate}
+                  min={startDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
             </div>
-            {slotInputs.length < POLL_SLOTS_MAX && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="mt-2"
-                onClick={() => setSlotInputs((current) => [...current, ""])}
-              >
-                <Plus aria-hidden className="h-3.5 w-3.5" />
-                Add another option
-              </Button>
-            )}
-            <FieldError error={state.fieldErrors?.slots} />
           </fieldset>
 
+          <fieldset>
+            <legend className="mb-1.5 text-sm font-medium text-ink">
+              Which hours each day? <span className="font-normal text-ink-muted">(your local time)</span>
+            </legend>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label htmlFor="poll-start-hour" className="text-xs text-ink-muted">
+                  No earlier than
+                </Label>
+                <Select
+                  id="poll-start-hour"
+                  value={startHour}
+                  onChange={(e) => setStartHour(Number(e.target.value))}
+                >
+                  {HOUR_OPTIONS.slice(0, 24).map((h) => (
+                    <option key={h} value={h}>
+                      {hourLabel(h)}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="poll-end-hour" className="text-xs text-ink-muted">
+                  No later than
+                </Label>
+                <Select
+                  id="poll-end-hour"
+                  value={endHour}
+                  onChange={(e) => setEndHour(Number(e.target.value))}
+                  aria-invalid={hoursInverted}
+                >
+                  {HOUR_OPTIONS.slice(1).map((h) => (
+                    <option key={h} value={h}>
+                      {hourLabel(h)}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+          </fieldset>
+
+          <p className={`text-xs ${tooMany || hoursInverted ? "text-danger" : "text-ink-muted"}`} aria-live="polite">
+            {hoursInverted
+              ? "End hour must be after start hour."
+              : `${pluralize(dayCount, "day")} × ${hourLabel(startHour)}–${hourLabel(endHour)} = ${pluralize(previewSlots.length, "half-hour slot")}${tooMany ? ` (max ${POLL_SLOTS_MAX})` : ""}`}
+          </p>
+
+          <FieldError error={clientError ?? state.fieldErrors?.slots} />
           {state.error && (
             <p role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
               {state.error}
             </p>
           )}
 
-          <Button type="submit" className="w-full" loading={pending}>
+          <Button type="submit" className="w-full" loading={pending} disabled={tooMany || hoursInverted}>
             Open the poll
           </Button>
         </form>

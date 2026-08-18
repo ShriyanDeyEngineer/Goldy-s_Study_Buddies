@@ -142,6 +142,31 @@ export async function voteAvailabilityAction(
   return {};
 }
 
+/**
+ * Batch vote for the drag-to-paint grid: replaces ALL of the caller's
+ * votes on one poll with exactly `slotIds`. One round-trip per drag
+ * instead of one per cell. UUIDs are validated here so a bad id fails
+ * fast with a friendly message rather than a Postgres cast error.
+ */
+export async function setAvailabilityVotesAction(
+  pollId: string,
+  groupId: string,
+  slotIds: string[],
+): Promise<{ error?: string }> {
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!UUID_RE.test(pollId) || !slotIds.every((id) => UUID_RE.test(id))) {
+    return { error: "Something went wrong — refresh and try again." };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_availability_votes", {
+    p_poll_id: pollId,
+    p_slot_ids: slotIds,
+  });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath(`/groups/${groupId}`);
+  return {};
+}
+
 export async function closeAvailabilityPollAction(
   pollId: string,
   groupId: string,
