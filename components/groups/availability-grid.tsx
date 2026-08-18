@@ -106,6 +106,14 @@ export function AvailabilityGrid({
     base: Set<string>;
   } | null>(null);
   const [preview, setPreview] = React.useState<Set<string> | null>(null);
+  // THE BUG THIS REF FIXES: a quick click is pointerdown → pointerup inside
+  // ONE frame. applyRect() calls setPreview(), but React state is async, so
+  // when onPointerUp ran it still saw the OLD `preview` (null), concluded
+  // "nothing changed", and returned without saving. Fast drags did the same
+  // for the last cell. So the in-progress selection is ALSO kept here, in a
+  // ref, which updates synchronously — onPointerUp reads this, never the
+  // state. (State still drives the paint; the ref drives the commit.)
+  const previewRef = React.useRef<Set<string> | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [hover, setHover] = React.useState<string | null>(null);
 
@@ -136,7 +144,8 @@ export function AvailabilityGrid({
     const ids = slotsInRectangle(grid, drag.anchor, to);
     const next = new Set(drag.base);
     for (const id of ids) drag.mode === "add" ? next.add(id) : next.delete(id);
-    setPreview(next);
+    previewRef.current = next; // sync — what pointerup will commit
+    setPreview(next); // async — what the screen paints
   }
 
   function onPointerDown(e: React.PointerEvent) {
@@ -186,7 +195,9 @@ export function AvailabilityGrid({
   async function onPointerUp() {
     if (!dragRef.current) return;
     dragRef.current = null;
-    const next = preview ?? mine;
+    // Read the ref, not `preview` state — see the comment on previewRef.
+    const next = previewRef.current ?? mine;
+    previewRef.current = null;
     setPreview(null);
     if (setsEqual(next, mine)) return;
     await commit(next);
