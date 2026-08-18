@@ -12,7 +12,12 @@
  * component). scheduled_at here is always an absolute UTC instant.
  */
 import { z } from "zod";
-import { POLL_SLOTS_MAX, POLL_SLOTS_MIN } from "@/lib/constants";
+import {
+  MEETUP_DURATION_MAX,
+  MEETUP_DURATION_MIN,
+  POLL_SLOTS_MAX,
+  POLL_SLOTS_MIN,
+} from "@/lib/constants";
 
 const uuid = z.string().uuid("Something went wrong — refresh and try again.");
 
@@ -32,6 +37,11 @@ export const meetupSchema = z
     }),
     location: z.string().trim().max(300, "Keep the location under 300 characters.").optional(),
     meeting_link: z.string().trim().max(500, "Keep the link under 500 characters.").optional(),
+    duration_minutes: z.coerce
+      .number({ invalid_type_error: "Pick how long the session runs." })
+      .int("Duration must be whole minutes.")
+      .min(MEETUP_DURATION_MIN, `Sessions need at least ${MEETUP_DURATION_MIN} minutes.`)
+      .max(MEETUP_DURATION_MAX, `Sessions are capped at ${MEETUP_DURATION_MAX / 60} hours.`),
   })
   .superRefine((data, ctx) => {
     // Future-only. Compared against "now" at validation time; the database

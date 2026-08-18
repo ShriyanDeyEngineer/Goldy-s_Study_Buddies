@@ -51,6 +51,7 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   MISSING_LINK: "Online meetups need a meeting link.",
   MISSING_LOCATION: "In-person meetups need a location.",
   INVALID_RSVP: "Pick attending, maybe, or can't make it.",
+  INVALID_DURATION: "Sessions run between 15 minutes and 8 hours.",
   POLL_NOT_FOUND: "We couldn't find that poll.",
   POLL_CLOSED: "This poll is closed.",
   INVALID_SLOTS: "Polls need 2–20 future time slots, each ending after it starts.",

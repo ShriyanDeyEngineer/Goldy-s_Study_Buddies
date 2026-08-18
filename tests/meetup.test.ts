@@ -19,6 +19,7 @@ function meetup(overrides: Record<string, unknown> = {}) {
     scheduled_at: FUTURE,
     format: "in_person",
     location: "Walter Library",
+    duration_minutes: 60,
     ...overrides,
   });
 }
@@ -26,6 +27,23 @@ function meetup(overrides: Record<string, unknown> = {}) {
 describe("meetup schema", () => {
   it("accepts a valid in-person meetup", () => {
     expect(meetup().success).toBe(true);
+  });
+
+  // Duration slider (bug report #2): 15 min – 8 h inclusive, whole minutes.
+  it("duration boundaries: 15 and 480 pass, 14 and 481 fail", () => {
+    expect(meetup({ duration_minutes: 15 }).success).toBe(true);
+    expect(meetup({ duration_minutes: 480 }).success).toBe(true);
+    expect(meetup({ duration_minutes: 14 }).success).toBe(false);
+    expect(meetup({ duration_minutes: 481 }).success).toBe(false);
+  });
+  it("duration must be whole minutes and coerces the form's string", () => {
+    expect(meetup({ duration_minutes: "90" }).success).toBe(true); // range inputs post strings
+    expect(meetup({ duration_minutes: 90.5 }).success).toBe(false);
+    const missing = meetup({ duration_minutes: undefined });
+    expect(missing.success).toBe(false);
+    if (!missing.success) {
+      expect(missing.error.flatten().fieldErrors.duration_minutes).toBeTruthy();
+    }
   });
 
   it("accepts a valid online meetup", () => {

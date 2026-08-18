@@ -28,6 +28,7 @@ export async function createMeetupAction(
     group_id: formData.get("group_id"),
     title: formData.get("title"),
     scheduled_at: formData.get("scheduled_at"),
+    duration_minutes: formData.get("duration_minutes"),
     format: formData.get("format"),
     location: String(formData.get("location") ?? "") || undefined,
     meeting_link: String(formData.get("meeting_link") ?? "") || undefined,
@@ -46,6 +47,7 @@ export async function createMeetupAction(
     p_format: parsed.data.format,
     p_location: parsed.data.location ?? null,
     p_meeting_link: parsed.data.meeting_link ?? null,
+    p_duration_minutes: parsed.data.duration_minutes,
   });
   if (error) return { error: friendlyError(error) };
 
