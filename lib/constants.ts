@@ -86,4 +86,4 @@ export const MEETUP_DURATION_STEP = 15;
 
 /** Availability polls. */
 export const POLL_SLOTS_MIN = 2;
-export const POLL_SLOTS_MAX = 20;
+export const POLL_SLOTS_MAX = 400; // ~2 weeks of 30-min grid cells (was 20 hand-typed slots)
