@@ -36,6 +36,7 @@ import { FieldError } from "@/components/ui/field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MeetupFormDialog } from "@/components/groups/meetup-form-dialog";
+import { useLiveRefresh } from "@/lib/hooks/use-live-refresh";
 import { cn, pluralize } from "@/lib/utils";
 
 export function PollsSection({
@@ -56,6 +57,35 @@ export function PollsSection({
   const router = useRouter();
   const openPolls = polls.filter((p) => p.status === "open");
 
+  // OPTIMISTIC VOTES (bug report #5). The checkbox used to be driven
+  // purely by server data + router.refresh(): tick it, and it snapped
+  // back to unticked for the ~300 ms until the refreshed page arrived —
+  // which read as "the poll won't let me vote," and on a slow connection
+  // looked permanently broken. Now a click flips local state instantly
+  // and the server catches up in the background; if the server says no,
+  // we roll back and toast the reason.
+  const [optimisticVotes, setOptimisticVotes] = React.useState(votes);
+  React.useEffect(() => setOptimisticVotes(votes), [votes]);
+
+  // Other members' votes appear live (this table's RLS = group members).
+  useLiveRefresh({ table: "availability_votes" });
+
+  async function toggleVote(slotId: string, checked: boolean) {
+    const previous = optimisticVotes;
+    setOptimisticVotes((current) =>
+      checked
+        ? [...current, { slot_id: slotId, user_id: currentUserId }]
+        : current.filter((v) => !(v.slot_id === slotId && v.user_id === currentUserId)),
+    );
+    const { error } = await voteAvailabilityAction(slotId, groupId, checked);
+    if (error) {
+      setOptimisticVotes(previous);
+      toast.error(error);
+      return;
+    }
+    router.refresh();
+  }
+
   return (
     <div className="border-t border-line pt-4">
       <div className="flex items-center justify-between">
@@ -73,7 +103,7 @@ export function PollsSection({
             .filter((s) => s.poll_id === poll.id)
             .sort((a, b) => a.starts_at.localeCompare(b.starts_at));
           const countFor = (slotId: string) =>
-            votes.filter((v) => v.slot_id === slotId).length;
+            optimisticVotes.filter((v) => v.slot_id === slotId).length;
           const bestCount = Math.max(0, ...pollSlots.map((s) => countFor(s.id)));
 
           return (
@@ -101,7 +131,7 @@ export function PollsSection({
               <ul className="space-y-1.5">
                 {pollSlots.map((slot) => {
                   const count = countFor(slot.id);
-                  const mine = votes.some(
+                  const mine = optimisticVotes.some(
                     (v) => v.slot_id === slot.id && v.user_id === currentUserId,
                   );
                   const isBest = count > 0 && count === bestCount;
@@ -116,15 +146,7 @@ export function PollsSection({
                       <Checkbox
                         checked={mine}
                         aria-label={`${format(new Date(slot.starts_at), "EEE MMM d, h:mm a")} works for me`}
-                        onCheckedChange={async (checked) => {
-                          const { error } = await voteAvailabilityAction(
-                            slot.id,
-                            groupId,
-                            checked === true,
-                          );
-                          if (error) toast.error(error);
-                          router.refresh();
-                        }}
+                        onCheckedChange={(checked) => void toggleVote(slot.id, checked === true)}
                       />
                       <span className="min-w-0 flex-1 text-sm text-ink">
                         {format(new Date(slot.starts_at), "EEE, MMM d · h:mm a")}

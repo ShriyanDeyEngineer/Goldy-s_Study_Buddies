@@ -11,6 +11,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LiveRefresh } from "@/lib/hooks/use-live-refresh";
 
 export const metadata = { title: "Messages" };
 
@@ -23,6 +24,8 @@ export default async function MessagesPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
+      {/* New DM to me → conversation list + unread counts update live. */}
+      <LiveRefresh table="direct_messages" filter={`recipient_id=eq.${profile.id}`} />
       <h1 className="mb-6 font-display text-3xl text-ink">Messages</h1>
 
       {conversations.length === 0 ? (
