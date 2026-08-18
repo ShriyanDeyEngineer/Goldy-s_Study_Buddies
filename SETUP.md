@@ -269,7 +269,41 @@ it per term (Summer 2026, Fall 2026, Spring 2027…).
 4. Branch flow: `main` → production; every PR gets a preview deploy
    automatically.
 
-## 9. Moderation basics (until admin tooling exists)
+## 9. Notification emails (optional — bug report #9)
+
+Students get an email when something important happens to them in-app
+(group invite, approval, removal, disband, new/cancelled meetup, friend
+or buddy request). Chat and DMs are never emailed. Each student can turn
+this off under **Edit profile → "Email me about group & friend
+activity"**.
+
+Every notification in this app is created inside a Postgres function, so
+the only place that sees ALL of them is the `notifications` table itself.
+A Supabase **Database Webhook** on that table calls our route, which
+looks up the recipient and sends through Resend.
+
+1. **Env, on Vercel** (Production + Preview) — the email trio from §5
+   (`RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_EMAIL`) plus a new secret:
+   ```
+   NOTIFICATION_WEBHOOK_SECRET=<output of: openssl rand -hex 32>
+   ```
+   Redeploy after adding.
+2. **Supabase dashboard → Database → Webhooks → Create a new hook**:
+   - Name: `notification-email`
+   - Table: `notifications` · Events: **Insert** only
+   - Type: HTTP Request · Method: POST
+   - URL: `https://YOUR-DOMAIN/api/hooks/notification-email`
+   - HTTP Headers: add `x-webhook-secret` = the exact value from step 1
+   - Timeout: 5000 ms is plenty
+3. Test: have a second account send you a friend request. Within a few
+   seconds the email arrives; the in-app bell fires regardless.
+
+If `RESEND_API_KEY` is unset the route still returns 200 and sends
+nothing — email stays optional everywhere (spec §10). If the secret is
+missing or wrong the route answers 401 and Supabase logs the failure
+under the webhook's history.
+
+## 10. Moderation basics (until admin tooling exists)
 
 - **Review reports**: Table Editor → `reports` (admins can also query it
   through the API thanks to the `is_admin` policy).

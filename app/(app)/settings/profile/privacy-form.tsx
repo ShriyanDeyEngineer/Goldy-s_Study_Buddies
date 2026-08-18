@@ -12,7 +12,11 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { updatePrivacyAction, setBuddyAvailabilityAction } from "@/lib/actions/profile";
+import {
+  updatePrivacyAction,
+  setBuddyAvailabilityAction,
+  setEmailNotificationsAction,
+} from "@/lib/actions/profile";
 import type { PrivacyFlags } from "@/lib/validation/profile";
 import type { ProfileRow } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -99,6 +103,29 @@ export function PrivacyForm({ profile }: { profile: ProfileRow }) {
               });
             }}
             aria-label="Available for study buddy sessions"
+          />
+        </div>
+
+        {/* Email notifications (bug report #9). Defaults on; the webhook
+            that sends them checks this flag first. */}
+        <div className="mt-3 flex items-center justify-between gap-4 rounded-xl border border-line px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-ink">Email me about group &amp; friend activity</p>
+            <p className="text-xs text-ink-muted">
+              Invites, approvals, new meetups, cancellations, friend requests. Chat
+              messages are never emailed. You&rsquo;ll always see everything in the bell.
+            </p>
+          </div>
+          <Switch
+            checked={profile.email_notifications ?? true}
+            disabled={pending}
+            onCheckedChange={(checked) => {
+              startTransition(async () => {
+                await setEmailNotificationsAction(checked === true);
+                router.refresh();
+              });
+            }}
+            aria-label="Email me about group and friend activity"
           />
         </div>
       </CardContent>
