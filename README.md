@@ -8,7 +8,6 @@ STEM courses (physics, chem, calc, intro CS) front and center.
 **Not officially affiliated with the University of Minnesota.**
 
 ## Contributors
-<<<<<<< HEAD
 ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), & joydeng-code (Joy Deng). 
 =======
 >>>>>>> claude/full-app
