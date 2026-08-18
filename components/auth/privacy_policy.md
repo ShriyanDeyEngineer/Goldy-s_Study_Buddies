@@ -40,6 +40,11 @@ This exposure is intended solely to allow verified peers to directly coordinate 
 ### C. User Responsibility
 You are responsible for the information you choose to post in your public profile. Because any authenticated student can view your contact details, we strongly advise against posting highly sensitive personal details (such as your physical home address or phone number) in open text areas.
 
+### D. Anti-Scraping and Bulk Harvesting Controls
+While access to the directory is restricted to users with verified university credentials, we recognize the risk of data harvesting. To protect student privacy:
+* We employ strict automated database rate-limiting and firewalls to detect and block abnormal profile viewing patterns.
+* Mass copying, automated scraping, or exporting of student contact lists from this platform is strictly prohibited and constitutes a violation of our Terms of Service. Doing so will result in immediate and permanent account termination.
+
 ---
 
 ## 3. How We Use Your Information
@@ -73,21 +78,27 @@ Depending on your jurisdiction and university policies, you may have specific da
 *   **Account Deletion:** You can request the permanent removal of your profile, chat history, and contact details from our active databases at any time.
 *   **Profile Modification:** You can update or change the academic information displayed on your profile through your account settings.
 
+## 7. Family Educational Rights and Privacy Act (FERPA) Disclaimer
+This platform is an independent student-to-student matching tool and is not officially sponsored, endorsed, or operated by your university or college administration. 
+
+* **No Access to Official Records:** We do not pull, store, access, or modify official institutional academic records, grades, transcripts, GPA metrics, or official enrollment files protected under the Family Educational Rights and Privacy Act (FERPA).
+* **User-Generated Academic Data:** Any academic information displayed on your profile (such as your major or current courses) is entirely self-reported and voluntarily provided by you. It does not constitute an official educational record.
+
 ---
 
-## 7. Security of Your Data
+## 8. Security of Your Data
 
 We employ industry-standard security protocols through Supabase and Vercel to protect your data during transit and at rest. However, please remember that no method of transmission over the Internet or electronic storage is 100% secure. While we restrict entry to verified university credentials, we cannot guarantee absolute security against unauthorized access or account compromise by authenticated peers.
 
 ---
 
-## 8. Changes to This Privacy Policy
+## 9. Changes to This Privacy Policy
 
 We may update this Privacy Policy from time to time. We will notify you of any material changes by updating the "Last Updated" date at the top of this policy and, where appropriate, posting a prominent notice on the platform website.
 
 ---
 
-## 9. Contact Us
+## 10. Contact Us
 
 If you have any questions, concerns, or requests regarding this Privacy Policy or your data, please contact the platform administrator at:
 *   **Email:** [Insert Admin/Support Email Address]
