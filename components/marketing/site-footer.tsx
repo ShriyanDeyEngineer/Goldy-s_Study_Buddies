@@ -45,7 +45,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60">
         Built by UMN students, for UMN students. Not officially affiliated with the
-        University of Minnesota.
+        University of Minnesota. Please send any feedback or report any issues to the email provided above.
       </div>
     </footer>
   );
