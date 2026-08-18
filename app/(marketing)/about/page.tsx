@@ -40,7 +40,7 @@ export default function AboutPage() {
       </div>
 
       <h2 className="mt-14 text-center font-display text-2xl text-ink">The team</h2>
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {FOUNDERS.map((founder) => (
           <Card key={founder.name}>
             <CardContent className="flex flex-col items-center text-center">
