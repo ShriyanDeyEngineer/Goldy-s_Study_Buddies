@@ -203,3 +203,31 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] Icon-only buttons (bell, send, close, remove) announce sensible
       labels in a screen reader.
 - [ ] New chat messages are announced (aria-live) without stealing focus.
+
+## Bug-report batch (2026-08-18) — regression checks
+
+- [ ] **Meetup duration**: New meetup shows a "How long?" slider, 15 min →
+      8 h in 15-min steps, live label ("1 h 30 min"). Card shows
+      "3:00 – 4:30 PM (1 h 30 min)"; Add to Google Calendar carries the
+      real end time. 14 and 481 minutes are refused by the server.
+- [ ] **Poll voting**: the poll's CREATOR can tick/untick slots; the box
+      flips instantly and stays after the page settles; other members'
+      votes appear without a manual refresh.
+- [ ] **Avatar save**: a 3–5 MB JPEG/PNG saves (was silently dropped
+      >1 MB). A 6 MB file or a PDF gets an instant inline message and the
+      Save button disables. Major/bio changes save alongside the picture.
+- [ ] **Unblock**: avatar menu → "Friends & blocked" lists blocked people
+      with an Unblock button; a blocked person's profile also offers it.
+- [ ] **Live notifications**: with /notifications open in one tab, an
+      event from a second account appears WITHOUT refresh; same for the
+      conversation list on /messages.
+- [ ] **Unread DM badge**: red count on "Messages" (desktop nav + mobile
+      bar). Increments live on a new DM; clears when the thread is opened
+      (no reload). Shows "99+" past 99.
+- [ ] **Email notifications** (only with RESEND + webhook configured):
+      friend request from another account → email within seconds. Toggle
+      off under Edit profile → no email, bell still fires.
+- [ ] **Onboarding shortcut**: a Google-named account opens the wizard on
+      "What are you taking?" (step 2); Back shows the prefilled name with
+      the "from your Google account" hint; nameless accounts start at
+      step 1.

@@ -38,10 +38,10 @@
   --color-danger: #dc2626;
 
   /* ── Typography ───────────────────────────────────────────────────── */
-  /* The CSS variables --font-inter / --font-dm-serif are injected by
+  /* The CSS variables --font-roboto / --font-dm-serif are injected by
      next/font in app/layout.tsx. Fallbacks cover the moment before the
      web fonts load. */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-dm-serif), ui-serif, Georgia, serif;
 }
 

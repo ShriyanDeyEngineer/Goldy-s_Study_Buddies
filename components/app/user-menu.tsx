@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LogOut, Settings, UserRound } from "lucide-react";
+import { LogOut, Settings, ShieldBan, UserRound } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
 import { Avatar } from "@/components/ui/avatar";
 import {
@@ -44,6 +44,15 @@ export function UserMenu({
           <Link href="/settings/profile">
             <Settings aria-hidden className="h-4 w-4" />
             Edit profile &amp; privacy
+          </Link>
+        </DropdownMenuItem>
+        {/* Friends, buddies, pending requests, AND the blocked list with its
+            Unblock buttons. Blocked people vanish from search on purpose, so
+            without this link there was no way to find the unblock action. */}
+        <DropdownMenuItem asChild>
+          <Link href="/friends">
+            <ShieldBan aria-hidden className="h-4 w-4" />
+            Friends &amp; blocked
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

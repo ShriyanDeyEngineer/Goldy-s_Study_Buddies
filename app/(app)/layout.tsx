@@ -26,7 +26,7 @@ import {
 import type { ProfileRow } from "@/lib/types";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, profile } = await getSessionProfile();
+  const { supabase, user, profile } = await getSessionProfile();
 
   if (!user) redirect("/login");
   if (!profile) return <ProfileMissingScreen />;
@@ -41,14 +41,34 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
   if (!typedProfile.display_name) redirect("/onboarding");
 
+  // Initial unread counts for the bell and the Messages badge. Fetched in
+  // parallel, once, here — see AppHeader's header comment for why.
+  const [notificationsRes, messagesRes] = await Promise.all([
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .is("read_at", null),
+    supabase
+      .from("direct_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("recipient_id", typedProfile.id)
+      .eq("is_read", false),
+  ]);
+  const unreadNotifications = notificationsRes.count ?? 0;
+  const unreadMessages = messagesRes.count ?? 0;
+
   return (
     <div className="flex min-h-dvh flex-col">
-      <AppHeader profile={typedProfile} />
+      <AppHeader
+        profile={typedProfile}
+        unreadNotifications={unreadNotifications}
+        unreadMessages={unreadMessages}
+      />
       {/* pb-20 keeps content clear of the mobile bottom bar. */}
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 md:pb-8">
         {children}
       </main>
-      <MobileNav />
+      <MobileNav userId={typedProfile.id} initialUnreadMessages={unreadMessages} />
     </div>
   );
 }

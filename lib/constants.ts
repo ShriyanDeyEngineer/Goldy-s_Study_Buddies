@@ -77,6 +77,13 @@ export const REPORT_CATEGORIES = [
 export const REPORT_CATEGORY_VALUES = REPORT_CATEGORIES.map((c) => c.value);
 export const REPORT_DESCRIPTION_MAX = 1000;
 
+/** Meetup duration in minutes (bug report #2): 15 min to 8 hours. */
+export const MEETUP_DURATION_MIN = 15;
+export const MEETUP_DURATION_MAX = 480;
+export const MEETUP_DURATION_DEFAULT = 60;
+/** Slider snaps to these so nobody schedules a 37-minute session. */
+export const MEETUP_DURATION_STEP = 15;
+
 /** Availability polls. */
 export const POLL_SLOTS_MIN = 2;
-export const POLL_SLOTS_MAX = 20;
+export const POLL_SLOTS_MAX = 400; // ~2 weeks of 30-min grid cells (was 20 hand-typed slots)

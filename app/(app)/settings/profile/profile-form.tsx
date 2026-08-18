@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { checkAvatarFile } from "@/lib/validation/avatar";
 
 export function ProfileForm({ profile }: { profile: ProfileRow }) {
   const [state, formAction, pending] = useActionState(updateProfileAction, {});
@@ -36,6 +37,9 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
     profile.social_links.length > 0 ? profile.social_links : [],
   );
   const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
+  // Instant client-side verdict on the chosen file (size/type). The
+  // server still re-checks; this just stops silent failures.
+  const [avatarClientError, setAvatarClientError] = React.useState<string | null>(null);
 
   return (
     <Card>
@@ -63,11 +67,17 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
                 className="h-auto py-2"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  setAvatarPreview(file ? URL.createObjectURL(file) : null);
+                  const problem = checkAvatarFile(file);
+                  setAvatarClientError(problem);
+                  setAvatarPreview(file && !problem ? URL.createObjectURL(file) : null);
                 }}
+                aria-invalid={!!(avatarClientError || state.fieldErrors?.avatar)}
                 aria-describedby="avatar-error"
               />
-              <FieldError id="avatar-error" error={state.fieldErrors?.avatar} />
+              <FieldError
+                id="avatar-error"
+                error={avatarClientError ?? state.fieldErrors?.avatar}
+              />
             </div>
           </div>
 
@@ -227,7 +237,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
             </p>
           )}
 
-          <Button type="submit" loading={pending}>
+          <Button type="submit" loading={pending} disabled={!!avatarClientError}>
             Save profile
           </Button>
         </form>

@@ -3,7 +3,7 @@
  * the signed-in app alike).
  *
  * Responsibilities:
- *   1. Load our two fonts (Inter for body/UI, DM Serif Display for
+ *   1. Load our two fonts (Roboto for body/UI, DM Serif Display for
  *      headings) and expose them as CSS variables that globals.css maps
  *      into Tailwind's font-sans / font-display.
  *   2. Set the default <title> / description used for SEO on public pages.
@@ -14,14 +14,16 @@
  * NOT belong here — that lives in the route-group layouts.
  */
 import type { Metadata } from "next";
-import { Inter, DM_Serif_Display } from "next/font/google";
+import { Roboto, DM_Serif_Display } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-/* Two weights only (400/600) per the design spec — keeps page weight down. */
-const inter = Inter({
+/* Body/UI face. Two weights only (400/600) per the design spec — keeps
+   page weight down. Roboto is a static font, so weights must be listed. */
+const roboto = Roboto({
+  weight: ["400", "600"],
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-roboto",
 });
 
 /* Display face ships in a single 400 weight; that is all headings use. */
@@ -44,7 +46,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${dmSerif.variable}`}>
+    <html lang="en" className={`${roboto.variable} ${dmSerif.variable}`}>
       <body>
         {children}
         {/* One global toast portal. richColors keeps success green /

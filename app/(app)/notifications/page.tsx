@@ -10,6 +10,7 @@ import type { NotificationRow } from "@/lib/types";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { NotificationList } from "./notification-list";
+import { LiveRefresh } from "@/lib/hooks/use-live-refresh";
 import Link from "next/link";
 
 export const metadata = { title: "Notifications" };
@@ -28,6 +29,9 @@ export default async function NotificationsPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
+      {/* Re-render this list the moment a notification for me is created
+          or marked read — no manual refresh needed (bug report #8). */}
+      <LiveRefresh table="notifications" filter={`recipient_id=eq.${profile.id}`} />
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-3xl text-ink">Notifications</h1>
         {hasUnread && (

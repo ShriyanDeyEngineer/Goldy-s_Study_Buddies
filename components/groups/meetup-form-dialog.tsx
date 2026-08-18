@@ -20,6 +20,13 @@ import { CalendarPlus } from "lucide-react";
 import { toast } from "sonner";
 import { createMeetupAction } from "@/lib/actions/meetups";
 import {
+  MEETUP_DURATION_DEFAULT,
+  MEETUP_DURATION_MAX,
+  MEETUP_DURATION_MIN,
+  MEETUP_DURATION_STEP,
+} from "@/lib/constants";
+import { formatDuration } from "@/lib/format";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -48,6 +55,10 @@ export function MeetupFormDialog({
   trigger?: React.ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(createMeetupAction, {});
+  // Duration slider (bug report #2). Controlled so the label can read
+  // "1 h 30 min" live as the thumb moves; the value posts as a plain
+  // number of minutes.
+  const [duration, setDuration] = React.useState(MEETUP_DURATION_DEFAULT);
   const [open, setOpen] = React.useState(false);
   const [format, setFormat] = React.useState<"online" | "in_person">("in_person");
   const router = useRouter();
@@ -129,6 +140,39 @@ export function MeetupFormDialog({
               aria-describedby="meetup-when-error"
             />
             <FieldError id="meetup-when-error" error={state.fieldErrors?.scheduled_at} />
+          </div>
+
+          <div>
+            <div className="mb-1.5 flex items-baseline justify-between">
+              <Label htmlFor="meetup-duration" className="mb-0">
+                How long?
+              </Label>
+              <span className="text-sm font-medium text-maroon" aria-live="polite">
+                {formatDuration(duration)}
+              </span>
+            </div>
+            {/* Native range input: keyboard-accessible (arrows/Home/End)
+                and works with the OS on mobile. Snaps to 15-minute steps
+                between 15 min and 8 h. */}
+            <input
+              id="meetup-duration"
+              name="duration_minutes"
+              type="range"
+              min={MEETUP_DURATION_MIN}
+              max={MEETUP_DURATION_MAX}
+              step={MEETUP_DURATION_STEP}
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              aria-valuetext={formatDuration(duration)}
+              aria-invalid={!!state.fieldErrors?.duration_minutes}
+              aria-describedby="meetup-duration-error"
+              className="w-full accent-maroon"
+            />
+            <div className="flex justify-between text-xs text-ink-muted">
+              <span>15 min</span>
+              <span>8 h</span>
+            </div>
+            <FieldError id="meetup-duration-error" error={state.fieldErrors?.duration_minutes} />
           </div>
 
           <div>

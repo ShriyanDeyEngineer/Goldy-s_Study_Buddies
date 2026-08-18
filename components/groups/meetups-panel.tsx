@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { cancelMeetupAction, rsvpAction } from "@/lib/actions/meetups";
 import { googleCalendarUrl } from "@/lib/calendar";
+import { formatDuration } from "@/lib/format";
 import type {
   AvailabilityPollRow,
   AvailabilitySlotRow,
@@ -185,9 +186,17 @@ function MeetupCard({
     onChanged();
   }
 
+  // Real end time from the stored duration (bug report #2) — the calendar
+  // event now matches what the group actually planned instead of a
+  // one-hour guess.
+  const startsAt = new Date(meetup.scheduled_at);
+  const durationMinutes = meetup.duration_minutes ?? 60;
+  const endsAt = new Date(startsAt.getTime() + durationMinutes * 60_000);
+
   const calendarHref = googleCalendarUrl({
     title: `${groupName} — ${meetup.title}`,
-    startsAt: new Date(meetup.scheduled_at),
+    startsAt,
+    endsAt,
     location: meetup.format === "online" ? (meetup.meeting_link ?? "") : (meetup.location ?? ""),
     details: `Study session for ${courseLabel} with ${groupName} (via Goldy's Study Buddies).`,
   });
@@ -211,8 +220,13 @@ function MeetupCard({
             {meetup.title}
           </h3>
           <p className="mt-0.5 text-sm text-ink-muted">
-            {/* Stored in UTC; format() renders the viewer's local time. */}
-            {format(new Date(meetup.scheduled_at), "EEE, MMM d · h:mm a")}
+            {/* Stored in UTC; format() renders the viewer's local time.
+                Shows the full window + how long, e.g.
+                "Tue, Sep 9 · 3:00 – 4:30 PM (1 h 30 min)". */}
+            {format(startsAt, "EEE, MMM d · h:mm")}
+            {" – "}
+            {format(endsAt, "h:mm a")}
+            <span className="text-ink-muted/80"> ({formatDuration(durationMinutes)})</span>
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-muted">
             {meetup.format === "online" ? (

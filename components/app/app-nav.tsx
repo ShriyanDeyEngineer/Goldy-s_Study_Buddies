@@ -3,7 +3,9 @@
  *   - <AppNavLinks>  — inline links in the desktop header
  *   - <MobileNav>    — the fixed bottom bar on phones (the spec's "top
  *                      nav collapses to a bottom row of links")
- * Both highlight the active section.
+ * Both highlight the active section, and both show the live unread-DM
+ * count on "Messages" (one shared subscription — see
+ * unread-messages-badge.tsx for why that matters).
  */
 "use client";
 
@@ -16,6 +18,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { UnreadMessagesBadge } from "@/components/app/unread-messages-badge";
 
 const LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -28,7 +31,13 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
-export function AppNavLinks() {
+/** Props both nav copies need for the unread badge. */
+export interface NavBadgeProps {
+  userId: string;
+  initialUnreadMessages: number;
+}
+
+export function AppNavLinks({ userId, initialUnreadMessages }: NavBadgeProps) {
   const pathname = usePathname();
   return (
     <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
@@ -38,20 +47,23 @@ export function AppNavLinks() {
           href={link.href}
           aria-current={isActive(pathname, link.href) ? "page" : undefined}
           className={cn(
-            "rounded-lg px-3 py-1.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-gold",
+            "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-gold",
             isActive(pathname, link.href)
               ? "bg-maroon text-white"
               : "text-ink-muted hover:bg-line/50 hover:text-ink",
           )}
         >
           {link.label}
+          {link.href === "/messages" && (
+            <UnreadMessagesBadge userId={userId} initial={initialUnreadMessages} />
+          )}
         </Link>
       ))}
     </nav>
   );
 }
 
-export function MobileNav() {
+export function MobileNav({ userId, initialUnreadMessages }: NavBadgeProps) {
   const pathname = usePathname();
   return (
     <nav
@@ -68,7 +80,17 @@ export function MobileNav() {
             isActive(pathname, link.href) ? "text-maroon" : "text-ink-muted",
           )}
         >
-          <link.icon aria-hidden className="h-5 w-5" />
+          {/* relative wrapper so the badge can sit on the icon's corner */}
+          <span className="relative">
+            <link.icon aria-hidden className="h-5 w-5" />
+            {link.href === "/messages" && (
+              <UnreadMessagesBadge
+                userId={userId}
+                initial={initialUnreadMessages}
+                className="absolute -right-2.5 -top-1.5"
+              />
+            )}
+          </span>
           {link.label}
         </Link>
       ))}

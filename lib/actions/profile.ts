@@ -245,6 +245,22 @@ export async function setBuddyAvailabilityAction(available: boolean): Promise<vo
   revalidatePath("/settings/profile");
 }
 
+/** The "email me about group & friend activity" switch (bug report #9).
+ *  Only affects the notification-email webhook; in-app notifications
+ *  always arrive. */
+export async function setEmailNotificationsAction(enabled: boolean): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  await supabase
+    .from("profiles")
+    .update({ email_notifications: enabled })
+    .eq("id", user.id);
+  revalidatePath("/settings/profile");
+}
+
 /** Add/remove a course on one of the three lists (current/taken/future). */
 export async function setCourseEnrollmentAction(
   courseId: string,

@@ -35,6 +35,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { checkAvatarFile } from "@/lib/validation/avatar";
 
 const STEP_TITLES = ["Tell us about you", "What are you taking?", "Add a face and a hello"];
 
@@ -46,9 +47,16 @@ export function OnboardingWizard({
   suggestedName: string;
 }) {
   const [state, formAction, pending] = useActionState(saveOnboardingAction, {});
-  const [step, setStep] = React.useState(0);
+  // Bug report #10: students wanted to get to their courses without first
+  // filling out a form whose one required field (their name) Google
+  // already told us. So when a name arrived with the Google account, the
+  // wizard OPENS on the courses step — the name is prefilled on step 1
+  // and one "Back" away if they want to change it. Nameless accounts
+  // still start at step 1 because the name is genuinely required.
+  const [step, setStep] = React.useState(suggestedName.trim() ? 1 : 0);
   const [courseQuery, setCourseQuery] = React.useState("");
   const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
+  const [avatarClientError, setAvatarClientError] = React.useState<string | null>(null);
 
   // If the server bounced us with field errors, jump to the step that
   // owns the first broken field so the student actually sees it.
@@ -116,7 +124,12 @@ export function OnboardingWizard({
           <fieldset hidden={step !== 0} className="space-y-4">
             <legend className="sr-only">About you</legend>
             <div>
-              <Label htmlFor="display_name">Display name (required)</Label>
+              <Label htmlFor="display_name">
+                Display name (required)
+                {suggestedName.trim() && (
+                  <span className="ml-1.5 font-normal text-ink-muted">— from your Google account, change it if you like</span>
+                )}
+              </Label>
               <Input
                 id="display_name"
                 name="display_name"
@@ -249,12 +262,18 @@ export function OnboardingWizard({
                   className="h-auto py-2"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    setAvatarPreview(file ? URL.createObjectURL(file) : null);
+                    const problem = checkAvatarFile(file);
+                    setAvatarClientError(problem);
+                    setAvatarPreview(file && !problem ? URL.createObjectURL(file) : null);
                   }}
+                  aria-invalid={!!(avatarClientError || state.fieldErrors?.avatar)}
                   aria-describedby="avatar-error"
                 />
               </div>
-              <FieldError id="avatar-error" error={state.fieldErrors?.avatar} />
+              <FieldError
+                id="avatar-error"
+                error={avatarClientError ?? state.fieldErrors?.avatar}
+              />
             </div>
             <div>
               <Label htmlFor="bio">Bio (optional)</Label>
@@ -297,7 +316,7 @@ export function OnboardingWizard({
                 <ArrowRight aria-hidden className="h-4 w-4" />
               </Button>
             ) : (
-              <Button key="finish" type="submit" loading={pending}>
+              <Button key="finish" type="submit" loading={pending} disabled={!!avatarClientError}>
                 Finish — take me in
               </Button>
             )}

@@ -26,6 +26,8 @@ export interface ProfileRow {
   social_links: string[];
   privacy: PrivacyFlags;
   is_available_for_buddies: boolean;
+  /** Email me about group/friend events (webhook honors this). */
+  email_notifications: boolean;
   account_status: "active" | "suspended" | "banned";
   is_admin: boolean;
   onboarded_at: string | null;
@@ -100,6 +102,8 @@ export interface MeetupRow {
   meeting_link: string | null;
   is_cancelled: boolean;
   cancellation_reason: string | null;
+  /** 15–480 whole minutes; drives the shown end time + calendar link. */
+  duration_minutes: number;
   created_at: string;
 }
 
