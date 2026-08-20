@@ -41,6 +41,7 @@ export function AppHeader({
           userId={profile.id}
           displayName={profile.display_name}
           avatarUrl={profile.avatar_url}
+          theme={profile.theme === "dark" ? "dark" : "light"}
         />
       </div>
     </header>
