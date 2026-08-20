@@ -8,6 +8,7 @@ import Link from "next/link";
 import { LogOut, Settings, ShieldBan, UserRound } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
 import { Avatar } from "@/components/ui/avatar";
+import { ThemeToggleItem } from "@/components/app/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,10 +21,12 @@ export function UserMenu({
   userId,
   displayName,
   avatarUrl,
+  theme,
 }: {
   userId: string;
   displayName: string | null;
   avatarUrl: string | null;
+  theme: "light" | "dark";
 }) {
   return (
     <DropdownMenu>
@@ -55,6 +58,8 @@ export function UserMenu({
             Friends &amp; Buddies
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <ThemeToggleItem theme={theme} />
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={() => {

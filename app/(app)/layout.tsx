@@ -57,8 +57,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const unreadNotifications = notificationsRes.count ?? 0;
   const unreadMessages = messagesRes.count ?? 0;
 
+  // Dark mode is signed-in only, so the class goes HERE rather than on
+  // <html> in the root layout — marketing and auth pages share that root
+  // and must stay light. Rendering it server-side (the profile is already
+  // in hand, no extra query) is what avoids a flash of the light theme.
+  //
+  // The `=== "dark"` test, rather than reading the column directly, means
+  // a deploy that lands BEFORE migration 0013 is applied degrades to light
+  // mode instead of crashing: theme is simply undefined until the column
+  // exists. bg-cream paints the wrapper in whichever theme is active.
+  const isDark = typedProfile.theme === "dark";
+
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className={`flex min-h-dvh flex-col bg-cream ${isDark ? "dark" : ""}`}>
       <AppHeader
         profile={typedProfile}
         unreadNotifications={unreadNotifications}
