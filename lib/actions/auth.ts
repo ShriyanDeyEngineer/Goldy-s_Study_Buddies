@@ -26,6 +26,19 @@ import { friendlyError } from "@/lib/errors";
  */
 export async function signInWithGoogleAction(formData: FormData): Promise<void> {
   const next = safeInternalPath(formData.get("next") as string | null);
+
+  // Terms acceptance is checked HERE, not just by the disabled button —
+  // a form post without accept_terms=yes never reaches Google.
+  if (formData.get("accept_terms") !== "yes") {
+    const errorPath = safeInternalPath(
+      formData.get("error_path") as string | null,
+      "/login",
+    );
+    redirect(
+      `${errorPath}?error=${encodeURIComponent("Please accept the Terms of Service to continue.")}`,
+    );
+  }
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({

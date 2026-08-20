@@ -7,8 +7,13 @@
  * the server builds the Google URL with our hd=umn.edu hint and redirects.
  * The optional `next` prop carries where to land after sign-in.
  */
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
 import { signInWithGoogleAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 
 /** Google's "G", drawn inline so we ship no external image. */
 function GoogleG() {
@@ -34,12 +39,50 @@ function GoogleG() {
   );
 }
 
-export function GoogleButton({ next }: { next?: string }) {
+export function GoogleButton({
+  next,
+  /** Where the server sends the "accept the terms first" error — the page
+   *  this button sits on, so the message appears where the user is. */
+  errorPath = "/login",
+}: {
+  next?: string;
+  errorPath?: string;
+}) {
+  const [accepted, setAccepted] = React.useState(false);
+
   return (
-    <form action={signInWithGoogleAction}>
+    <form action={signInWithGoogleAction} className="space-y-3">
       {next && <input type="hidden" name="next" value={next} />}
+      <input type="hidden" name="error_path" value={errorPath} />
+
+      {/* The terms gate: the button stays disabled until this is checked.
+          The checkbox posts accept_terms=yes with the form, and the server
+          action re-checks it — the disabled button is UX, not the rule. */}
+      <div className="flex items-start gap-2">
+        <Checkbox
+          id="accept-terms"
+          name="accept_terms"
+          value="yes"
+          checked={accepted}
+          onCheckedChange={(value) => setAccepted(value === true)}
+          className="mt-0.5"
+        />
+        <label htmlFor="accept-terms" className="text-sm text-ink-muted">
+          I agree to the{" "}
+          <Link
+            href="/terms_of_service"
+            target="_blank"
+            rel="noopener"
+            className="font-medium text-maroon underline underline-offset-2"
+          >
+            Terms of Service
+          </Link>
+          .
+        </label>
+      </div>
+
       {/* The one and only way in, so it gets primary styling. */}
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full" disabled={!accepted}>
         <GoogleG />
         Continue with UMN Google
       </Button>

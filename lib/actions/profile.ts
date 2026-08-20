@@ -322,6 +322,8 @@ export async function deleteAccountAction(): Promise<{ error?: string }> {
 
   const { error } = await supabase.rpc("delete_account");
   if (error) return { error: friendlyError(error) };
-  await supabase.auth.signOut();
+  // Local scope: the RPC deleted the auth user, so the server-side
+  // session is already gone — this just clears the cookies.
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/");
 }

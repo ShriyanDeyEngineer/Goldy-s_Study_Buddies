@@ -12,7 +12,12 @@ import { GoogleButton } from "@/components/auth/google-button";
 
 export const metadata: Metadata = { title: "Sign up" };
 
-export default function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
   return (
     <Card>
       <CardContent>
@@ -22,7 +27,13 @@ export default function RegisterPage() {
           Google account (the one ending in @umn.edu).
         </p>
 
-        <GoogleButton next="/onboarding" />
+        {params.error && (
+          <p role="alert" className="mb-4 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+            {params.error}
+          </p>
+        )}
+
+        <GoogleButton next="/onboarding" errorPath="/register" />
 
         <p className="mt-6 text-center text-sm text-ink-muted">
           Already have an account?{" "}

@@ -279,5 +279,17 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       avatar; groups U1 managed got a new manager (or disbanded if U1
       was the only member).
 - [ ] **After deletion (as U1)**: signing in with the same Google account
-      shows the "This account has been deleted" screen; no app pages
-      reachable.
+      creates a BRAND-NEW account — onboarding wizard, empty profile, no
+      old groups/friends/DMs. Old messages from before the deletion still
+      show "Unknown", not the new account's name.
+
+## Terms-of-service gate — 2026-08-20
+
+- [ ] /login and /register both show "I agree to the Terms of Service"
+      with the link opening /terms_of_service in a new tab; the Google
+      button is disabled until checked.
+- [ ] Checking the box enables the button; the flow reaches Google's
+      account chooser as before.
+- [ ] Bypass check: submitting the form without the box (e.g. re-enabling
+      the button in devtools) bounces back to the same page with "Please
+      accept the Terms of Service to continue." — it never reaches Google.
