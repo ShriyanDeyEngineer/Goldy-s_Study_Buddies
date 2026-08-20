@@ -14,8 +14,6 @@ const NAV_LINKS = [
   { href: "/about", label: "About us" },
   { href: "/why", label: "Why use it" },
   { href: "/testimonials", label: "Testimonials" },
-  { href: "/terms_of_service", label: "Terms & Conditions" },
-  { href: "/privacy_policy", label: "Privacy Policy" },
 ];
 
 export function PublicHeader() {
