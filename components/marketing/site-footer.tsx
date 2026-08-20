@@ -48,8 +48,8 @@ export function SiteFooter() {
         Built by UMN students, for UMN students. Not officially affiliated with the University of Minnesota.
 
         <p className="mt-2 text-center text-xs text-white/60">
-          <Link href="/terms_of_service" className="text-white/80 hover:text-gold">Terms &#8200;</Link>
-          <Link href="/privacy_policy" className="text-white/80 hover:text-gold">Privacy</Link>
+          <Link href="/terms_of_service" className="text-white/80 hover:text-gold">Terms & Conditions&#8200;</Link>
+          <Link href="/privacy_policy" className="text-white/80 hover:text-gold">Privacy Policy</Link>
         </p>
 
         <p className="mt-2 text-center text-xs text-white/60">
