@@ -302,6 +302,24 @@ export async function setCourseEnrollmentAction(
  */
 export async function deleteAccountAction(): Promise<{ error?: string }> {
   const supabase = await createClient();
+
+  // Avatar cleanup happens HERE, not in SQL: the database function's owner
+  // has no privileges on the storage schema (migration 0015), but the
+  // user's own session may delete files in their own folder (0009
+  // policies) — and the storage API removes the actual bytes. Best-effort:
+  // a leftover file references nothing once the profile is scrubbed.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    const { data: files } = await supabase.storage.from("avatars").list(user.id);
+    if (files?.length) {
+      await supabase.storage
+        .from("avatars")
+        .remove(files.map((f) => `${user.id}/${f.name}`));
+    }
+  }
+
   const { error } = await supabase.rpc("delete_account");
   if (error) return { error: friendlyError(error) };
   await supabase.auth.signOut();
