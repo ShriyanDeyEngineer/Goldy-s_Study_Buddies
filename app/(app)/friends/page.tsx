@@ -86,7 +86,7 @@ export default async function FriendsPage() {
       {nothingAnywhere ? (
         <EmptyState
           title="No connections yet"
-          description="Find classmates on the People page and send a friend request."
+          description="Added study buddies will show up here."
           action={
             <Button asChild>
               <Link href="/people">Find people</Link>
