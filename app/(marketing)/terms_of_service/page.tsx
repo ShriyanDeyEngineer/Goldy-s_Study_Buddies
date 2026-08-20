@@ -1,3 +1,5 @@
+/** This is the web page that display's our terms and conditions for users */
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
