@@ -133,7 +133,8 @@ export function GroupChat({
 
   async function send() {
     if (empty || overLimit || sending) return;
-    let content = draft;
+    /** Before the drafted message is appended to the chat log and sent, pass it through the filter function */
+    const content = messageNaughtyFilter(NAUGHTY_WORDS, draft);
     setSending(true);
     const { message, error } = await sendGroupMessageAction(groupId, content);
     setSending(false);
@@ -143,9 +144,6 @@ export function GroupChat({
     }
     setDraft("");
     pinnedToBottom.current = true;
-    
-    /** Before the drafted message is appended to the chat log and sent, pass it through the filter function */
-    content = messageNaughtyFilter(NAUGHTY_WORDS, content);
 
     if (message) {
       // Render immediately; the realtime echo of this id gets de-duped.
