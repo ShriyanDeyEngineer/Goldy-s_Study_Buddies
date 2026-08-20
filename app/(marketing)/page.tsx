@@ -76,8 +76,8 @@ export default function HomePage() {
             Find your study buddies
           </h1>
           <p className="mt-4 max-w-xl text-lg text-white/85">
-            Find study partners and join study groups for your exact UMN courses —
-            from Calc I to orgo. Free, built by students, for students.
+            Find study partners and join or create study groups for your UMN courses.
+            <span className="font-bold text-gold"> It's free to use</span>, built by students, for students.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild variant="secondary" size="lg">
