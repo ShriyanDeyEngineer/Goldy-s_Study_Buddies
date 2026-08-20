@@ -63,7 +63,7 @@ export function LogoLockup({
     >
       <GopherLogo className={cn("h-7 w-7", dark ? "text-gold" : "text-maroon")} />
       <span>
-        Goldy&rsquo;s <span className={dark ? "text-gold" : ""}>Study Buddies</span>
+        <span className={dark ? "text-gold" : ""}>Goldy&rsquo;s Study Buddies</span>
       </span>
     </span>
   );
