@@ -20,14 +20,14 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   ACCOUNT_DISABLED: "Your account is currently suspended.",
 
   // ── Groups ───────────────────────────────────────────────────────────
-  GROUP_FULL: "This group is full — try another one, or start your own.",
+  GROUP_FULL: "This group is full.",
   GROUP_NOT_FOUND: "We couldn't find that group. It may have been disbanded.",
   GROUP_UNAVAILABLE: "This group isn't active anymore.",
   NAME_TAKEN: "A group with that name already exists for this course — pick another name.",
   NOT_MANAGER: "Only the group's manager can do that.",
   NOT_MEMBER: "You're not a member of this group.",
-  ALREADY_MEMBER: "You're already in this group!",
-  DUPLICATE_REQUEST: "You already have a request waiting — hang tight.",
+  ALREADY_MEMBER: "You're already in this group.",
+  DUPLICATE_REQUEST: "You already have a pending request.",
   NO_PENDING_REQUEST: "There's no pending request to withdraw.",
   INVALID_NAME: "Group names need to be 1–100 characters.",
   INVALID_CAPACITY: "Capacity must be between 2 and 50.",
@@ -38,7 +38,7 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
 
   // ── Requests / invitations ───────────────────────────────────────────
   REQUEST_NOT_FOUND: "That request doesn't exist anymore.",
-  ALREADY_RESOLVED: "This one's already been handled — refresh to see the latest.",
+  ALREADY_RESOLVED: "This was already handled. Refresh to see the latest.",
   NOT_ALLOWED: "You don't have permission to do that.",
 
   // ── Meetups & polls ──────────────────────────────────────────────────
@@ -54,7 +54,7 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   INVALID_DURATION: "Sessions run between 15 minutes and 8 hours.",
   POLL_NOT_FOUND: "We couldn't find that poll.",
   POLL_CLOSED: "This poll is closed.",
-  INVALID_SLOTS: "Polls need 2–20 future time slots, each ending after it starts.",
+  INVALID_SLOTS: "Polls need 2–400 future time slots, each ending after it starts.",
 
   // ── Messages ─────────────────────────────────────────────────────────
   EMPTY_MESSAGE: "Type a message first.",
@@ -63,9 +63,9 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   // ── People ───────────────────────────────────────────────────────────
   USER_NOT_FOUND: "We couldn't find that person.",
   SELF_ACTION: "You can't do that to yourself.",
-  ALREADY_FRIENDS: "You're already friends!",
+  ALREADY_FRIENDS: "You're already friends.",
   NOT_FRIENDS: "You're not friends with this person.",
-  ALREADY_CONNECTED: "You're already study buddies!",
+  ALREADY_CONNECTED: "You're already study buddies.",
   NOT_CONNECTED: "You're not study buddies with this person.",
   NOT_AVAILABLE: "This person isn't looking for a study buddy right now.",
   BLOCKED: "You can't send that request.",
@@ -82,7 +82,7 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
 };
 
 export const GENERIC_ERROR =
-  "Something went wrong on our end. Give it another try in a moment.";
+  "Something went wrong on our end. Try again in a moment.";
 
 /**
  * Turns anything a Supabase call can throw/return into friendly copy.

@@ -28,7 +28,7 @@ const STEPS = [
   },
   {
     title: "Join or create a group",
-    body: "Hop into an open group instantly, request a closed one, or start your own and invite classmates.",
+    body: "Join an open group instantly, request a closed one, or start your own and invite classmates.",
   },
 ];
 
@@ -36,12 +36,12 @@ const FEATURES = [
   {
     icon: Users,
     title: "Groups for your exact course",
-    body: "Not \"STEM study group\" — a group for your section of Chem 1061, with people taking the same exams.",
+    body: "A group for your specific course, with people taking the same exams.",
   },
   {
     icon: MessageCircle,
     title: "Built-in group chat",
-    body: "Every group gets a realtime chat. No \"what's everyone's number?\" spreadsheet required.",
+    body: "Every group gets a realtime chat, so plans and questions stay in one place.",
   },
   {
     icon: CalendarClock,
@@ -56,12 +56,12 @@ const FEATURES = [
   {
     icon: Sparkles,
     title: "Study buddies, 1-on-1",
-    body: "Prefer one partner over a crowd? Flip on study-buddy mode and match by shared classes.",
+    body: "If you want a single study partner instead of a group, turn on study-buddy availability and match by shared classes.",
   },
   {
     icon: ShieldCheck,
     title: "Students only, privacy first",
-    body: "UMN-verified accounts, per-field profile privacy, and blocking that actually blocks.",
+    body: "UMN-verified accounts, per-field profile privacy, and blocking controls.",
   },
 ];
 
@@ -98,7 +98,7 @@ export default function HomePage() {
       <section id="how-it-works" className="mx-auto max-w-6xl scroll-mt-8 px-4 py-16 sm:py-20">
         <h2 className="text-center font-display text-3xl text-ink">How it works</h2>
         <p className="mx-auto mt-2 max-w-md text-center text-ink-muted">
-          Three steps between you and a group that gets it.
+          Three steps to find your study group.
         </p>
         <ol className="mt-10 grid gap-6 sm:grid-cols-3">
           {STEPS.map((step, index) => (
@@ -148,7 +148,7 @@ export default function HomePage() {
           Your study group is already on campus.
         </h2>
         <p className="mx-auto mt-2 max-w-md text-ink-muted">
-          They just haven&rsquo;t met you yet. Break the ice — even a &ldquo;hey&rdquo; works.
+          Find the classmates taking your courses and start studying together.
         </p>
         <Button asChild size="lg" className="mt-8">
           <Link href="/register">Find your study buddies</Link>

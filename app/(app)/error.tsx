@@ -10,8 +10,8 @@ import { ErrorState } from "@/components/ui/error-state";
 export default function AppError({ reset }: { error: Error; reset: () => void }) {
   return (
     <ErrorState
-      title="This page hit a snag"
-      description="Something on our end broke while loading. Your data is fine — try again."
+      title="Something went wrong"
+      description="Something broke while loading this page. Try again."
       onRetry={reset}
     />
   );

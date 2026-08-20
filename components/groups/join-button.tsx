@@ -45,9 +45,9 @@ export function JoinButton({
     if (error) {
       toast.error(error);
     } else if (result === "joined") {
-      toast.success("You're in! Welcome to the group.");
+      toast.success("You've joined the group.");
     } else {
-      toast.success("Request sent — the manager will take a look.");
+      toast.success("Request sent to the group manager.");
     }
     router.refresh();
   }

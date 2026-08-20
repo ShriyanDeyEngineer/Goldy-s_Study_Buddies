@@ -22,7 +22,7 @@ export function BuddyPromo({ available }: { available: boolean }) {
         <Sparkles aria-hidden className="h-4 w-4" />
         {available
           ? "You're discoverable as a study buddy — classmates can send you buddy requests."
-          : "Want a 1-on-1 study partner? Flip this on to appear in buddy searches."}
+          : "Turn this on to appear in study-buddy searches and get 1-on-1 partner requests."}
       </p>
       <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm font-medium text-maroon">
         <Switch
@@ -33,8 +33,8 @@ export function BuddyPromo({ available }: { available: boolean }) {
               await setBuddyAvailabilityAction(checked === true);
               toast.success(
                 checked
-                  ? "You're in the study-buddy pool!"
-                  : "Okay — you won't appear in buddy searches.",
+                  ? "You're now listed as available."
+                  : "You won't appear in buddy searches.",
               );
               router.refresh();
             });

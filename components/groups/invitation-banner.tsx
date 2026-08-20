@@ -30,7 +30,7 @@ export function InvitationBanner({
     if (error) {
       toast.error(error);
     } else if (result === "joined") {
-      toast.success("Welcome to the group!");
+      toast.success("You've joined the group.");
     } else if (result === "cancelled_full") {
       toast.warning("Ah, bad luck — the group filled up before you accepted.");
     }

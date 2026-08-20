@@ -59,10 +59,10 @@ export function ProfileMissingScreen() {
       <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-warning/15">
         <TriangleAlert aria-hidden className="h-7 w-7 text-warning" />
       </span>
-      <h1 className="font-display text-2xl text-ink">Something's off with your account</h1>
+      <h1 className="font-display text-2xl text-ink">There was a problem setting up your account</h1>
       <p className="mt-2 text-sm text-ink-muted">
         You're signed in, but your profile didn't finish setting up. Sign out and
-        register again — that fixes it. If it keeps happening, tell the team.
+        register again. If it keeps happening, contact the team.
       </p>
       <form action={signOutAction} className="mt-6">
         <Button type="submit" variant="outline">

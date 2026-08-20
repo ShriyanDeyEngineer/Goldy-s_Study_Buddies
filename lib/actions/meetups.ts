@@ -52,7 +52,7 @@ export async function createMeetupAction(
   if (error) return { error: friendlyError(error) };
 
   revalidatePath(`/groups/${parsed.data.group_id}`);
-  return { success: "Meetup scheduled!" };
+  return { success: "Meetup scheduled." };
 }
 
 export async function cancelMeetupAction(
@@ -124,7 +124,7 @@ export async function createAvailabilityPollAction(
   if (error) return { error: friendlyError(error) };
 
   revalidatePath(`/groups/${parsed.data.group_id}`);
-  return { success: "Poll created — time to vote!" };
+  return { success: "Poll created." };
 }
 
 export async function voteAvailabilityAction(

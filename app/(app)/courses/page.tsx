@@ -121,7 +121,7 @@ export default async function CoursesPage({
       {courses.length === 0 ? (
         <EmptyState
           title="No courses match"
-          description="Try a shorter search — or if your course genuinely isn't here yet, add it and be the reason your classmates find it."
+          description="Try a shorter search, or add the course if it isn't in the catalog yet."
           action={<AddCourseDialog triggerLabel="Add a missing course" />}
         />
       ) : (

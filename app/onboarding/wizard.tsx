@@ -37,7 +37,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { checkAvatarFile } from "@/lib/validation/avatar";
 
-const STEP_TITLES = ["Tell us about you", "What are you taking?", "Add a face and a hello"];
+const STEP_TITLES = ["Tell us about you", "What are you taking?", "Add a photo and bio"];
 
 export function OnboardingWizard({
   courses,
@@ -282,7 +282,7 @@ export function OnboardingWizard({
                 name="bio"
                 maxLength={500}
                 rows={4}
-                placeholder="Hey! I'm usually at Walter Library after 4. Strong opinions about whiteboard markers."
+                placeholder="I'm usually at Walter Library after 4 and looking for a weekly group."
                 aria-describedby="bio-error"
               />
               <FieldError id="bio-error" error={state.fieldErrors?.bio} />

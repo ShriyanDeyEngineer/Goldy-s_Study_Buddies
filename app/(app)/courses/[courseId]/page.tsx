@@ -89,7 +89,7 @@ export default async function CourseDetailPage({
       {groups.length === 0 ? (
         <EmptyState
           title="No study groups here yet"
-          description="Be the icebreaker — create the first group for this course. Open groups fill up fast once they exist."
+          description="Create the first group for this course so your classmates have one to join."
           action={
             <Button asChild>
               <Link href={`/groups/new?course=${course.id}`}>Create the first group</Link>

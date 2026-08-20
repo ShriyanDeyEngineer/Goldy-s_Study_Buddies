@@ -45,7 +45,7 @@ export default async function NotificationsPage() {
 
       {notifications.length === 0 ? (
         <EmptyState
-          title="All quiet for now"
+          title="No notifications yet"
           description="Group invitations, join requests, meetup changes, and friend requests will land here."
           action={
             <Button asChild>

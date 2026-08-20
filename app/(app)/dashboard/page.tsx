@@ -109,7 +109,7 @@ export default async function DashboardPage() {
     <div className="space-y-10">
       <div>
         <h1 className="font-display text-3xl text-ink">
-          Hey, {profile.display_name?.split(" ")[0]} 👋
+          Hey, {profile.display_name?.split(" ")[0]}
         </h1>
         <p className="mt-1 text-ink-muted">Here&rsquo;s what&rsquo;s happening with your studies.</p>
       </div>
@@ -215,8 +215,8 @@ export default async function DashboardPage() {
         </div>
         {mostActiveCourses.length === 0 ? (
           <EmptyState
-            title="No study groups exist yet — anywhere"
-            description="Someone has to be first, and 'first' looks great on you. Create the very first group and your classmates will find it."
+            title="No study groups yet"
+            description="Create the first group for one of your courses and your classmates will find it."
             action={
               <Button asChild>
                 <Link href="/courses">Create the first group</Link>

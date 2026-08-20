@@ -24,18 +24,17 @@ export default function AboutPage() {
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl text-ink">About us</h1>
         <p className="mt-4 text-ink-muted">
-          We&rsquo;re a group of UMN students who kept watching the same thing happen: lecture
-          halls full of people quietly struggling with the same problem sets, none of
-          them studying together. Office hours that don&rsquo;t fit your schedule.
-          Sign-up spreadsheets that die by week three. Friends made in week one,
-          never seen again after seats shuffle.
+          We&rsquo;re a group of UMN students who kept seeing the same thing: lecture
+          halls full of people working through the same problem sets, none of them
+          studying together. Office hours don&rsquo;t fit every schedule, sign-up
+          spreadsheets stop being used after a few weeks, and the people you meet
+          in week one are hard to find again.
         </p>
         <p className="mt-4 text-ink-muted">
-          Goldy&rsquo;s Study Buddies is our fix: a place where finding people in{" "}
-          <em>your</em> course takes two clicks, joining a group doesn&rsquo;t require
-          being the outgoing one, and scheduling a session doesn&rsquo;t take nineteen
-          texts. It&rsquo;s free, it&rsquo;s student-run, and it exists because we
-          wanted it to exist for ourselves.
+          Goldy&rsquo;s Study Buddies is our fix: finding people in your course takes
+          two clicks, joining a group doesn&rsquo;t require being outgoing, and
+          scheduling a session doesn&rsquo;t take a long text thread. It&rsquo;s
+          free, student-run, and built because we wanted it ourselves.
         </p>
       </div>
 

@@ -26,14 +26,14 @@ export default function TestimonialsPage() {
     <div className="mx-auto max-w-6xl px-4 py-14">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl text-ink">Testimonials</h1>
-        <p className="mt-4 text-ink-muted">Real words from real Gophers.</p>
+        <p className="mt-4 text-ink-muted">What students say about the site.</p>
       </div>
 
       <div className="mx-auto mt-10 max-w-2xl">
         {TESTIMONIALS.length === 0 ? (
           <EmptyState
-            title="No testimonials yet — you could be the first"
-            description="We just launched. Join, find your people, and if it helps you through a midterm, tell us — your words could be the ones that convince the next student not to study alone."
+            title="No testimonials yet"
+            description="We just launched. If the site helps you, email us and we may feature your words here."
             action={
               <Button asChild variant="secondary">
                 <Link href="/register">Be an early Gopher</Link>

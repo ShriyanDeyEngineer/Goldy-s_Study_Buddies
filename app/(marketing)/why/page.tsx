@@ -23,27 +23,27 @@ const ARGUMENTS = [
   {
     icon: Landmark,
     title: "Office hours don't fit everyone",
-    body: "Tutoring rooms and office hours run on fixed schedules — and attendance collapses right when the material gets hard. Your group meets when YOUR schedules line up.",
+    body: "Tutoring rooms and office hours run on fixed schedules that don't work for everyone. Your group meets when your schedules line up.",
   },
   {
     icon: DoorOpen,
     title: "Open groups beat cold approaches",
-    body: "Walking up to strangers in a 300-person lecture takes nerve. Clicking \"Join\" on an open group doesn't. Shy is fine here.",
+    body: "Walking up to strangers in a 300-person lecture is hard. Clicking \"Join\" on an open group isn't.",
   },
   {
     icon: UserRound,
     title: "Every section isn't equal",
-    body: "Some sections get the great TA; some don't. Groups connect students ACROSS sections, so everyone gets access to the classmate who finally makes recursion click.",
+    body: "Some sections get more support than others. Groups connect students across sections, so everyone has access to the same help.",
   },
   {
     icon: Table2,
     title: "No more dead spreadsheets",
-    body: "Professors mean well, but a sign-up sheet nobody maintains isn't a study group. Groups here have chat, meetups, and RSVPs built in — they stay alive.",
+    body: "A sign-up sheet nobody maintains isn't a study group. Groups here have chat, meetups, and RSVPs built in.",
   },
   {
     icon: MessagesSquare,
     title: "It's a talking point",
-    body: "\"Want to join my study group?\" is the easiest opener on campus. Plenty of long friendships start with one problem set.",
+    body: "Asking someone to join your study group is an easy way to start a conversation. Many friendships start with a shared problem set.",
   },
 ];
 
@@ -53,8 +53,8 @@ export default function WhyPage() {
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl text-ink">Why use Goldy&rsquo;s Study Buddies?</h1>
         <p className="mt-4 text-ink-muted">
-          Because the hardest part of studying together isn&rsquo;t the studying —
-          it&rsquo;s the finding-each-other part. That&rsquo;s the part we fixed.
+          The hardest part of studying together is finding people to study with.
+          That&rsquo;s the part this site handles.
         </p>
       </div>
 

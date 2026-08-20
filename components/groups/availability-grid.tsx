@@ -115,7 +115,12 @@ export function AvailabilityGrid({
   // state. (State still drives the paint; the ref drives the commit.)
   const previewRef = React.useRef<Set<string> | null>(null);
   const [busy, setBusy] = React.useState(false);
-  const [hover, setHover] = React.useState<string | null>(null);
+  // Hovered cell + where to anchor its who's-free popup. Coordinates are
+  // relative to wrapRef (the outermost, NON-scrolling box) — anchoring
+  // inside the overflow-x-auto container would clip the popup at its edge.
+  const [hover, setHover] = React.useState<{ id: string; x: number; y: number } | null>(
+    null,
+  );
 
   const shown = preview ?? mine;
 
@@ -167,6 +172,37 @@ export function AvailabilityGrid({
   // exact and works even for cells scrolled off-screen (auto-scroll then
   // reveals them).
   const gridRef = React.useRef<HTMLDivElement>(null);
+  const wrapRef = React.useRef<HTMLDivElement>(null);
+
+  /** Track which cell the mouse is over and anchor the popup to it.
+   *  One listener on the grid root (pointerover bubbles) instead of a
+   *  handler per cell; anything that isn't a votable cell clears it. */
+  function onPointerOver(e: React.PointerEvent) {
+    const el = (e.target as HTMLElement | null)?.closest?.(
+      "[data-day][data-row]",
+    ) as HTMLElement | null;
+    const wrap = wrapRef.current;
+    if (!el || !wrap) {
+      setHover(null);
+      return;
+    }
+    const dayKey = grid.columns[Number(el.dataset.day)]?.dayKey;
+    const minute = grid.rows[Number(el.dataset.row)]?.minuteOfDay;
+    const id = dayKey !== undefined && minute !== undefined ? grid.cell[dayKey]?.[minute] : undefined;
+    if (!id) {
+      setHover(null);
+      return;
+    }
+    const cellBox = el.getBoundingClientRect();
+    const wrapBox = wrap.getBoundingClientRect();
+    // Centered over the cell, clamped so it can't poke past the sides.
+    const x = Math.min(
+      Math.max(cellBox.left - wrapBox.left + cellBox.width / 2, 48),
+      wrapBox.width - 48,
+    );
+    setHover({ id, x, y: cellBox.top - wrapBox.top });
+  }
+
   function cellFromPoint(clientX: number, clientY: number) {
     const root = gridRef.current;
     if (!root) return null;
@@ -192,7 +228,10 @@ export function AvailabilityGrid({
     if (at) applyRect(at);
   }
 
-  async function onPointerUp() {
+  async function onPointerUp(e: React.PointerEvent) {
+    // Touch has no hover state — don't leave a stale popup after the
+    // finger lifts.
+    if (e.pointerType !== "mouse") setHover(null);
     if (!dragRef.current) return;
     dragRef.current = null;
     // Read the ref, not `preview` state — see the comment on previewRef.
@@ -260,15 +299,15 @@ export function AvailabilityGrid({
 
   const hoverInfo = hover
     ? (() => {
-        const others = othersBySlot.get(hover) ?? [];
+        const others = othersBySlot.get(hover.id) ?? [];
         const names = others.map((id) => memberName[id] ?? "Someone");
-        if (shown.has(hover)) names.unshift("You");
+        if (shown.has(hover.id)) names.unshift("You");
         return names;
       })()
     : null;
 
   return (
-    <div className="space-y-2">
+    <div ref={wrapRef} className="relative space-y-2">
       <p className="text-xs text-ink-muted">
         Drag across the times you&rsquo;re free. Darker green = more people can make it.
       </p>
@@ -280,6 +319,7 @@ export function AvailabilityGrid({
           aria-label="Availability grid — drag to mark when you're free"
           className="select-none touch-none"
           style={{ minWidth: `${TIME_COL + grid.columns.length * MIN_COL}px` }}
+          onPointerOver={onPointerOver}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -354,7 +394,6 @@ export function AvailabilityGrid({
                       aria-label={`${format(col.date, "EEE M/d")} ${formatMinuteOfDay(row.minuteOfDay)} — ${pluralize(count, "person", "people")} free${isMine ? ", including you" : ""}`}
                       disabled={disabled}
                       onKeyDown={(e) => onCellKey(e, id)}
-                      onPointerEnter={() => setHover(id)}
                       className={cn(
                         ROW_H,
                         "border-b border-l border-line/60 transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold",
@@ -372,16 +411,25 @@ export function AvailabilityGrid({
         </div>
       </div>
 
-      {/* Hover readout + legend */}
+      {/* Who's-free popup: floats just above the hovered cell and
+          disappears the moment the mouse leaves it. margin:0 inline
+          keeps the parent's space-y from nudging the anchor point. */}
+      {hover && hoverInfo && (
+        <div
+          role="tooltip"
+          className="pointer-events-none absolute z-20 max-w-72 -translate-x-1/2 -translate-y-full truncate whitespace-nowrap rounded-lg border border-line bg-surface px-2.5 py-1.5 text-xs text-ink shadow-md"
+          style={{ left: hover.x, top: hover.y - 6, margin: 0 }}
+        >
+          {hoverInfo.length
+            ? `Free: ${hoverInfo.join(", ")}`
+            : "Nobody's free at this time yet"}
+        </div>
+      )}
+
+      {/* Saving state + legend */}
       <div className="flex min-h-5 flex-wrap items-center justify-between gap-2 text-xs">
         <span className="text-ink" aria-live="polite">
-          {hoverInfo
-            ? hoverInfo.length
-              ? `Free: ${hoverInfo.join(", ")}`
-              : "Nobody's marked this time yet"
-            : busy
-              ? "Saving…"
-              : `${pluralize(mine.size, "slot")} marked · you`}
+          {busy ? "Saving…" : `${pluralize(mine.size, "slot")} marked`}
         </span>
         <span className="flex items-center gap-1 text-ink-muted">
           <span className="text-[10px]">fewer</span>

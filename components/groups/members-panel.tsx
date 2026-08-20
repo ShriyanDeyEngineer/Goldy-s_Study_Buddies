@@ -54,7 +54,7 @@ export function MembersPanel({
       // The invariant-#2 message: the group filled while this waited.
       toast.warning("Your group is now full — that request was cancelled and the student was told.");
     } else {
-      toast.success("Approved — they're in!");
+      toast.success("Request approved.");
     }
     router.refresh();
   }

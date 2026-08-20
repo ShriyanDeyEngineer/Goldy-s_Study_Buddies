@@ -26,9 +26,8 @@ export default function AuthErrorPage() {
           </span>
           <h1 className="font-display text-2xl text-ink">That sign-in didn&rsquo;t finish</h1>
           <p className="mt-2 text-sm text-ink-muted">
-            The trip through Google got interrupted — maybe the window was
-            closed, or the link was already used. No harm done; give it
-            another go.
+            The Google sign-in was interrupted — the window may have been closed,
+            or the link already used. Try again.
           </p>
           <div className="mt-6 flex flex-col gap-3">
             <Button asChild variant="secondary">

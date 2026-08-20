@@ -31,7 +31,7 @@ export default async function MessagesPage() {
       {conversations.length === 0 ? (
         <EmptyState
           title="No conversations yet"
-          description="Say hi to a classmate! Open someone's profile and hit Message — even a 'hey' works."
+          description="Open a classmate's profile and select Message to start a conversation."
           action={
             <Button asChild>
               <Link href="/people">Find people</Link>

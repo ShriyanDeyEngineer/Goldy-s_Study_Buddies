@@ -84,8 +84,8 @@ export function PollsSection({
 
       {openPolls.length === 0 ? (
         <p className="mt-2 text-sm text-ink-muted">
-          Can&rsquo;t agree on a time? Open a poll — everyone paints when they&rsquo;re
-          free and the best slot rises to the top.
+          Open a poll to find a time: everyone marks when they&rsquo;re free, and
+          the best slot rises to the top.
         </p>
       ) : (
         openPolls.map((poll) => {

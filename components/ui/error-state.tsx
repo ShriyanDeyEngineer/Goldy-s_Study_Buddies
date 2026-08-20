@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 export function ErrorState({
   title = "Something went wrong",
-  description = "That's on us, not you. Give it another try.",
+  description = "Something broke on our end. Try again.",
   onRetry,
   className,
 }: {

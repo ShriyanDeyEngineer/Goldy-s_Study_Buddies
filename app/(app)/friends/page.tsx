@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FriendLists } from "./friend-lists";
 
-export const metadata = { title: "Friends & buddies" };
+export const metadata = { title: "Friends & Buddies" };
 
 interface RequestRow {
   id: string;
@@ -82,11 +82,11 @@ export default async function FriendsPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-6 font-display text-3xl text-ink">Friends &amp; buddies</h1>
+      <h1 className="mb-6 font-display text-3xl text-ink">Friends &amp; Buddies</h1>
       {nothingAnywhere ? (
         <EmptyState
           title="No connections yet"
-          description="Friendships here usually start in a study group or a shared class. Find your people and send the first request."
+          description="Find classmates on the People page and send a friend request."
           action={
             <Button asChild>
               <Link href="/people">Find people</Link>

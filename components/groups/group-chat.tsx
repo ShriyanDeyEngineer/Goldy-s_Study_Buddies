@@ -171,7 +171,7 @@ export function GroupChat({
         >
           {messages.length === 0 ? (
             <p className="py-10 text-center text-sm text-ink-muted">
-              No messages yet. Break the ice — even a &ldquo;hey&rdquo; works.
+              No messages yet.
             </p>
           ) : (
             messages.map((message, index) => {

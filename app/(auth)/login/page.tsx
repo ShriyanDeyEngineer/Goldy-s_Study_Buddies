@@ -24,7 +24,7 @@ export default async function LoginPage({
       <CardContent>
         <h1 className="font-display text-2xl text-ink">Welcome back</h1>
         <p className="mt-1 mb-6 text-sm text-ink-muted">
-          Sign in with your UMN Google account to find your people.
+          Sign in with your UMN Google account.
         </p>
 
         {/* OAuth error handoff (e.g. non-UMN Google account rejected). */}
@@ -37,8 +37,7 @@ export default async function LoginPage({
         <GoogleButton next={params.next} />
 
         <p className="mt-6 text-center text-sm text-ink-muted">
-          First time here? Same button — your account is created the moment
-          you sign in.
+          First time here? Your account is created the first time you sign in.
         </p>
       </CardContent>
     </Card>
