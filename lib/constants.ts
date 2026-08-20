@@ -74,6 +74,9 @@ export const REPORT_CATEGORIES = [
   { value: "other", label: "Something else" },
 ] as const;
 
+/** Naughty words that shall cause a message to be replaced by some kind of censored message */
+export const NAUGHTY_WORDS = ["fuck", "shit", "ass"] as const;
+
 export const REPORT_CATEGORY_VALUES = REPORT_CATEGORIES.map((c) => c.value);
 export const REPORT_DESCRIPTION_MAX = 1000;
 
