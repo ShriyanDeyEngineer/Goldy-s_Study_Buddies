@@ -160,7 +160,7 @@ export function GroupChat({
   }
 
   /** Function for filtering out and censoring naughty messages */
-  function messageNaughtyFilter(naugthy_words, chat_message)
+  function messageNaughtyFilter(naugthy_words: readonly string[], chat_message: string)
   {
     let chat_message_copy = chat_message.toLowerCase();
 
