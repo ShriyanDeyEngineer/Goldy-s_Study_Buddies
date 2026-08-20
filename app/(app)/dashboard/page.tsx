@@ -207,7 +207,7 @@ export default async function DashboardPage() {
       <section aria-labelledby="explore-heading">
         <div className="mb-4 flex items-center justify-between">
           <h2 id="explore-heading" className="font-display text-xl text-ink">
-            Explore courses
+            Add your Courses
           </h2>
           <Button asChild variant="ghost" size="sm">
             <Link href="/courses">Full catalog</Link>
