@@ -316,3 +316,17 @@ export async function setCourseEnrollmentAction(
   revalidatePath("/dashboard");
   return {};
 }
+
+/**
+ * Self-service account deletion (migration 0014). The database function
+ * leaves every group (succession/disband included), severs the social
+ * graph, and scrubs the profile to "Unknown" — old chats keep their
+ * messages. On success: sign out and land on the marketing home.
+ */
+export async function deleteAccountAction(): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_account");
+  if (error) return { error: friendlyError(error) };
+  await supabase.auth.signOut();
+  redirect("/");
+}

@@ -19,6 +19,7 @@ import {
   sendDirectMessageAction,
 } from "@/lib/actions/messages";
 import { MESSAGE_MAX_LENGTH } from "@/lib/constants";
+import { censorProfanity } from "@/lib/profanity";
 import type { DirectMessageRow, PublicProfile } from "@/lib/types";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -87,7 +88,8 @@ export function DmThread({
 
   async function send() {
     if (empty || overLimit || sending) return;
-    const content = draft;
+    // Same masking the server applies, so the optimistic echo is honest.
+    const content = censorProfanity(draft);
     setSending(true);
     const { message, error } = await sendDirectMessageAction(other.id, content);
     setSending(false);
