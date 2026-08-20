@@ -22,6 +22,7 @@ import { ArrowDown, SendHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { sendGroupMessageAction } from "@/lib/actions/messages";
+import { censorProfanity } from "@/lib/profanity";
 import { MESSAGE_MAX_LENGTH } from "@/lib/constants";
 import type { GroupMessageRow, PublicProfile } from "@/lib/types";
 import { Avatar } from "@/components/ui/avatar";
@@ -132,7 +133,9 @@ export function GroupChat({
 
   async function send() {
     if (empty || overLimit || sending) return;
-    const content = draft;
+    // Mask cuss words locally so the optimistic echo matches what the
+    // server stores (the database masks again — lib/profanity.ts).
+    const content = censorProfanity(draft);
     setSending(true);
     const { message, error } = await sendGroupMessageAction(groupId, content);
     setSending(false);
@@ -205,7 +208,7 @@ export function GroupChat({
                     <div className={cn("max-w-[80%]", mine && "text-right")}>
                       {!mine && (
                         <p className="mb-0.5 text-xs font-medium text-ink-muted">
-                          {sender?.display_name ?? "A former member"}
+                          {sender?.display_name ?? "Unknown"}
                         </p>
                       )}
                       <div

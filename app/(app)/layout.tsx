@@ -33,11 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const typedProfile = profile as ProfileRow;
   if (typedProfile.account_status !== "active") {
-    return (
-      <SuspendedScreen
-        status={typedProfile.account_status === "banned" ? "banned" : "suspended"}
-      />
-    );
+    return <SuspendedScreen status={typedProfile.account_status} />;
   }
   if (!typedProfile.display_name) redirect("/onboarding");
 

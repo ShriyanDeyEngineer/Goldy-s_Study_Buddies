@@ -28,7 +28,7 @@ export interface ProfileRow {
   is_available_for_buddies: boolean;
   /** Email me about group/friend events (webhook honors this). */
   email_notifications: boolean;
-  account_status: "active" | "suspended" | "banned";
+  account_status: "active" | "suspended" | "banned" | "deleted";
   is_admin: boolean;
   onboarded_at: string | null;
   last_login_at: string | null;
