@@ -23,7 +23,6 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { sendGroupMessageAction } from "@/lib/actions/messages";
 import { MESSAGE_MAX_LENGTH } from "@/lib/constants";
-import { NAUGHTY_WORDS } from "@/lib/constants";
 import type { GroupMessageRow, PublicProfile } from "@/lib/types";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -133,8 +132,7 @@ export function GroupChat({
 
   async function send() {
     if (empty || overLimit || sending) return;
-    /** Before the drafted message is appended to the chat log and sent, pass it through the filter function */
-    const content = messageNaughtyFilter(NAUGHTY_WORDS, draft);
+    const content = draft;
     setSending(true);
     const { message, error } = await sendGroupMessageAction(groupId, content);
     setSending(false);
@@ -155,18 +153,6 @@ export function GroupChat({
         created_at: message.created_at,
       });
     }
-  }
-
-  /** Function for filtering out and censoring naughty messages */
-  function messageNaughtyFilter(naugthy_words: readonly string[], chat_message: string)
-  {
-    let chat_message_copy = chat_message.toLowerCase();
-
-    naugthy_words.forEach(naughty_word => {
-      if(chat_message_copy.includes(naughty_word)){chat_message = "[REDACTED]"}
-    });
-
-    return chat_message;
   }
 
   return (
@@ -196,7 +182,7 @@ export function GroupChat({
               const showDateSeparator =
                 !prev ||
                 !isSameDay(new Date(prev.created_at), new Date(message.created_at));
-                
+                console.log(message.content);
               return (
                 <React.Fragment key={message.id}>
                   {showDateSeparator && (

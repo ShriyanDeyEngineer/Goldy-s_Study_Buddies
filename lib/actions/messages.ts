@@ -10,6 +10,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { messageContentSchema } from "@/lib/validation/message";
 import { friendlyError } from "@/lib/errors";
+import { NAUGHTY_WORDS } from "@/lib/constants";
 
 interface SendResult {
   message?: { id: string; created_at: string };
@@ -25,10 +26,13 @@ export async function sendGroupMessageAction(
     return { error: parsed.error.issues[0]?.message ?? "Type a message first." };
   }
 
+  /** Before the drafted message is appended to the chat log and sent, pass it through the filter function */
+  const filteredMessage = messageNaughtyFilter(NAUGHTY_WORDS, parsed.data);
+
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("send_group_message", {
     p_group_id: groupId,
-    p_content: parsed.data,
+    p_content: filteredMessage,
   });
   if (error) return { error: friendlyError(error) };
 
@@ -60,4 +64,16 @@ export async function sendDirectMessageAction(
 export async function markThreadReadAction(otherUserId: string): Promise<void> {
   const supabase = await createClient();
   await supabase.rpc("mark_thread_read", { p_other: otherUserId });
+}
+
+/** Function for filtering out and censoring naughty messages */
+function messageNaughtyFilter(naugthy_words: readonly string[], chat_message: string): string
+{
+  let chat_message_copy = chat_message.toLowerCase();
+
+  naugthy_words.forEach(naughty_word => {
+    if(chat_message_copy.includes(naughty_word)){chat_message = "[REDACTED]"}
+  });
+
+  return chat_message;
 }
