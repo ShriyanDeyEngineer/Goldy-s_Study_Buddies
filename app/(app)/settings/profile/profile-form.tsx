@@ -175,6 +175,8 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
             <Textarea
               id="bio"
               name="bio"
+              className="placeholder:opacity-50"
+              placeholder="Describe yourself, your interests, etc."
               defaultValue={profile.bio ?? ""}
               maxLength={BIO_MAX_LENGTH}
               rows={4}
@@ -192,10 +194,11 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
               {links.map((link, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <Input
+                    className="placeholder:opacity-50"
                     name="social_links"
                     type="url"
                     defaultValue={link}
-                    placeholder="https://instagram.com/goldythegopher"
+                    placeholder="https://instagram.com/JaneDoe"
                     aria-label={`Social link ${index + 1}`}
                   />
                   <Button

@@ -22,23 +22,23 @@ export const metadata: Metadata = {
 const ARGUMENTS = [
   {
     icon: Landmark,
-    title: "Office hours don't fit everyone",
-    body: "Tutoring rooms and office hours run on fixed schedules that don't work for everyone. Your group meets when your schedules line up.",
+    title: "Office hours don't fit everyone everytime",
+    body: "Your schedule may not be compatible with the typically fixed office hours of your courses. Now you can easily find an alternate form of support which fits your schedule with a group of other students in the same courses as you.",
   },
   {
     icon: DoorOpen,
     title: "Open groups beat cold approaches",
-    body: "Walking up to strangers in a 300-person lecture is hard. Clicking \"Join\" on an open group isn't.",
+    body: "Walking up to strangers in a 300-person lecture takes nerve. Clicking \"Join\" on an open group doesn't.",
   },
   {
     icon: UserRound,
     title: "Every section isn't equal",
-    body: "Some sections get more support than others. Groups connect students across sections, so everyone has access to the same help.",
+    body: "Some sections get more support than others. Study buddy groups connect students across sections, so everyone has easier access to those that \"make it click.\"",
   },
   {
     icon: Table2,
-    title: "No more dead spreadsheets",
-    body: "A sign-up sheet nobody maintains isn't a study group. Groups here have chat, meetups, and RSVPs built in.",
+    title: "Efficient meeting planning with your fellow students",
+    body: "Once you join a study group, plan in person/online meetings with students in the same group through availability polls and chat messages. Within the click of a button, send and store the scheduled meeting in your Google Calendar.",
   },
   {
     icon: MessagesSquare,
@@ -53,8 +53,7 @@ export default function WhyPage() {
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl text-ink">Why use Goldy&rsquo;s Study Buddies?</h1>
         <p className="mt-4 text-ink-muted">
-          The hardest part of studying together is finding people to study with.
-          That&rsquo;s the part this site handles.
+          It's better to study with others than alone to be academically successful.
         </p>
       </div>
 

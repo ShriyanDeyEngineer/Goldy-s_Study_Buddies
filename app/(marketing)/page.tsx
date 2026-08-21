@@ -20,11 +20,11 @@ import { GopherLogo } from "@/components/gopher-logo";
 const STEPS = [
   {
     title: "Sign in with UMN Google",
-    body: "One click with your @umn.edu Google account — everyone here is a real U of M student.",
+    body: "Users are verified through UMN and Google SSO. Everyone here is a real student.",
   },
   {
     title: "Pick your courses",
-    body: "Tell us what you're taking — PHYS 1301W, MATH 1371, CSCI 1133, anything. We'll show you who's studying what.",
+    body: "Tell us what you're taking — PHYS 1301W, MATH 1371, CSCI 1133, anything. We'll connect you with classmates.",
   },
   {
     title: "Join or create a group",
@@ -36,32 +36,32 @@ const FEATURES = [
   {
     icon: Users,
     title: "Groups for your exact course",
-    body: "A group for your specific course, with people taking the same exams.",
+    body: "Meet students taking the same courses as you.",
   },
   {
     icon: MessageCircle,
     title: "Built-in group chat",
-    body: "Every group gets a realtime chat, so plans and questions stay in one place.",
+    body: "Real-time chat for efficient planning and studying.",
   },
   {
     icon: CalendarClock,
     title: "Meetups that fit your schedule",
-    body: "Schedule sessions online or in person, RSVP, and add them to Google Calendar in one tap.",
+    body: "Schedule online or in-person study sessions through the availability poll feature or chat feature and then create a new meeting and directly add it to your Google Calendar with the click of a button.",
   },
   {
     icon: Vote,
-    title: "Find a time that works",
+    title: "Find a time that works for your group",
     body: "Availability polls show which slot works for the most people — no back-and-forth.",
   },
   {
     icon: Sparkles,
     title: "Study buddies, 1-on-1",
-    body: "If you want a single study partner instead of a group, turn on study-buddy availability and match by shared classes.",
+    body: "Turn on the study buddy option to open yourself to pairing up with students sharing your courses.",
   },
   {
     icon: ShieldCheck,
     title: "Students only, privacy first",
-    body: "UMN-verified accounts, per-field profile privacy, and blocking controls.",
+    body: "Only verified UMN students have access. You also have blocking controls.",
   },
 ];
 
@@ -98,7 +98,7 @@ export default function HomePage() {
       <section id="how-it-works" className="mx-auto max-w-6xl scroll-mt-8 px-4 py-16 sm:py-20">
         <h2 className="text-center font-display text-3xl text-ink">How it works</h2>
         <p className="mx-auto mt-2 max-w-md text-center text-ink-muted">
-          Three steps to find your study group.
+          Only 3 simple steps between you and your study group.
         </p>
         <ol className="mt-10 grid gap-6 sm:grid-cols-3">
           {STEPS.map((step, index) => (
@@ -145,13 +145,13 @@ export default function HomePage() {
       {/* ── Closing CTA ──────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16 text-center sm:py-20">
         <h2 className="font-display text-3xl text-ink">
-          Your study group is already on campus.
+          Ready to find your study buddies and academic success?
         </h2>
         <p className="mx-auto mt-2 max-w-md text-ink-muted">
-          Find the classmates taking your courses and start studying together.
+          Then click the button below!
         </p>
         <Button asChild size="lg" className="mt-8">
-          <Link href="/register">Find your study buddies</Link>
+          <Link href="/register">Find my study buddies!</Link>
         </Button>
       </section>
     </>

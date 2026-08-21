@@ -24,11 +24,11 @@ export default function AboutPage() {
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl text-ink">About us</h1>
         <p className="mt-4 text-ink-muted">
-          We&rsquo;re a group of UMN students who kept seeing the same thing: lecture
-          halls full of people working through the same problem sets, none of them
-          studying together. Office hours don&rsquo;t fit every schedule, sign-up
-          spreadsheets stop being used after a few weeks, and the people you meet
-          in week one are hard to find again.
+          We&rsquo;re a group of UMN students who saw and felt how hard it is to find 
+          a group of peers from our classes to study with. Whether it be because we 
+          learned better with others, because resources like office hours weren&rsquo;t 
+          fitting with our schedules, or because we just wanted to meet more people 
+          going through the same experiences as us, all of us wanted an easy way to find a study group.
         </p>
         <p className="mt-4 text-ink-muted">
           Goldy&rsquo;s Study Buddies is our fix: finding people in your course takes

@@ -160,7 +160,7 @@ export default async function DashboardPage() {
           <h2 id="my-courses-heading" className="font-display text-xl text-ink">
             Your courses
           </h2>
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="secondary" size="sm">
             <Link href="/settings/courses">Manage courses</Link>
           </Button>
         </div>
@@ -209,7 +209,7 @@ export default async function DashboardPage() {
           <h2 id="explore-heading" className="font-display text-xl text-ink">
             Add your Courses
           </h2>
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="secondary" size="sm">
             <Link href="/courses">Full catalog</Link>
           </Button>
         </div>

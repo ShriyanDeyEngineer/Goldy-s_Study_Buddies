@@ -41,7 +41,7 @@ export function BuddyPromo({ available }: { available: boolean }) {
           }}
           aria-label="Available for study buddy sessions"
         />
-        {available ? "Available" : "Not available"}
+        {available ? "On" : "Off"}
       </label>
     </div>
   );

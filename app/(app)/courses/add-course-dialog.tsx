@@ -44,9 +44,10 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
             <div>
               <Label htmlFor="department_code">Department</Label>
               <Input
+                className="placeholder:opacity-50"
                 id="department_code"
                 name="department_code"
-                placeholder="CSCI"
+                placeholder="MATH"
                 maxLength={8}
                 required
                 aria-invalid={!!state.fieldErrors?.department_code}
@@ -60,9 +61,10 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
             <div>
               <Label htmlFor="course_number">Number</Label>
               <Input
+                className="placeholder:opacity-50"
                 id="course_number"
                 name="course_number"
-                placeholder="1133"
+                placeholder="1272"
                 maxLength={7}
                 required
                 aria-invalid={!!state.fieldErrors?.course_number}
@@ -74,9 +76,10 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
           <div>
             <Label htmlFor="course_name">Course name</Label>
             <Input
+              className="placeholder:opacity-50"
               id="course_name"
               name="course_name"
-              placeholder="Introduction to Computing and Programming Concepts"
+              placeholder="Calculus II"
               maxLength={200}
               required
               aria-invalid={!!state.fieldErrors?.course_name}

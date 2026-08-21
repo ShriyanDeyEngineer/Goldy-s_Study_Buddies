@@ -80,9 +80,10 @@ export function CreateGroupForm({
                   <div>
                     <Label htmlFor="department_code">Department</Label>
                     <Input
+                      className="placeholder:opacity-50"
                       id="department_code"
                       name="department_code"
-                      placeholder="CSCI"
+                      placeholder="EE"
                       required
                       aria-invalid={!!state.fieldErrors?.department_code}
                       aria-describedby="department_code-error"
@@ -95,9 +96,10 @@ export function CreateGroupForm({
                   <div>
                     <Label htmlFor="course_number">Course number</Label>
                     <Input
+                      className="placeholder:opacity-50"
                       id="course_number"
                       name="course_number"
-                      placeholder="1133"
+                      placeholder="2301"
                       required
                       aria-invalid={!!state.fieldErrors?.course_number}
                       aria-describedby="course_number-error"
@@ -111,9 +113,10 @@ export function CreateGroupForm({
                 <div>
                   <Label htmlFor="course_name">Course name</Label>
                   <Input
+                    className="placeholder:opacity-50"
                     id="course_name"
                     name="course_name"
-                    placeholder="Introduction to…"
+                    placeholder="Introduction to Digital System Design"
                     required
                     aria-invalid={!!state.fieldErrors?.course_name}
                     aria-describedby="course_name-error"
@@ -126,10 +129,11 @@ export function CreateGroupForm({
             <div>
               <Label htmlFor="name">Group name</Label>
               <Input
+                className="placeholder:opacity-50"
                 id="name"
                 name="name"
                 maxLength={GROUP_NAME_MAX}
-                placeholder="Tuesday Night Problem Set Crew"
+                placeholder="Homework Grinders"
                 required
                 aria-invalid={!!state.fieldErrors?.name}
                 aria-describedby="name-error"
