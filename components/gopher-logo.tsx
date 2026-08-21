@@ -10,10 +10,8 @@
 import { cn } from "@/lib/utils";
 
 /**
- * A simple friendly gopher: round head, two ears, cheeks, and the classic
- * pair of front teeth. Drawn as flat shapes so it stays crisp at 24px.
- * currentColor lets the parent choose the color (maroon on light
- * backgrounds, gold/white on maroon).
+ * Icon depicting two students collaborating/studying together,
+ * seated at a shared table with an open book between them and pencils at their sides.
  */
 export function GopherLogo({ className }: { className?: string }) {
   return (
@@ -23,20 +21,61 @@ export function GopherLogo({ className }: { className?: string }) {
       className={cn("h-8 w-8", className)}
       fill="currentColor"
     >
-      {/* ears */}
-      <circle cx="18" cy="14" r="8" />
-      <circle cx="46" cy="14" r="8" />
+      {/* table */}
+      <rect x="8" y="46" width="48" height="5" rx="2" />
+
+      {/* ===== left student ===== */}
       {/* head */}
-      <ellipse cx="32" cy="34" rx="22" ry="21" />
-      {/* cheeks — cut out of the head in the page background color is
-          overkill; instead we draw lighter shapes on top via fill-opacity */}
-      <ellipse cx="22" cy="40" rx="7" ry="6" fill="#fff" fillOpacity="0.25" />
-      <ellipse cx="42" cy="40" rx="7" ry="6" fill="#fff" fillOpacity="0.25" />
-      {/* the two front teeth, the universal gopher signifier */}
-      <rect x="26.5" y="44" width="5" height="9" rx="1.5" fill="#fff" />
-      <rect x="32.5" y="44" width="5" height="9" rx="1.5" fill="#fff" />
-      {/* nose */}
-      <ellipse cx="32" cy="40" rx="4" ry="3" fill="#fff" fillOpacity="0.9" />
+      <circle cx="20" cy="20" r="9" />
+      {/* eyes, looking down toward the shared book */}
+      <circle cx="18.5" cy="21" r="1" fill="#fff" />
+      <circle cx="24" cy="21" r="1" fill="#fff" />
+      
+      {/* body */}
+      <path d="M 9 46 C 9 34 14 28 20 28 C 26 28 31 34 31 46 Z" />
+      
+      {/* pencil, held at the student's side with a gap, pointing up and outward */}
+      <g transform="translate(6 37) rotate(-125)">
+        <rect x="0" y="-0.6" width="8" height="1.2" rx="0.6" />
+        <path d="M 8 -0.6 L 10 0 L 8 0.6 Z" />
+        <rect x="0" y="-0.6" width="1.2" height="1.2" fill="#fff" fillOpacity="0.6" />
+      </g>
+
+
+      {/* ===== right student ===== */}
+      {/* head */}
+      <circle cx="44" cy="20" r="9" />
+      {/* eyes, looking down toward the shared book */}
+      <circle cx="40" cy="21" r="1" fill="#fff" />
+      <circle cx="45.5" cy="21" r="1" fill="#fff" />
+      
+      {/* body */}
+      <path d="M 33 46 C 33 34 38 28 44 28 C 50 28 55 34 55 46 Z" />
+      
+      {/* pencil, held at the student's side with a gap, pointing up and outward */}
+      <g transform="translate(57 37) rotate(-55)">
+        <rect x="0" y="-0.6" width="8" height="1.2" rx="0.6" />
+        <path d="M 8 -0.6 L 10 0 L 8 0.6 Z" />
+        <rect x="0" y="-0.6" width="1.2" height="1.2" fill="#fff" fillOpacity="0.6" />
+      </g>
+
+
+      {/* ===== shared open book on the table ===== */}
+      <path
+        d="M 32 47.5 L 20 43.5 L 20 39 L 32 42 L 44 39 L 44 43.5 Z"
+        fill="#fff"
+        fillOpacity="0.9"
+      />
+      {/* spine crease */}
+      <line
+        x1="32"
+        y1="47.5"
+        x2="32"
+        y2="42"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeOpacity="0.3"
+      />
     </svg>
   );
 }
