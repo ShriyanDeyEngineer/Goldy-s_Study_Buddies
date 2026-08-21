@@ -22,7 +22,7 @@ import { ArrowDown, SendHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { sendGroupMessageAction } from "@/lib/actions/messages";
-import { MESSAGE_MAX_LENGTH } from "@/lib/constants";
+import { MESSAGE_MAX_LENGTH, NAUGHTY_WORDS } from "@/lib/constants";
 import type { GroupMessageRow, PublicProfile } from "@/lib/types";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -179,6 +179,7 @@ export function GroupChat({
               const prev = messages[index - 1];
               const mine = message.sender_id === currentUserId;
               const sender = profilesRef.current[message.sender_id];
+              const filteredMessage = messageNaughtyFilter(NAUGHTY_WORDS, message.content);
               const showDateSeparator =
                 !prev ||
                 !isSameDay(new Date(prev.created_at), new Date(message.created_at));
@@ -215,7 +216,7 @@ export function GroupChat({
                           mine ? "bg-maroon text-white" : "bg-cream text-ink",
                         )}
                       >
-                        {message.content}
+                        {filteredMessage}
                       </div>
                       <p className="mt-0.5 text-[10px] text-ink-muted">
                         {format(new Date(message.created_at), "h:mm a")}
@@ -285,4 +286,21 @@ export function GroupChat({
       </div>
     </section>
   );
+}
+
+
+
+
+
+
+/** Function for filtering out and censoring naughty messages */
+function messageNaughtyFilter(naugthy_words: readonly string[], chat_message: string): string
+{
+  let chat_message_copy = chat_message.toLowerCase();
+
+  naugthy_words.forEach(naughty_word => {
+    if(chat_message_copy.includes(naughty_word)){chat_message = "[REDACTED]"}
+  });
+
+  return chat_message;
 }
