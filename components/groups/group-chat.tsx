@@ -208,7 +208,7 @@ export function GroupChat({
                     <div className={cn("max-w-[80%]", mine && "text-right")}>
                       {!mine && (
                         <p className="mb-0.5 text-xs font-medium text-ink-muted">
-                          {sender?.display_name ?? "Unknown"}
+                          {sender?.display_name ?? "Deleted User"}
                         </p>
                       )}
                       <div

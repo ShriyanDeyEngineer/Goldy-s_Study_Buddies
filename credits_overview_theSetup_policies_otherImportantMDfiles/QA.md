@@ -216,6 +216,9 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] **Avatar save**: a 3–5 MB JPEG/PNG saves (was silently dropped
       >1 MB). A 6 MB file or a PDF gets an instant inline message and the
       Save button disables. Major/bio changes save alongside the picture.
+      The picker is an "Upload photo" button + preview circle (onboarding
+      step 3 and Edit profile); choosing a file shows its name and swaps
+      the button label to "Change photo".
 - [ ] **Unblock**: avatar menu → "Friends & blocked" lists blocked people
       with an Unblock button; a blocked person's profile also offers it.
 - [ ] **Live notifications**: with /notifications open in one tab, an
@@ -266,22 +269,30 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 ## Chat filter & account deletion — 2026-08-20
 
 - [ ] **Chat filter**: sending "this is bullshit" in group chat shows
-      "this is bull****" instantly for the sender AND for a second
-      account; same in DMs. "assessment", "cockpit", "Dickens" pass
-      through untouched. The database row stores the masked text (the
-      filter can't be bypassed by calling the RPC directly).
+      "this is ****" instantly for the sender AND for a second account;
+      same in DMs. "fucking" masks as "****" (whole word), and spaced
+      dodges ("f u c k", "f-u-c-k") are caught too. "assessment",
+      "cockpit", "Dickens", "Dickson" pass through untouched. The
+      database row stores the masked text; the ORIGINAL text of any
+      masked message lands in message_originals (dashboard-only — not
+      readable through the API by any account).
+- [ ] **Names reject swears**: a display name, group name, course name,
+      meetup title, or poll title containing a swear (spaced tricks
+      included) shows "That name contains language that isn't allowed —
+      please choose another." inline, and nothing is saved. "Dickson"
+      as a display name is accepted.
 - [ ] **Delete account**: Edit profile → Delete account requires typing
       DELETE. After confirming: signed out, landed on the home page.
 - [ ] **After deletion (check from U2)**: U1 gone from U2's friends and
       buddies lists; pending requests between them cancelled; U1 absent
       from search and suggestions; U1's profile URL 404s; U1's old group
-      and DM messages still visible, sender shown as "Unknown" with no
+      and DM messages still visible, sender shown as "Deleted User" with no
       avatar; groups U1 managed got a new manager (or disbanded if U1
       was the only member).
 - [ ] **After deletion (as U1)**: signing in with the same Google account
       creates a BRAND-NEW account — onboarding wizard, empty profile, no
       old groups/friends/DMs. Old messages from before the deletion still
-      show "Unknown", not the new account's name.
+      show "Deleted User", not the new account's name.
 
 ## Terms-of-service gate — 2026-08-20
 

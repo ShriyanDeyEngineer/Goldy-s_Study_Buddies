@@ -9,10 +9,6 @@ STEM courses (physics, chem, calc, intro CS) front and center.
 
 ## Contributors
 ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), & joydeng-code (Joy Deng). 
-=======
->>>>>>> claude/full-app
-
-Shriyan Dey, Angad Virdi, Aadi Sharma, and Joy Deng.
 
 ## What it does
 

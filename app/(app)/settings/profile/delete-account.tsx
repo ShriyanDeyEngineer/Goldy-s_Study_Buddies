@@ -21,13 +21,13 @@ export function DeleteAccountCard() {
           This removes your profile, takes you out of your groups and
           everyone&rsquo;s friend lists, and cancels your pending requests.
           Messages you sent stay in their chats, shown as
-          &ldquo;Unknown&rdquo;. Deleted data cannot be recovered — signing
+          &ldquo;Deleted User&rdquo;. Deleted data cannot be recovered — signing
           in again later starts a brand-new, empty account.
         </p>
         <div className="mt-4">
           <TypedConfirmDialog
             title="Delete your account?"
-            description="Your profile is removed, you leave every group, and you disappear from friend lists. Old messages remain, attributed to Unknown. Deleted data cannot be recovered; signing in again starts a brand-new account."
+            description="Your profile is removed, you leave every group, and you disappear from friend lists. Old messages remain, attributed to Deleted User. Deleted data cannot be recovered; signing in again starts a brand-new account."
             requiredText="DELETE"
             confirmLabel="Delete my account"
             onConfirm={async () => {

@@ -41,7 +41,7 @@ const LOCKOUT_COPY = {
   },
   deleted: {
     title: "This account has been deleted",
-    body: "This account was deleted and its profile removed. Old messages remain, shown as Unknown. Sign out and sign in with Google again to start a brand-new account.",
+    body: "This account was deleted and its profile removed. Old messages remain, shown as Deleted User. Sign out and sign in with Google again to start a brand-new account.",
   },
 } as const;
 
