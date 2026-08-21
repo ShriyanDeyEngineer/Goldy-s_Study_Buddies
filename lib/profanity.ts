@@ -1,29 +1,26 @@
 /**
- * Chat profanity filter — the CLIENT half.
+ * Profanity filter — the CLIENT/VALIDATION half.
  *
- * The authoritative masking happens in the database (censor_profanity(),
- * migration 0013) so it can't be bypassed by calling the RPC directly.
- * This mirror exists for one reason: the sender's own message is rendered
- * optimistically from local state before the round trip, and it must show
- * exactly what everyone else will receive. KEEP THE TWO WORD LISTS IN
- * SYNC — edit both this file and 0013 or the echo will lie.
+ * The authoritative chat masking happens in the database
+ * (censor_profanity(), migrations 0013/0017) so it can't be bypassed by
+ * calling the RPC directly. This mirror exists so (a) the sender's
+ * optimistic chat echo matches what the server stores, and (b) the zod
+ * schemas can REJECT profane names/titles before anything is saved.
+ * KEEP THE WORD LISTS AND PATTERNS IN SYNC with the SQL — the migration
+ * generates its regex from these same rules.
  *
- * Two tiers (the Scunthorpe problem):
- *   - STRONG words mask wherever they appear ("bullshit" → "bull****").
- *   - AMBIGUOUS words mask only as whole words, so "assessment",
- *     "Dickson", and "cockpit" pass through.
+ * Matching rules:
+ *   - STRONG words are caught with bypass hardening — leetspeak
+ *     substitutions (f4ck, fvck), separators between letters ("f u c k",
+ *     "f-u-c-k", "f.u.c.k"), zero-width/invisible unicode spacers, and
+ *     repeated letters ("fuuuck") — and the WHOLE surrounding word is
+ *     masked, so "fucking" becomes "****", not "****ing".
+ *   - AMBIGUOUS words match only as whole words (the Scunthorpe problem),
+ *     so "assessment", "cockpit", "Dickson", "Dickens" pass untouched.
  *
- * Bypass hardening: each word is compiled into a "fuzzy" pattern that
- * tolerates:
- *   - leetspeak substitutions (a↔4/@, e↔3, i↔1/!, o↔0, s↔5/$, t↔7, ...)
- *   - separators/punctuation inserted between letters ("f.u.c.k", "f u c k")
- *   - zero-width/invisible unicode used as spacers ("f\u200Buck")
- *   - repeated characters ("fuuuuck")
- *
- * Known limitation: this does NOT catch unicode homoglyphs (Cyrillic "а"
- * for Latin "a", etc). Doing that properly needs a confusables-normalization
- * pass (e.g. based on the Unicode confusables table) — flag if that's a
- * real problem in practice and we can add it.
+ * Known limitation: unicode homoglyphs (Cyrillic "а" for Latin "a") are
+ * not normalized. Doing that properly needs a confusables pass — flag it
+ * if it shows up in practice.
  */
 
 // Letters mapped to the set of characters commonly used to stand in for them.
@@ -49,16 +46,12 @@ function escapeClass(chars: string): string {
   return chars.replace(/[\]\\^-]/g, "\\$&");
 }
 
-// Turns a plain word into a regex source that matches it plus common
-// bypass variants, e.g. "fuck" -> matches "f u c k", "f.u.c.k", "fuuuck",
-// "f*ck", "f4ck", "f\u200Buck", etc.
+/** "fuck" → a source matching it plus bypass variants (spacing, leet,
+ *  repeats): "f u c k", "f.u.c.k", "fuuuck", "f*ck", "f4ck", "f​uck". */
 function fuzzyWord(word: string): string {
   return word
     .split("")
-    .map((ch) => {
-      const cls = escapeClass(LEET[ch.toLowerCase()] ?? ch);
-      return `[${cls}]+`;
-    })
+    .map((ch) => `[${escapeClass(LEET[ch.toLowerCase()] ?? ch)}]+`)
     .join(SEP);
 }
 
@@ -72,27 +65,29 @@ function buildAlternation(words: string[]): string {
 }
 
 const STRONG_WORDS = [
-  "fuck",
-  "shit",
-  "cunt",
-  "bitch",
-  "whore",
-  "slut",
-  "faggot",
-  "nigger",
-  "nigga",
-  "asshole",
-  "retard",
+  "fuck", "shit", "cunt", "bitch", "whore", "slut",
+  "faggot", "nigger", "nigga", "asshole", "retard",
 ];
-
 const WHOLE_WORD_WORDS = ["ass", "dick", "cock", "pussy", "bastard", "tits"];
 
-const STRONG = new RegExp(`(${buildAlternation(STRONG_WORDS)})`, "gi");
-const WHOLE_WORD = new RegExp(
-  `\\b(${buildAlternation(WHOLE_WORD_WORDS)})\\b`,
-  "gi"
-);
+/** \w* on both sides swallows the rest of the word → whole-word masking. */
+const STRONG_SRC = `\\w*(?:${buildAlternation(STRONG_WORDS)})\\w*`;
+const WHOLE_SRC = `\\b(?:${buildAlternation(WHOLE_WORD_WORDS)})\\b`;
 
 export function censorProfanity(text: string): string {
-  return text.replace(STRONG, "[REDACTED]").replace(WHOLE_WORD, "#&%*@!");
+  return text
+    .replace(new RegExp(STRONG_SRC, "gi"), "****")
+    .replace(new RegExp(WHOLE_SRC, "gi"), "****");
 }
+
+/** True when the text would be censored — used to REJECT names/titles. */
+export function containsProfanity(text: string): boolean {
+  return (
+    new RegExp(STRONG_SRC, "i").test(text) || new RegExp(WHOLE_SRC, "i").test(text)
+  );
+}
+
+export const PROFANITY_NAME_MESSAGE =
+  "That name contains language that isn't allowed — please choose another.";
+export const PROFANITY_TEXT_MESSAGE =
+  "That contains language that isn't allowed here — please reword it.";

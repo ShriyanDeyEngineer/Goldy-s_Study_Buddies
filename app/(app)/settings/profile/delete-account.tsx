@@ -27,7 +27,7 @@ export function DeleteAccountCard() {
         <div className="mt-4">
           <TypedConfirmDialog
             title="Delete your account?"
-            description="Your profile is removed, you leave every group, and you disappear from friend lists. Old messages remain, attributed to Unknown. Deleted data cannot be recovered; signing in again starts a brand-new account."
+            description="Your profile is removed, you leave every group, and you disappear from friend lists. Old messages remain, attributed to Deleted User. Deleted data cannot be recovered; signing in again starts a brand-new account."
             requiredText="DELETE"
             confirmLabel="Delete my account"
             onConfirm={async () => {

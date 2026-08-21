@@ -7,6 +7,7 @@
  * the server actions typed, trusted input.
  */
 import { z } from "zod";
+import { containsProfanity, PROFANITY_NAME_MESSAGE } from "@/lib/profanity";
 import {
   GROUP_CAPACITY_MAX,
   GROUP_CAPACITY_MIN,
@@ -19,7 +20,8 @@ export const groupNameSchema = z
   .string()
   .trim()
   .min(1, "Give your group a name.")
-  .max(GROUP_NAME_MAX, `Group names max out at ${GROUP_NAME_MAX} characters.`);
+  .max(GROUP_NAME_MAX, `Group names max out at ${GROUP_NAME_MAX} characters.`)
+  .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE);
 
 export const capacitySchema = z.coerce
   .number({ invalid_type_error: "Capacity must be a number." })
@@ -71,7 +73,8 @@ export const createGroupWithCourseSchema = z
       .string()
       .trim()
       .min(1, "What's the course called?")
-      .max(200, "Keep the course name under 200 characters."),
+      .max(200, "Keep the course name under 200 characters.")
+      .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE),
     name: groupNameSchema,
     capacity: capacitySchema,
     mode: groupModeSchema,
