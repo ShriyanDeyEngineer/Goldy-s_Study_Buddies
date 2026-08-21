@@ -8,6 +8,11 @@
  */
 import { z } from "zod";
 import {
+  containsProfanity,
+  PROFANITY_NAME_MESSAGE,
+  PROFANITY_TEXT_MESSAGE,
+} from "@/lib/profanity";
+import {
   BIO_MAX_LENGTH,
   COLLEGE_VALUES,
   DISPLAY_NAME_MAX,
@@ -26,7 +31,8 @@ export const displayNameSchema = z
   .string()
   .trim()
   .min(1, "Pick a display name — it's how classmates will find you.")
-  .max(DISPLAY_NAME_MAX, `Keep it under ${DISPLAY_NAME_MAX} characters.`);
+  .max(DISPLAY_NAME_MAX, `Keep it under ${DISPLAY_NAME_MAX} characters.`)
+  .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE);
 
 /** A single social link: must be a real http(s) URL (spec §5.11). The
  *  protocol check stops javascript: links from ever rendering as <a href>. */
@@ -43,7 +49,14 @@ export const profileSchema = z.object({
   college: emptyToNull(
     z.enum(COLLEGE_VALUES as [string, ...string[]]).nullable(),
   ),
-  major: emptyToNull(z.string().trim().max(100, "Keep majors under 100 characters.").nullable()),
+  major: emptyToNull(
+    z
+      .string()
+      .trim()
+      .max(100, "Keep majors under 100 characters.")
+      .nullable()
+      .refine((v) => v === null || !containsProfanity(v), PROFANITY_NAME_MESSAGE),
+  ),
   class_standing: emptyToNull(
     z.enum(STANDING_VALUES as [string, ...string[]]).nullable(),
   ),
@@ -59,7 +72,12 @@ export const profileSchema = z.object({
       .nullable(),
   ),
   bio: emptyToNull(
-    z.string().trim().max(BIO_MAX_LENGTH, `Bios max out at ${BIO_MAX_LENGTH} characters.`).nullable(),
+    z
+      .string()
+      .trim()
+      .max(BIO_MAX_LENGTH, `Bios max out at ${BIO_MAX_LENGTH} characters.`)
+      .nullable()
+      .refine((v) => v === null || !containsProfanity(v), PROFANITY_TEXT_MESSAGE),
   ),
   social_links: z
     .array(socialLinkSchema)

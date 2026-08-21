@@ -5,6 +5,7 @@
  * same course before they ever reach the database's find-or-create.
  */
 import { z } from "zod";
+import { containsProfanity, PROFANITY_NAME_MESSAGE } from "@/lib/profanity";
 
 export const addCourseSchema = z.object({
   department_code: z
@@ -21,5 +22,6 @@ export const addCourseSchema = z.object({
     .string()
     .trim()
     .min(1, "What's the course called?")
-    .max(200, "Keep the course name under 200 characters."),
+    .max(200, "Keep the course name under 200 characters.")
+    .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE),
 });

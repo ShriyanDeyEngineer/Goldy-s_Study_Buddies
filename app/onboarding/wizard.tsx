@@ -35,7 +35,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { checkAvatarFile } from "@/lib/validation/avatar";
+import { AvatarPicker } from "@/components/ui/avatar-picker";
 
 const STEP_TITLES = ["Tell us about you", "What are you taking?", "Add a photo and bio"];
 
@@ -55,7 +55,6 @@ export function OnboardingWizard({
   // still start at step 1 because the name is genuinely required.
   const [step, setStep] = React.useState(suggestedName.trim() ? 1 : 0);
   const [courseQuery, setCourseQuery] = React.useState("");
-  const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
   const [avatarClientError, setAvatarClientError] = React.useState<string | null>(null);
 
   // If the server bounced us with field errors, jump to the step that
@@ -243,38 +242,11 @@ export function OnboardingWizard({
           {/* ── Step 3: bio + picture ────────────────────────────────── */}
           <fieldset hidden={step !== 2} className="space-y-4">
             <legend className="sr-only">Bio and profile picture</legend>
-            <div>
-              <Label htmlFor="avatar">Profile picture (optional — JPEG/PNG, up to 5 MB)</Label>
-              <div className="flex items-center gap-4">
-                {avatarPreview && (
-                  // eslint-disable-next-line @next/next/no-img-element -- local blob preview
-                  <img
-                    src={avatarPreview}
-                    alt="Preview of your chosen profile picture"
-                    className="h-16 w-16 rounded-full border border-line object-cover"
-                  />
-                )}
-                <Input
-                  id="avatar"
-                  name="avatar"
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  className="h-auto py-2"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    const problem = checkAvatarFile(file);
-                    setAvatarClientError(problem);
-                    setAvatarPreview(file && !problem ? URL.createObjectURL(file) : null);
-                  }}
-                  aria-invalid={!!(avatarClientError || state.fieldErrors?.avatar)}
-                  aria-describedby="avatar-error"
-                />
-              </div>
-              <FieldError
-                id="avatar-error"
-                error={avatarClientError ?? state.fieldErrors?.avatar}
-              />
-            </div>
+            <AvatarPicker
+              label="Profile picture (optional — JPEG/PNG, up to 5 MB)"
+              error={avatarClientError ?? state.fieldErrors?.avatar}
+              onFileCheck={setAvatarClientError}
+            />
             <div>
               <Label htmlFor="bio">Bio (optional)</Label>
               <Textarea
