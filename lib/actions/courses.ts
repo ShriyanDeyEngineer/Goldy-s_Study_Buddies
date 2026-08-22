@@ -16,29 +16,74 @@ export type GmailComposeData = {
 
 const DESTINATION_EMAIL = "goldysstudybuddies@gmail.com";
 
-export async function openGmailCompose(data: GmailComposeData): Promise<void> {
+type Platform = "ios" | "android" | "desktop";
+
+function detectPlatform(): Platform 
+{
+  const ua = navigator.userAgent || "";
+  
+  if(/iPhone|iPad|iPod/i.test(ua)){return "ios";}
+  else if(/Android/i.test(ua)){return "android";}
+  else{return "desktop";}
+}
+
+export async function openGmailCompose(data: GmailComposeData): Promise<void> 
+{
+  const userPlatform = detectPlatform();
+
   const subject = `ADD NEW COURSE REQUEST`;
   data.department = data.department.toUpperCase();
+  data.course_number = data.course_number.toUpperCase();
+
   if(data.course_name === ""){data.course_name = 'NOT PROVIDED';}
   const body = `DEPARTMENT:\n${data.department}\n\nCOURSE NUMBER:\n${data.course_number}\n\nCOURSE NAME (Optional):\n${data.course_name}`;
 
-  const params = new URLSearchParams({
-    view: "cm",
-    fs: "1",
-    to: DESTINATION_EMAIL,
-    su: subject,
-    body: body,
-  });
+  if(userPlatform === "desktop")
+  {
+    const params = new URLSearchParams({
+      view: "cm",
+      fs: "1",
+      to: DESTINATION_EMAIL,
+      su: subject,
+      body: body,
+    });
 
-  const gmailUrl = `https://mail.google.com/mail/?${params.toString()}`;
+    const gmailUrl = `https://mail.google.com/mail/?${params.toString()}`;
+    window.open(gmailUrl, "_blank", "noopener,noreferrer");
+  }
 
-  window.open(gmailUrl, "_blank", "noopener,noreferrer");
+  else if(userPlatform === "ios" || userPlatform == "android")
+  {
+      const appParams = new URLSearchParams({
+        to: DESTINATION_EMAIL,
+        subject: subject,
+        body: body,
+      });
+
+    const mailtoParams = new URLSearchParams({
+        subject: subject,
+        body: body,
+      });
+
+    // If the Gmail app isn't installed, this silently fails and the
+    // page stays visible — so we set a fallback timer.
+    const fallbackTimer = window.setTimeout(() => {
+      if(document.visibilityState === "visible"){window.location.href = `mailto:${DESTINATION_EMAIL}?${mailtoParams.toString()}`;}
+    }, 1500);
+
+    // If the Gmail app *does* open, the tab will blur/hide — cancel the fallback.
+    const cancelFallback = () => window.clearTimeout(fallbackTimer);
+    window.addEventListener("blur", cancelFallback, { once: true });
+    document.addEventListener("visibilitychange", () => {
+        if(document.visibilityState === "hidden"){cancelFallback();}
+      },
+      {once: true}
+    );
+
+    // Attempt to open the native Gmail app
+    window.location.href = `googlegmail://co?${appParams.toString()}`;
+  }
 }
-
-
-
-
-
 
 
 /**
