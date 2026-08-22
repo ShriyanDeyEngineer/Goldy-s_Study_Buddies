@@ -52,7 +52,9 @@ export function SiteFooter() {
           &#8200;||&#8200;
           <Link href="/privacy_policy" className="text-white/80 hover:text-gold">Privacy Policy</Link>
         </p>
-        
+        <p className="mt-2 text-center text-xs text-white/60">
+          ©2026 Goldy's Study Buddies. All rights reserved.
+        </p>
       </div>
     </footer>
   );
