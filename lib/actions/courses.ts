@@ -6,6 +6,8 @@
  * (with a friendly note) instead of erroring — that behavior is a spec
  * requirement, not a nicety.
  */
+
+/*
 "use server";
 
 import { redirect } from "next/navigation";
@@ -41,9 +43,9 @@ export async function addCourseAction(
 
   redirect(`/courses/${row.course_id}${row.created ? "" : "?existing=1"}`);
 }
+*/
 
 
-/*
 export type GmailComposeData = {
   department: string;
   course_number: string;
@@ -70,4 +72,3 @@ export async function openGmailCompose(data: GmailComposeData): Promise<void> {
 
   window.open(gmailUrl, "_blank", "noopener,noreferrer");
 }
-*/

@@ -3,6 +3,7 @@
  * errors, and the duplicate case redirects to the existing course page
  * (the action handles that) rather than erroring.
  */
+/*
 "use client";
 
 import { useActionState } from "react";
@@ -48,7 +49,7 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
                 id="department_code"
                 name="department_code"
                 placeholder="MATH"
-                maxLength={4}
+                maxLength={8}
                 required
                 aria-invalid={!!state.fieldErrors?.department_code}
                 aria-describedby="department_code-error"
@@ -59,13 +60,13 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
               />
             </div>
             <div>
-              <Label htmlFor="course_number">Numbbber</Label>
+              <Label htmlFor="course_number">Number</Label>
               <Input
                 className="placeholder:opacity-50"
                 id="course_number"
                 name="course_number"
                 placeholder="1272"
-                maxLength={2}
+                maxLength={7}
                 required
                 aria-invalid={!!state.fieldErrors?.course_number}
                 aria-describedby="course_number-error"
@@ -102,6 +103,7 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
     </Dialog>
   );
 }
+*/
 
 
 
@@ -110,7 +112,6 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
 
 
 
-/*
 "use client";
 
 import { useState, type SubmitEvent } from "react";
@@ -198,4 +199,3 @@ export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabe
     </>
   );
 }
-*/
