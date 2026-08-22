@@ -33,7 +33,7 @@ const initialState: FormState = {
   course_name: "",
 };
 
-export function AddCourseDialog({ triggerLabel = "Add a course" }: { triggerLabel?: string }) {
+export function AddCourseDialog({ triggerLabel = "Add a Course" }: { triggerLabel?: string }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(initialState);
 

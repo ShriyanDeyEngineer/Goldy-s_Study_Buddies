@@ -114,7 +114,7 @@ export default async function CoursesPage({
           ))}
         </Select>
         <Button type="submit" variant="secondary">
-          Apply
+          Apply Selected Search Filters
         </Button>
       </form>
 
