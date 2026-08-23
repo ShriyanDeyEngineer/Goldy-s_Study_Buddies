@@ -28,7 +28,7 @@ export async function sendGroupMessageAction(
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("send_group_message", {
     p_group_id: groupId,
-    p_content: parsed.data + "hello there!",
+    p_content: parsed.data,
   });
   if (error) return { error: friendlyError(error) };
 
