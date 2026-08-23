@@ -19,5 +19,5 @@ const STRONG =
 const WHOLE_WORD = /\b(ass|dick|cock|pussy|bastard|tits)\b/gi;
 
 export function censorProfanity(text: string): string {
-  return text.replace(STRONG, "****").replace(WHOLE_WORD, "****");
+  return text.replace(STRONG, "[NOPE]").replace(WHOLE_WORD, "[NOPE]");
 }
