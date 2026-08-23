@@ -4,8 +4,7 @@
  * meetup if one is scheduled. The whole card links to the group page.
  */
 import Link from "next/link";
-import { CalendarClock, Users } from "lucide-react";
-import { format } from "date-fns";
+import { Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { pluralize } from "@/lib/utils";
@@ -18,7 +17,6 @@ export function GroupCard({
   capacity,
   mode,
   status,
-  nextMeetup,
 }: {
   groupId: string;
   name: string;
@@ -27,8 +25,6 @@ export function GroupCard({
   capacity: number;
   mode: "open" | "closed";
   status: string;
-  /** The soonest upcoming, non-cancelled meetup — null when none. */
-  nextMeetup: { title: string; scheduled_at: string } | null;
 }) {
   return (
     <Card className="transition-shadow hover:shadow-md">
@@ -58,18 +54,11 @@ export function GroupCard({
           )}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-muted">
-          <span className="inline-flex items-center gap-1.5">
+        <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-ink-muted">
+          <span className="inline-flex items-center gap-1.5 font-bold">
             <Users aria-hidden className="h-4 w-4" />
-            {memberCount}/{capacity} {pluralize(capacity, "seat", "seats").split(" ")[1]}
+            {memberCount}/{capacity} {pluralize(capacity, "Seat", "Seats").split(" ")[1]}
           </span>
-          {nextMeetup && (
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarClock aria-hidden className="h-4 w-4" />
-              {/* Local-time render of the stored UTC instant. */}
-              {format(new Date(nextMeetup.scheduled_at), "EEE MMM d, h:mm a")}
-            </span>
-          )}
         </div>
       </CardContent>
     </Card>

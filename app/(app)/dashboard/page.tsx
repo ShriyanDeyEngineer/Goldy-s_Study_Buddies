@@ -146,7 +146,6 @@ export default async function DashboardPage() {
                   capacity={group.capacity}
                   mode={group.mode}
                   status={group.status}
-                  nextMeetup={upcomingByGroup.get(group.id) ?? null}
                 />
               </div>
             ))}

@@ -204,6 +204,19 @@ function MeetupCard({
           >
             {meetup.title}
           </h3>
+          {!meetup.is_cancelled && !isPast && (
+          <a
+            href={calendarHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Add to Google Calendar"
+            aria-label="Add to Google Calendar"
+            className="rounded-lg p-1.5 hover:bg-cream hover:text-maroon focus-visible:outline-2 focus-visible:outline-gold mt-0.5 flex align-center justify-start pl-0 gap-1"
+          >
+            <CalendarPlus aria-hidden className="h-5 w-5" />
+            <p className="font-bold text-sm">ADD TO CALENDAR</p>
+          </a>
+        )}
           <p className="mt-0.5 text-sm text-ink-muted">
             {/* Stored in UTC; format() renders the viewer's local time.
                 Shows the full window + how long, e.g.
@@ -238,18 +251,6 @@ function MeetupCard({
             )}
           </p>
         </div>
-        {!meetup.is_cancelled && !isPast && (
-          <a
-            href={calendarHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Add to Google Calendar"
-            aria-label="Add to Google Calendar"
-            className="rounded-lg p-1.5 text-ink-muted hover:bg-cream hover:text-maroon focus-visible:outline-2 focus-visible:outline-gold"
-          >
-            <CalendarPlus aria-hidden className="h-4 w-4" />
-          </a>
-        )}
       </div>
 
       {meetup.is_cancelled ? (
