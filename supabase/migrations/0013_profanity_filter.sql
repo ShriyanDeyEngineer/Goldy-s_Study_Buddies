@@ -24,10 +24,10 @@ as $$
            regexp_replace(
              coalesce(p_text, ''),
              '(fuck|shit|cunt|bitch|whore|slut|faggot|nigger|nigga|asshole)',
-             '****', 'gi'
+             '[NOPE]', 'gi'
            ),
            '\y(ass|dick|cock|pussy|bastard|tits)\y',
-           '****', 'gi'
+           '[NOPE]', 'gi'
          );
 $$;
 
