@@ -39,7 +39,7 @@ export default async function CoursesPage({
   // The whole catalog + group counts in two queries, filtered in code:
   // at university scale this is a few hundred rows, and doing the search
   // here keeps "match code OR number OR name" trivially readable.
-  const [coursesRes, groupsRes] = await Promise.all([
+  const [coursesRes, groupsRes, joinableGroupsRes] = await Promise.all([
     supabase
       .from("courses")
       .select("*")
@@ -47,11 +47,17 @@ export default async function CoursesPage({
       .order("department_code")
       .order("course_number"),
     supabase.from("study_groups").select("course_id").eq("status", "active"),
+    supabase.from("study_groups").select("course_id").eq("mode", "open").eq("status", "active"),
   ]);
 
   const groupCounts = new Map<string, number>();
   for (const row of groupsRes.data ?? []) {
     groupCounts.set(row.course_id, (groupCounts.get(row.course_id) ?? 0) + 1);
+  }
+
+  const joinableGroupCounts = new Map<string, number>();
+  for (const row of joinableGroupsRes.data ?? []) {
+    joinableGroupCounts.set(row.course_id, (joinableGroupCounts.get(row.course_id) ?? 0) + 1);
   }
 
   const allCourses = (coursesRes.data ?? []) as CourseRow[];
@@ -128,6 +134,7 @@ export default async function CoursesPage({
         <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
           {courses.map((course) => {
             const groupCount = groupCounts.get(course.id) ?? 0;
+            const joinableGroupCount = joinableGroupCounts.get(course.id) ?? 0;
             return (
               <li key={course.id}>
                 <Link
@@ -147,7 +154,7 @@ export default async function CoursesPage({
                         : "shrink-0 text-xs text-ink-muted"
                     }
                   >
-                    {groupCount > 0 ? pluralize(groupCount, "group") : "No groups yet"}
+                    {groupCount > 0 ? pluralize(groupCount, "Group") + " || " + joinableGroupCount + " Joinable" : "No groups yet"}
                   </span>
                 </Link>
               </li>
