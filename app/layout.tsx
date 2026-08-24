@@ -30,7 +30,7 @@ const roboto = Roboto({
 const dmSerif = DM_Serif_Display({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-dm-serif",
+  variable: "--times-new-roman",
 });
 
 export const metadata: Metadata = {
