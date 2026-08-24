@@ -65,8 +65,8 @@ export default async function CourseDetailPage({
   const myGroupIds = new Set((membershipRes.data ?? []).map((m) => m.group_id as string));
   const myPendingIds = new Set((requestsRes.data ?? []).map((r) => r.group_id as string));
 
-  
-  const filteredGroups = groups.filter(group => group.mode === mode);
+
+  const filteredGroups = groups.filter(group => group.mode === mode || mode.length === 0 ? true : false);
   
   
   return (
@@ -110,7 +110,7 @@ export default async function CourseDetailPage({
 
 
           <form method="get" className="mb-6 grid gap-3 sm:grid-cols-[1fr_10rem_14rem_auto]">
-            <Select name="mode" defaultValue="" aria-label="Filter by mode">
+            <Select name="mode" defaultValue={mode} aria-label="Filter by mode">
               <option value="">All Groups</option>
               <option value="open">Open Groups</option>
               <option value="closed">Closed Groups</option>
