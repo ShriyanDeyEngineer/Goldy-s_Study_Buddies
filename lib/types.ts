@@ -132,6 +132,40 @@ export interface AvailabilitySlotRow {
   ends_at: string;
 }
 
+export interface CourseRequestRow {
+  id: string;
+  university_id: string;
+  requester_id: string;
+  department_code: string;
+  course_number: string;
+  course_name: string;
+  status: "pending" | "approved" | "declined";
+  course_id: string | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
+  created_at: string;
+}
+
+export interface ReportRow {
+  id: string;
+  reporter_id: string;
+  reported_user_id: string;
+  category: string;
+  description: string | null;
+  status: "open" | "reviewing" | "resolved" | "dismissed";
+  resolution: string | null;
+  created_at: string;
+}
+
+export interface MessageOriginalRow {
+  id: string;
+  message_kind: "group" | "direct";
+  message_id: string;
+  sender_id: string;
+  original_content: string;
+  created_at: string;
+}
+
 export interface GroupResourceRow {
   id: string;
   group_id: string;

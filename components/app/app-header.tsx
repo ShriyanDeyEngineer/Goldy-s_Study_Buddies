@@ -34,7 +34,11 @@ export function AppHeader({
           <LogoLockup className="text-lg" />
         </Link>
         <div className="flex-1">
-          <AppNavLinks userId={profile.id} initialUnreadMessages={unreadMessages} />
+          <AppNavLinks
+            userId={profile.id}
+            initialUnreadMessages={unreadMessages}
+            isAdmin={profile.is_admin}
+          />
         </div>
         <NotificationBell userId={profile.id} initialUnread={unreadNotifications} />
         <UserMenu

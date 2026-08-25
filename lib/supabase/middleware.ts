@@ -32,6 +32,7 @@ const PROTECTED_PREFIXES = [
   "/messages",
   "/notifications",
   "/settings",
+  "/admin",
 ];
 
 /** Signed-in users get bounced OFF these (already signed in = nothing to do). */

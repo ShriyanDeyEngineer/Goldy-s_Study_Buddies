@@ -21,6 +21,7 @@ export default function robots(): MetadataRoute.Robots {
         "/messages",
         "/notifications",
         "/settings",
+        "/admin",
         "/auth/",
       ],
     },
