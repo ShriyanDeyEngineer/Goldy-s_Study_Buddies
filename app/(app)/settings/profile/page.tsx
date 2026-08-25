@@ -20,7 +20,7 @@ export default async function ProfileSettingsPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="font-display text-3xl text-ink">Edit profile</h1>
-      <p className="mt-1 mb-6 text-ink-muted">
+      <p className="mt-1 mb-6 text-ink-muted font-['Times_New_Roman']">
         What you share here is what classmates see on{" "}
         <Link
           href={`/profile/${typedProfile.id}`}

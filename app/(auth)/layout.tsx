@@ -16,7 +16,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <LogoLockup />
       </Link>
       <main className="w-full max-w-md">{children}</main>
-      <p className="mt-8 max-w-md text-center text-xs text-ink-muted">
+      <p className="mt-8 max-w-md text-center text-sm text-ink-muted font-['Times_New_Roman']">
         Not officially affiliated with the University of Minnesota.
       </p>
     </div>

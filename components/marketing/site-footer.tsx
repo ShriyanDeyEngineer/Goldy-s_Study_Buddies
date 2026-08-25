@@ -36,7 +36,7 @@ export function SiteFooter() {
         <div className="text-sm">
           <h2 className="mb-3 font-medium text-gold">The team</h2>
           <p className="text-white/80">{TEAM.join(" · ")}</p>
-          <p className="mt-3 text-white/80 font-bold">
+          <p className="mt-3 text-white/80 font-bold font-['Times_New_Roman']">
             Please send any feedback or report any issues to our email: &#8200;
             <a href={`mailto:${CONTACT_EMAIL}`} className="text-white/80 underline underline-offset-2 hover:text-gold font-normal">
               {CONTACT_EMAIL}
@@ -44,15 +44,15 @@ export function SiteFooter() {
           </p>
         </div>
       </div>
-      <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60">
+      <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60 font-['Times_New_Roman']">
         Built by UMN students, for UMN students. Not officially affiliated with the University of Minnesota.
 
         <p className="mt-2 text-center text-xs text-white/60">
-          <Link href="/terms_of_service" className="text-white/80 hover:text-gold">Terms & Conditions</Link>
+          <Link href="/terms_of_service" className="text-white/80 hover:text-gold font-['Times_New_Roman']">Terms & Conditions</Link>
           &#8200;||&#8200;
-          <Link href="/privacy_policy" className="text-white/80 hover:text-gold">Privacy Policy</Link>
+          <Link href="/privacy_policy" className="text-white/80 hover:text-gold font-['Times_New_Roman']">Privacy Policy</Link>
         </p>
-        <p className="mt-2 text-center text-xs text-white/60">
+        <p className="mt-2 text-center text-xs text-white/60 font-['Times_New_Roman']">
           ©2026 Goldy's Study Buddies. All rights reserved.
         </p>
       </div>

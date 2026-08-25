@@ -226,7 +226,7 @@ export function ProfileActions({
         confirmLabel="Block"
         onConfirm={() => run(() => blockUserAction(userId), "Blocked.")}
       >
-        <Button variant="ghost" className="text-ink-muted hover:text-danger">
+        <Button variant="ghost" className="text-ink-muted hover:text-danger font-['Times_New_Roman']">
           <ShieldBan aria-hidden className="h-4 w-4" />
           Block
         </Button>
@@ -248,16 +248,16 @@ function ReportDialog({ userId, displayName }: { userId: string; displayName: st
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="text-ink-muted hover:text-danger">
+        <Button variant="ghost" className="text-ink-muted hover:text-danger font-['Times_New_Roman']">
           <Flag aria-hidden className="h-4 w-4" />
           Report
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Report {displayName}</DialogTitle>
-        <DialogDescription>
-          The team reviews every report. Heads up: submitting false or abusive
-          reports may result in action against your own account.
+        <DialogDescription className="font-['Times_New_Roman'] text-base">
+          The team reviews every report. <strong>Heads up: submitting false or abusive
+          reports may result in action against your own account.</strong>
         </DialogDescription>
 
         {state.success ? (
@@ -265,7 +265,7 @@ function ReportDialog({ userId, displayName }: { userId: string; displayName: st
             {state.success}
           </p>
         ) : (
-          <form action={formAction} noValidate className="mt-4 space-y-4">
+          <form action={formAction} noValidate className="mt-4 space-y-4 font-['Times_New_Roman']">
             <input type="hidden" name="reported_user_id" value={userId} />
             <div>
               <Label htmlFor="report-category">What&rsquo;s going on?</Label>
@@ -309,7 +309,7 @@ function ReportDialog({ userId, displayName }: { userId: string; displayName: st
               </p>
             )}
             <Button type="submit" variant="danger" className="w-full" loading={pending}>
-              Submit report
+              Submit Report
             </Button>
           </form>
         )}

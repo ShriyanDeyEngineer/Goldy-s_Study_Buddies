@@ -23,20 +23,20 @@ export default async function LoginPage({
     <Card>
       <CardContent>
         <h1 className="font-display text-2xl text-ink">Welcome back</h1>
-        <p className="mt-1 mb-6 text-sm text-ink-muted">
+        <p className="mt-1 mb-6 text-sm text-ink-muted font-['Times_New_Roman']">
           Sign in with your UMN Google account.
         </p>
 
         {/* OAuth error handoff (e.g. non-UMN Google account rejected). */}
         {params.error && (
-          <p role="alert" className="mb-4 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p role="alert" className="mb-4 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger font-['Times_New_Roman']">
             {params.error}
           </p>
         )}
 
         <GoogleButton next={params.next} />
 
-        <p className="mt-6 text-center text-sm text-ink-muted">
+        <p className="mt-6 text-center text-sm text-ink-muted font-['Times_New_Roman']">
           First time here? Your account is created the first time you sign in.
         </p>
       </CardContent>

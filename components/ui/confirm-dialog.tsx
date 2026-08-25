@@ -70,7 +70,7 @@ export function ConfirmDialog({
         {body && <div className="mt-4">{body}</div>}
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
-            Never mind
+            Never Mind
           </Button>
           <Button
             variant={destructive ? "danger" : "primary"}
@@ -152,7 +152,7 @@ export function TypedConfirmDialog({
         </div>
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
-            Never mind
+            Never Mind
           </Button>
           <Button variant="danger" onClick={handleConfirm} disabled={!matches} loading={busy}>
             {confirmLabel}
