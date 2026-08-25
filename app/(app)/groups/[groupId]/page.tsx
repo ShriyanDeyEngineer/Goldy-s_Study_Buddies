@@ -20,6 +20,7 @@ import {
   type AvailabilitySlotRow,
   type CourseRow,
   type GroupMemberRow,
+  type GroupResourceRow,
   type GroupMessageRow,
   type JoinRequestRow,
   type MeetupAttendanceRow,
@@ -33,6 +34,7 @@ import { GroupChat } from "@/components/groups/group-chat";
 import { MeetupsPanel } from "@/components/groups/meetups-panel";
 import { MembersPanel } from "@/components/groups/members-panel";
 import { PollsSection } from "@/components/groups/polls-section";
+import { ResourcesPanel } from "@/components/groups/resources-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
@@ -124,7 +126,7 @@ export default async function GroupPage({
             <p className="text-sm font-medium uppercase tracking-wide text-maroon">
               {courseCode(group.courses)}
             </p>
-            <h1 className="mt-1 font-display text-3xl text-ink">{group.name}</h1>
+            <h1 className="mt-1 break-words font-display text-3xl text-ink">{group.name}</h1>
 
             <div className="mt-4 flex items-center justify-center gap-4 text-sm text-ink-muted">
               <span className="inline-flex items-center gap-1.5">
@@ -168,7 +170,7 @@ export default async function GroupPage({
 
   /* ── Member: the full page ────────────────────────────────────────── */
   // Everything the three panels need, fetched in parallel.
-  const [messagesRes, membersRes, meetupsRes, pollsRes, requestsRes] =
+  const [messagesRes, membersRes, meetupsRes, pollsRes, resourcesRes, requestsRes] =
     await Promise.all([
       supabase
         .from("group_messages")
@@ -190,6 +192,11 @@ export default async function GroupPage({
         .select("*")
         .eq("group_id", groupId)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("group_resources")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: false }),
       isManager
         ? supabase
             .from("join_requests")
@@ -204,6 +211,7 @@ export default async function GroupPage({
   const members = (membersRes.data ?? []) as GroupMemberRow[];
   const meetups = (meetupsRes.data ?? []) as MeetupRow[];
   const polls = (pollsRes.data ?? []) as AvailabilityPollRow[];
+  const resources = (resourcesRes.data ?? []) as GroupResourceRow[];
   const pendingRequests = (requestsRes.data ?? []) as JoinRequestRow[];
 
   // Attendance + poll details depend on the ids we just fetched.
@@ -233,6 +241,7 @@ export default async function GroupPage({
       ...members.map((m) => m.user_id),
       ...messages.map((m) => m.sender_id),
       ...pendingRequests.map((r) => r.user_id),
+      ...resources.map((r) => r.author_id),
     ]),
   ];
   const profilesRes = everyoneIds.length
@@ -248,7 +257,7 @@ export default async function GroupPage({
           <p className="text-sm font-medium uppercase tracking-wide text-maroon">
             {courseCode(group.courses)} · {group.courses.course_name}
           </p>
-          <h1 className="font-display text-3xl text-ink">{group.name}</h1>
+          <h1 className="break-words font-display text-3xl text-ink">{group.name}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant={group.mode === "open" ? "success" : "warning"}>
@@ -309,6 +318,17 @@ export default async function GroupPage({
             id: m.user_id,
             display_name: profilesById[m.user_id]?.display_name ?? null,
           }))}
+        />
+      </section>
+
+      {/* Shared notes & links — full width like the polls. */}
+      <section className="mt-6 rounded-xl border border-line bg-surface p-4 shadow-sm">
+        <ResourcesPanel
+          groupId={group.id}
+          currentUserId={profile.id}
+          isManager={isManager}
+          resources={resources}
+          profiles={profilesById}
         />
       </section>
     </div>

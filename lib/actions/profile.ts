@@ -79,6 +79,8 @@ function profileFields(formData: FormData) {
     class_standing: formData.get("class_standing"),
     graduation_month: formData.get("graduation_month"),
     graduation_year: formData.get("graduation_year"),
+    // Consumed by onboardingSchema only; profileSchema strips it.
+    sex: formData.get("sex"),
   };
 }
 
@@ -118,10 +120,18 @@ export async function saveOnboardingAction(
     return { fieldErrors: { avatar: [avatar.error] } };
   }
 
+  // Sex is not a profiles-grant column — the ONLY write path is the
+  // set_sex() function, which also enforces the once-chosen lock.
+  const { sex, ...profileData } = parsed.data;
+  const { error: sexError } = await supabase.rpc("set_sex", { p_sex: sex });
+  if (sexError) {
+    return { fieldErrors: { sex: [friendlyError(sexError)] } };
+  }
+
   const { error } = await supabase
     .from("profiles")
     .update({
-      ...parsed.data,
+      ...profileData,
       bio: bio || null,
       ...(avatar.url ? { avatar_url: avatar.url } : {}),
       onboarded_at: new Date().toISOString(),

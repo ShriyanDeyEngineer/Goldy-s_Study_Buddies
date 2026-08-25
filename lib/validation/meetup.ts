@@ -12,6 +12,7 @@
  * component). scheduled_at here is always an absolute UTC instant.
  */
 import { z } from "zod";
+import { containsProfanity, PROFANITY_NAME_MESSAGE } from "@/lib/profanity";
 import {
   MEETUP_DURATION_MAX,
   MEETUP_DURATION_MIN,
@@ -28,7 +29,8 @@ export const meetupSchema = z
       .string()
       .trim()
       .min(1, "Give the meetup a title.")
-      .max(100, "Titles max out at 100 characters."),
+      .max(100, "Titles max out at 100 characters.")
+      .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE),
     scheduled_at: z
       .string()
       .datetime({ offset: true, message: "Pick a date and time." }),
@@ -90,7 +92,8 @@ export const availabilityPollSchema = z
       .string()
       .trim()
       .min(1, "Give the poll a title.")
-      .max(100, "Titles max out at 100 characters."),
+      .max(100, "Titles max out at 100 characters.")
+      .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE),
     slots: z
       .array(
         z.object({

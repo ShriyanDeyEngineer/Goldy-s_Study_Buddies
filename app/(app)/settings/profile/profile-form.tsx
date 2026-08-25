@@ -20,7 +20,6 @@ import {
   SOCIAL_LINKS_MAX,
 } from "@/lib/constants";
 import type { ProfileRow } from "@/lib/types";
-import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FieldError } from "@/components/ui/field-error";
@@ -28,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { checkAvatarFile } from "@/lib/validation/avatar";
+import { AvatarPicker } from "@/components/ui/avatar-picker";
 
 export function ProfileForm({ profile }: { profile: ProfileRow }) {
   const [state, formAction, pending] = useActionState(updateProfileAction, {});
@@ -36,7 +35,6 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
   const [links, setLinks] = React.useState<string[]>(
     profile.social_links.length > 0 ? profile.social_links : [],
   );
-  const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
   // Instant client-side verdict on the chosen file (size/type). The
   // server still re-checks; this just stops silent failures.
   const [avatarClientError, setAvatarClientError] = React.useState<string | null>(null);
@@ -46,40 +44,27 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
       <CardContent>
         <h2 className="mb-4 font-display text-xl text-ink">The basics</h2>
         <form action={formAction} noValidate className="space-y-4">
-          <div className="flex items-center gap-4">
-            {avatarPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element -- local blob preview
-              <img
-                src={avatarPreview}
-                alt="Preview of your new profile picture"
-                className="h-16 w-16 rounded-full border border-line object-cover"
-              />
-            ) : (
-              <Avatar src={profile.avatar_url} name={profile.display_name} size="xl" />
-            )}
-            <div className="flex-1">
-              <Label htmlFor="avatar">Profile picture (JPEG/PNG, up to 5 MB)</Label>
-              <Input
-                id="avatar"
-                name="avatar"
-                type="file"
-                accept="image/jpeg,image/png"
-                className="h-auto py-2"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  const problem = checkAvatarFile(file);
-                  setAvatarClientError(problem);
-                  setAvatarPreview(file && !problem ? URL.createObjectURL(file) : null);
-                }}
-                aria-invalid={!!(avatarClientError || state.fieldErrors?.avatar)}
-                aria-describedby="avatar-error"
-              />
-              <FieldError
-                id="avatar-error"
-                error={avatarClientError ?? state.fieldErrors?.avatar}
-              />
-            </div>
-          </div>
+          <AvatarPicker
+            label="Profile picture (JPEG/PNG, up to 5 MB)"
+            currentUrl={profile.avatar_url}
+            fallbackName={profile.display_name}
+            error={avatarClientError ?? state.fieldErrors?.avatar}
+            onFileCheck={setAvatarClientError}
+          />
+
+          {profile.sex && (
+            <p className="text-sm text-ink-muted">
+              Sex:{" "}
+              <span className="font-medium text-ink">
+                {profile.sex === "male"
+                  ? "Male"
+                  : profile.sex === "female"
+                    ? "Female"
+                    : "Prefer not to say"}
+              </span>
+              {profile.sex !== "undisclosed" && " (permanent — set at sign-up)"}
+            </p>
+          )}
 
           <div>
             <Label htmlFor="display_name">Display name</Label>

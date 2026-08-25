@@ -1,16 +1,39 @@
 /**
- * censorProfanity() — the client mirror of the database's
- * censor_profanity() (migration 0013). If an expectation here changes,
- * the SQL word lists must change with it, and vice versa.
+ * censorProfanity() / containsProfanity() — the client mirror of the
+ * database's censor_profanity() (migrations 0013/0017). If an expectation
+ * here changes, the SQL word lists must change with it, and vice versa.
  */
 import { describe, expect, it } from "vitest";
-import { censorProfanity } from "@/lib/profanity";
+import { censorProfanity, containsProfanity } from "@/lib/profanity";
 
 describe("censorProfanity", () => {
   it("masks strong words", () => {
     expect(censorProfanity("fuck")).toBe("****");
     expect(censorProfanity("shit")).toBe("****");
-    expect(censorProfanity("this is bullshit")).toBe("this is bull****");
+  });
+
+  it("masks the WHOLE containing word, not just the match", () => {
+    expect(censorProfanity("fucking")).toBe("****");
+    expect(censorProfanity("this is bullshit")).toBe("this is ****");
+    expect(censorProfanity("assholes")).toBe("****");
+  });
+
+  it("catches leetspeak, symbol swaps, and repeated letters", () => {
+    expect(censorProfanity("f4ck")).toBe("****");
+    expect(censorProfanity("fvck")).toBe("****");
+    expect(censorProfanity("f*ck")).toBe("****");
+    expect(censorProfanity("fuuuuck")).toBe("****");
+    expect(censorProfanity("sh1t")).toBe("****");
+    expect(censorProfanity("what a ret4rd")).toBe("what a ****");
+    expect(censorProfanity("f\u200Buck")).toBe("****");
+  });
+
+  it("catches spaced and separated spellings", () => {
+    expect(censorProfanity("f u c k")).toBe("****");
+    expect(censorProfanity("f-u-c-k")).toBe("****");
+    expect(censorProfanity("f.u.c.k")).toBe("****");
+    expect(censorProfanity("what the f_u_c_k?!")).toBe("what the ****?!");
+    expect(censorProfanity("s h i t happens")).toBe("**** happens");
   });
 
   it("is case-insensitive", () => {
@@ -18,17 +41,13 @@ describe("censorProfanity", () => {
     expect(censorProfanity("Shit happens")).toBe("**** happens");
   });
 
-  it("masks strong words inside other words", () => {
-    expect(censorProfanity("fucking")).toBe("****ing");
-    expect(censorProfanity("assholes")).toBe("****s");
-  });
-
   it("masks every occurrence", () => {
     expect(censorProfanity("shit shit shit")).toBe("**** **** ****");
   });
 
-  it("masks ambiguous words only as whole words", () => {
+  it("masks ambiguous words only as exact whole words", () => {
     expect(censorProfanity("you ass")).toBe("you ****");
+    expect(censorProfanity("ass.")).toBe("****.");
     expect(censorProfanity("the assessment is due")).toBe("the assessment is due");
     expect(censorProfanity("in the cockpit")).toBe("in the cockpit");
     expect(censorProfanity("read some Dickens")).toBe("read some Dickens");
@@ -40,8 +59,26 @@ describe("censorProfanity", () => {
     expect(censorProfanity(clean)).toBe(clean);
   });
 
-  it("handles punctuation boundaries", () => {
+  it("preserves punctuation around a masked word", () => {
     expect(censorProfanity("what the fuck?!")).toBe("what the ****?!");
-    expect(censorProfanity("ass.")).toBe("****.");
+  });
+});
+
+describe("containsProfanity", () => {
+  it("flags swears, plain or spaced or embedded", () => {
+    expect(containsProfanity("fuck")).toBe(true);
+    expect(containsProfanity("f u c k")).toBe(true);
+    expect(containsProfanity("f-u-c-k")).toBe(true);
+    expect(containsProfanity("StudyFuckers")).toBe(true);
+    expect(containsProfanity("f4ck this group")).toBe(true);
+    expect(containsProfanity("you ass")).toBe(true);
+  });
+
+  it("passes real names and clean text (Scunthorpe rule)", () => {
+    expect(containsProfanity("Dickson")).toBe(false);
+    expect(containsProfanity("Dickens")).toBe(false);
+    expect(containsProfanity("Assessment Prep Group")).toBe(false);
+    expect(containsProfanity("Cockpit Physics")).toBe(false);
+    expect(containsProfanity("CSCI 1133 Study Group")).toBe(false);
   });
 });

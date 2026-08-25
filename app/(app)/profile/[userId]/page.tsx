@@ -96,7 +96,7 @@ export default async function ProfilePage({
             <Avatar src={person.avatar_url} name={person.display_name} size="xl" />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="font-display text-3xl text-ink">{person.display_name}</h1>
+                <h1 className="break-words font-display text-3xl text-ink">{person.display_name}</h1>
                 {person.is_available_for_buddies && (
                   <Badge variant="success">Open to study buddy</Badge>
                 )}
@@ -124,7 +124,7 @@ export default async function ProfilePage({
               </div>
 
               {person.bio && (
-                <p className="mt-4 whitespace-pre-wrap text-sm text-ink">{person.bio}</p>
+                <p className="mt-4 whitespace-pre-wrap break-words text-sm text-ink">{person.bio}</p>
               )}
 
               {person.social_links && person.social_links.length > 0 && (

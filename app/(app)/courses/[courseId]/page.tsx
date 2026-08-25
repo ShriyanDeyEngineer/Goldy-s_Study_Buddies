@@ -85,7 +85,7 @@ export default async function CourseDetailPage({
           <p className="text-sm font-medium uppercase tracking-wide text-maroon">
             {courseCode(course)}
           </p>
-          <h1 className="font-display text-3xl text-ink">{course.course_name}</h1>
+          <h1 className="break-words font-display text-3xl text-ink">{course.course_name}</h1>
         </div>
         <Button asChild>
           <Link href={`/groups/new?course=${course.id}`}>

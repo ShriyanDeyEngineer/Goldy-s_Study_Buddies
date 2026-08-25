@@ -19,12 +19,13 @@ const NAV_LINKS = [
 export function PublicHeader() {
   return (
     <header className="border-b border-line bg-surface">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-4 sm:gap-x-6">
         <Link
           href="/"
           className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
         >
-          <LogoLockup />
+          {/* One size down on phones so the auth buttons fit beside it. */}
+          <LogoLockup className="text-base sm:text-xl" />
         </Link>
 
         <nav
@@ -43,10 +44,10 @@ export function PublicHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 sm:ml-0">
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="sm" className="px-2 sm:px-3">
             <Link href="/login">Sign in</Link>
           </Button>
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="px-2.5 sm:px-3">
             <Link href="/register">Sign up</Link>
           </Button>
         </div>

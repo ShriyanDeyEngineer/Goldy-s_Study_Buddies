@@ -56,6 +56,12 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   POLL_CLOSED: "This poll is closed.",
   INVALID_SLOTS: "Polls need 2–400 future time slots, each ending after it starts.",
 
+  // ── Resources ────────────────────────────────────────────────────────
+  RESOURCE_NOT_FOUND: "That resource is already gone.",
+  INVALID_KIND: "Choose a note or a link.",
+  INVALID_LINK: "Links must start with http:// or https://.",
+  INVALID_NOTE: "Notes need 1\u20135,000 characters.",
+
   // ── Messages ─────────────────────────────────────────────────────────
   EMPTY_MESSAGE: "Type a message first.",
   MESSAGE_TOO_LONG: "Messages max out at 2,000 characters.",
@@ -70,6 +76,10 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   NOT_AVAILABLE: "This person isn't looking for a study buddy right now.",
   BLOCKED: "You can't send that request.",
   NOT_BLOCKED: "You haven't blocked this person.",
+
+  // ── Profile: sex ─────────────────────────────────────────────────────
+  INVALID_SEX: "Choose male, female, or prefer not to say.",
+  SEX_LOCKED: "This setting is permanent and can't be changed.",
 
   // ── Courses ──────────────────────────────────────────────────────────
   INVALID_DEPARTMENT: "Department codes look like CSCI or MATH (2–8 letters).",

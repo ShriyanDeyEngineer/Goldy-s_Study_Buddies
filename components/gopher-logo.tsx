@@ -100,7 +100,7 @@ export function LogoLockup({
         className,
       )}
     >
-      <GopherLogo className={cn("h-7 w-7", dark ? "text-gold" : "text-maroon")} />
+      <GopherLogo className={cn("h-[1.35em] w-[1.35em]", dark ? "text-gold" : "text-maroon")} />
       <span>
         <span className={dark ? "text-gold" : ""}>Goldy&rsquo;s Study Buddies</span>
       </span>

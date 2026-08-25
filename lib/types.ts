@@ -26,6 +26,8 @@ export interface ProfileRow {
   social_links: string[];
   privacy: PrivacyFlags;
   is_available_for_buddies: boolean;
+  /** male | female | undisclosed; null = account predates the field. */
+  sex: "male" | "female" | "undisclosed" | null;
   /** Email me about group/friend events (webhook honors this). */
   email_notifications: boolean;
   account_status: "active" | "suspended" | "banned" | "deleted";
@@ -128,6 +130,17 @@ export interface AvailabilitySlotRow {
   poll_id: string;
   starts_at: string;
   ends_at: string;
+}
+
+export interface GroupResourceRow {
+  id: string;
+  group_id: string;
+  author_id: string;
+  kind: "note" | "link";
+  title: string;
+  /** Note body, or the URL for links. */
+  content: string;
+  created_at: string;
 }
 
 export interface GroupMessageRow {
