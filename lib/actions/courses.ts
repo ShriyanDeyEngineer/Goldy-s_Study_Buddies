@@ -52,26 +52,38 @@ export async function openGmailCompose(data: GmailComposeData): Promise<void>
     window.open(gmailUrl, "_blank", "noopener,noreferrer");
   }
 
-  else if(userPlatform === "ios" || userPlatform == "android")
+  else
   {
-      const appParams = new URLSearchParams({
-        to: DESTINATION_EMAIL,
-        subject: subject,
-        body: body,
-      });
+    // mailto builds its query with encodeURIComponent, NOT URLSearchParams:
+    // URLSearchParams encodes spaces as "+", which some mail apps show as
+    // literal plus signs in the subject/body.
+    const mailtoUrl =
+      `mailto:${DESTINATION_EMAIL}` +
+      `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-    const mailtoParams = new URLSearchParams({
-        subject: subject,
-        body: body,
-      });
+    if(userPlatform === "android")
+    {
+      // ANDROID: googlegmail:// is an iOS-ONLY scheme — Android's Gmail
+      // doesn't register it, so navigating to it sent people to the Play
+      // Store "get the app" page even with Gmail installed. A plain
+      // mailto: opens the user's default mail app (Gmail for almost
+      // everyone) directly.
+      window.location.href = mailtoUrl;
+      return;
+    }
 
-    // If the Gmail app isn't installed, this silently fails and the
-    // page stays visible — so we set a fallback timer.
+    // iOS: try the Gmail app's compose scheme first; if the app isn't
+    // installed the navigation silently fails and the page stays visible,
+    // so a timer falls back to mailto (Apple Mail). If Gmail *does* open,
+    // the tab hides — cancel the fallback.
+    const appParams =
+      `to=${encodeURIComponent(DESTINATION_EMAIL)}` +
+      `&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
     const fallbackTimer = window.setTimeout(() => {
-      if(document.visibilityState === "visible"){window.location.href = `mailto:${DESTINATION_EMAIL}?${mailtoParams.toString()}`;}
+      if(document.visibilityState === "visible"){window.location.href = mailtoUrl;}
     }, 1500);
 
-    // If the Gmail app *does* open, the tab will blur/hide — cancel the fallback.
     const cancelFallback = () => window.clearTimeout(fallbackTimer);
     window.addEventListener("blur", cancelFallback, { once: true });
     document.addEventListener("visibilitychange", () => {
@@ -80,8 +92,7 @@ export async function openGmailCompose(data: GmailComposeData): Promise<void>
       {once: true}
     );
 
-    // Attempt to open the native Gmail app
-    window.location.href = `googlegmail://co?${appParams.toString()}`;
+    window.location.href = `googlegmail://co?${appParams}`;
   }
 }
 
