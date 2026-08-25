@@ -166,7 +166,7 @@ export function FriendLists({
               onConfirm={() => run(() => removeFriendAction(id))}
             >
               <Button size="sm" variant="ghost" className="text-ink-muted">
-                Unfriend
+                Unfriend &#62;&#58;&#40;
               </Button>
             </ConfirmDialog>
           </PersonRow>

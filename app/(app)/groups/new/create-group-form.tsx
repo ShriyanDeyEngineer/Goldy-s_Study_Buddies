@@ -27,6 +27,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FieldError } from "@/components/ui/field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AddCourseDialog } from "../../courses/add-course-dialog";
+
 
 export function CreateGroupForm({
   course,
@@ -254,14 +256,9 @@ export function CreateGroupForm({
             </Button>
 
             {course && (
-              <p className="text-center text-sm text-ink-muted">
+              <p className="text-center text-base text-ink-muted">
                 Course not right?{" "}
-                <Link
-                  href="/groups/new?course=custom"
-                  className="font-medium text-maroon underline underline-offset-2"
-                >
-                  My course isn&rsquo;t listed
-                </Link>
+                <AddCourseDialog />
               </p>
             )}
           </form>

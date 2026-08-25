@@ -17,14 +17,14 @@ export function DeleteAccountCard() {
     <Card className="border-danger/40">
       <CardContent>
         <h2 className="font-display text-lg text-ink">Delete account</h2>
-        <p className="mt-1 text-sm text-ink-muted">
+        <p className="mt-1 text-base text-ink-muted font-['Times_New_Roman']">
           This removes your profile, takes you out of your groups and
           everyone&rsquo;s friend lists, and cancels your pending requests.
           Messages you sent stay in their chats, shown as
           &ldquo;Deleted User&rdquo;. Deleted data cannot be recovered — signing
           in again later starts a brand-new, empty account.
         </p>
-        <div className="mt-4">
+        <div className="mt-4 font-['Times_New_Roman']">
           <TypedConfirmDialog
             title="Delete your account?"
             description="Your profile is removed, you leave every group, and you disappear from friend lists. Old messages remain, attributed to Deleted User. Deleted data cannot be recovered; signing in again starts a brand-new account."
@@ -36,7 +36,7 @@ export function DeleteAccountCard() {
               if (result?.error) toast.error(result.error);
             }}
           >
-            <Button variant="danger">Delete account…</Button>
+            <Button variant="danger">Delete Account…</Button>
           </TypedConfirmDialog>
         </div>
       </CardContent>

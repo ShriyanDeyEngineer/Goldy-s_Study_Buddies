@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Select } from "@/components/ui/select";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,16 +28,20 @@ export default async function CourseDetailPage({
   searchParams,
 }: {
   params: Promise<{ courseId: string }>;
-  searchParams: Promise<{ existing?: string }>;
+  searchParams: Promise<{ existing?: string; mode?: string}>;
 }) {
   const { courseId } = await params;
-  const { existing } = await searchParams;
+  const searchParameters = await searchParams;
+  const existing = searchParameters.existing;
+
+  const mode = (searchParameters.mode?? "").trim().toLowerCase();
+  
   // Validate before it ever reaches a query filter (spec pitfall #5).
   if (!UUID_RE.test(courseId)) notFound();
 
   const { supabase, profile } = await getSessionProfile();
   if (!profile) return null;
-
+  
   const [courseRes, groupsRes, membershipRes, requestsRes] = await Promise.all([
     supabase.from("courses").select("*").eq("id", courseId).maybeSingle(),
     supabase
@@ -60,6 +65,10 @@ export default async function CourseDetailPage({
   const myGroupIds = new Set((membershipRes.data ?? []).map((m) => m.group_id as string));
   const myPendingIds = new Set((requestsRes.data ?? []).map((r) => r.group_id as string));
 
+
+  const filteredGroups = groups.filter(group => group.mode === mode || mode.length === 0 ? true : false);
+  
+  
   return (
     <div>
       {existing && (
@@ -97,45 +106,66 @@ export default async function CourseDetailPage({
           }
         />
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {groups.map((group) => {
-            const state = getJoinState({
-              groupStatus: group.status,
-              mode: group.mode,
-              memberCount: group.member_count,
-              capacity: group.capacity,
-              isManager: group.manager_id === profile.id,
-              isMember: myGroupIds.has(group.id),
-              hasPendingRequest: myPendingIds.has(group.id),
-            });
-            return (
-              <li key={group.id}>
-                <Card>
-                  <CardContent className="flex items-center justify-between gap-4">
-                    <div className="min-w-0">
-                      <Link
-                        href={`/groups/${group.id}`}
-                        className="truncate font-display text-lg text-ink hover:underline focus-visible:outline-2 focus-visible:outline-gold"
-                      >
-                        {group.name}
-                      </Link>
-                      <div className="mt-1.5 flex items-center gap-3 text-sm text-ink-muted">
-                        <span className="inline-flex items-center gap-1.5">
-                          <Users aria-hidden className="h-4 w-4" />
-                          {group.member_count}/{group.capacity}
-                        </span>
-                        <Badge variant={group.mode === "open" ? "success" : "warning"}>
-                          {group.mode === "open" ? "Open — join instantly" : "Closed — request to join"}
-                        </Badge>
-                      </div>
-                    </div>
-                    <JoinButton groupId={group.id} state={state} />
-                  </CardContent>
-                </Card>
-              </li>
-            );
-          })}
-        </ul>
+        <div>
+
+
+          <form method="get" className="mb-6 grid gap-3 sm:grid-cols-[1fr_10rem_14rem_auto]">
+            <Select name="mode" defaultValue={mode} aria-label="Filter by mode">
+              <option value="">All Groups</option>
+              <option value="open">Open Groups</option>
+              <option value="closed">Closed Groups</option>
+            </Select>
+            <Button type="submit" variant="secondary" className="whitespace-normal break-words">
+              Apply Selected Search Filters
+            </Button>
+          </form>
+
+
+          {filteredGroups.length === 0 ? (
+                  <EmptyState
+                    title="No groups match"
+                    description="Try applying a different search filter or create your own study group."
+                  />
+          ) : (
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {filteredGroups.map((group) => {
+              const state = getJoinState({
+                groupStatus: group.status,
+                mode: group.mode,
+                memberCount: group.member_count,
+                capacity: group.capacity,
+                isManager: group.manager_id === profile.id,
+                isMember: myGroupIds.has(group.id),
+                hasPendingRequest: myPendingIds.has(group.id),
+              });
+              return (
+                <li key={group.id}>
+                  
+                    <Card>
+                      <CardContent className="flex items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <Link href={`/groups/${group.id}`} className="truncate font-display text-lg text-ink hover:underline focus-visible:outline-2 focus-visible:outline-gold">
+                            {group.name}
+                          </Link>
+                          <div className="mt-1.5 flex items-center gap-3 text-sm text-ink-muted">
+                            <span className="inline-flex items-center gap-1.5">
+                              <Users aria-hidden className="h-4 w-4" />
+                              {group.member_count}/{group.capacity}
+                            </span>
+                            <Badge variant={group.mode === "open" ? "success" : "warning"}>
+                              {group.mode === "open" ? "Open — join instantly" : "Closed — request to join"}
+                            </Badge>
+                          </div>
+                        </div>
+                        <JoinButton groupId={group.id} state={state} />
+                      </CardContent>
+                    </Card>
+                </li>
+              );
+            })}
+          </ul>
+          )}
+        </div>
       )}
     </div>
   );

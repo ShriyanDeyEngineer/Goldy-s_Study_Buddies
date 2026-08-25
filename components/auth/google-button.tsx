@@ -67,7 +67,7 @@ export function GoogleButton({
           onCheckedChange={(value) => setAccepted(value === true)}
           className="mt-0.5"
         />
-        <label htmlFor="accept-terms" className="text-sm text-ink-muted">
+        <label htmlFor="accept-terms" className="text-sm text-ink-muted font-['Times_New_Roman']">
           I agree to the{" "}
           <Link
             href="/terms_of_service"
@@ -82,7 +82,7 @@ export function GoogleButton({
       </div>
 
       {/* The one and only way in, so it gets primary styling. */}
-      <Button type="submit" className="w-full" disabled={!accepted}>
+      <Button type="submit" className="w-full font-['Times_New_Roman'] text-base" disabled={!accepted}>
         <GoogleG />
         Continue with UMN Google
       </Button>
