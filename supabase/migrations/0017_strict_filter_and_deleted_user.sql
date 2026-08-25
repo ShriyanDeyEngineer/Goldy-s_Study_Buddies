@@ -1,9 +1,10 @@
 -- ============================================================================
 -- 0017 — stricter filter, uncensored originals, "Deleted User" rename.
 --
--- 1. censor_profanity() catches spelled-out swears ("f u c k", "f-u-c-k":
---    each letter may be followed by any run of non-alphanumerics) and masks
---    the WHOLE containing word ("fucking" -> "****", not "****ing").
+-- 1. censor_profanity() catches spelled-out swears ("f u c k", "f-u-c-k"),
+--    leetspeak (f4ck, fvck), and repeated letters (fuuuck), and masks the
+--    WHOLE containing word ("fucking" -> "****", not "****ing"). The
+--    pattern is generated from the same word lists as lib/profanity.ts.
 --    Ambiguous words stay exact-whole-word (\y...\y), so "assessment",
 --    "cockpit", "Dickson" still pass. Mirror of lib/profanity.ts — keep
 --    the two word lists in sync.
@@ -23,10 +24,10 @@ as $fn$
   select regexp_replace(
            regexp_replace(
              coalesce(p_text, ''),
-             '[[:alnum:]_]*(f[^[:alnum:]]*u[^[:alnum:]]*c[^[:alnum:]]*k|s[^[:alnum:]]*h[^[:alnum:]]*i[^[:alnum:]]*t|c[^[:alnum:]]*u[^[:alnum:]]*n[^[:alnum:]]*t|b[^[:alnum:]]*i[^[:alnum:]]*t[^[:alnum:]]*c[^[:alnum:]]*h|w[^[:alnum:]]*h[^[:alnum:]]*o[^[:alnum:]]*r[^[:alnum:]]*e|s[^[:alnum:]]*l[^[:alnum:]]*u[^[:alnum:]]*t|f[^[:alnum:]]*a[^[:alnum:]]*g[^[:alnum:]]*g[^[:alnum:]]*o[^[:alnum:]]*t|n[^[:alnum:]]*i[^[:alnum:]]*g[^[:alnum:]]*g[^[:alnum:]]*e[^[:alnum:]]*r|n[^[:alnum:]]*i[^[:alnum:]]*g[^[:alnum:]]*g[^[:alnum:]]*a|a[^[:alnum:]]*s[^[:alnum:]]*s[^[:alnum:]]*h[^[:alnum:]]*o[^[:alnum:]]*l[^[:alnum:]]*e)[[:alnum:]_]*',
+             '[[:alnum:]_]*([a4@*]+[^[:alnum:]]*[s5$]+[^[:alnum:]]*[s5$]+[^[:alnum:]]*[h]+[^[:alnum:]]*[o0*]+[^[:alnum:]]*[l1|]+[^[:alnum:]]*[e3*]+|[f]+[^[:alnum:]]*[a4@*]+[^[:alnum:]]*[g9]+[^[:alnum:]]*[g9]+[^[:alnum:]]*[o0*]+[^[:alnum:]]*[t7+]+|[n]+[^[:alnum:]]*[i1!|*]+[^[:alnum:]]*[g9]+[^[:alnum:]]*[g9]+[^[:alnum:]]*[e3*]+[^[:alnum:]]*[r]+|[r]+[^[:alnum:]]*[e3*]+[^[:alnum:]]*[t7+]+[^[:alnum:]]*[a4@*]+[^[:alnum:]]*[r]+[^[:alnum:]]*[d]+|[b8]+[^[:alnum:]]*[i1!|*]+[^[:alnum:]]*[t7+]+[^[:alnum:]]*[c(<{]+[^[:alnum:]]*[h]+|[w]+[^[:alnum:]]*[h]+[^[:alnum:]]*[o0*]+[^[:alnum:]]*[r]+[^[:alnum:]]*[e3*]+|[n]+[^[:alnum:]]*[i1!|*]+[^[:alnum:]]*[g9]+[^[:alnum:]]*[g9]+[^[:alnum:]]*[a4@*]+|[f]+[^[:alnum:]]*[uv4*]+[^[:alnum:]]*[c(<{]+[^[:alnum:]]*[k]+|[s5$]+[^[:alnum:]]*[h]+[^[:alnum:]]*[i1!|*]+[^[:alnum:]]*[t7+]+|[c(<{]+[^[:alnum:]]*[uv4*]+[^[:alnum:]]*[n]+[^[:alnum:]]*[t7+]+|[s5$]+[^[:alnum:]]*[l1|]+[^[:alnum:]]*[uv4*]+[^[:alnum:]]*[t7+]+)[[:alnum:]_]*',
              '****', 'gi'
            ),
-           '\y(ass|dick|cock|pussy|bastard|tits)\y',
+           '\y([b8]+[^[:alnum:]]*[a4@*]+[^[:alnum:]]*[s5$]+[^[:alnum:]]*[t7+]+[^[:alnum:]]*[a4@*]+[^[:alnum:]]*[r]+[^[:alnum:]]*[d]+|[p]+[^[:alnum:]]*[uv4*]+[^[:alnum:]]*[s5$]+[^[:alnum:]]*[s5$]+[^[:alnum:]]*[y]+|[d]+[^[:alnum:]]*[i1!|*]+[^[:alnum:]]*[c(<{]+[^[:alnum:]]*[k]+|[c(<{]+[^[:alnum:]]*[o0*]+[^[:alnum:]]*[c(<{]+[^[:alnum:]]*[k]+|[t7+]+[^[:alnum:]]*[i1!|*]+[^[:alnum:]]*[t7+]+[^[:alnum:]]*[s5$]+|[a4@*]+[^[:alnum:]]*[s5$]+[^[:alnum:]]*[s5$]+)\y',
            '****', 'gi'
          );
 $fn$;

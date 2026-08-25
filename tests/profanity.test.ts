@@ -18,6 +18,16 @@ describe("censorProfanity", () => {
     expect(censorProfanity("assholes")).toBe("****");
   });
 
+  it("catches leetspeak, symbol swaps, and repeated letters", () => {
+    expect(censorProfanity("f4ck")).toBe("****");
+    expect(censorProfanity("fvck")).toBe("****");
+    expect(censorProfanity("f*ck")).toBe("****");
+    expect(censorProfanity("fuuuuck")).toBe("****");
+    expect(censorProfanity("sh1t")).toBe("****");
+    expect(censorProfanity("what a ret4rd")).toBe("what a ****");
+    expect(censorProfanity("f\u200Buck")).toBe("****");
+  });
+
   it("catches spaced and separated spellings", () => {
     expect(censorProfanity("f u c k")).toBe("****");
     expect(censorProfanity("f-u-c-k")).toBe("****");
@@ -60,6 +70,7 @@ describe("containsProfanity", () => {
     expect(containsProfanity("f u c k")).toBe(true);
     expect(containsProfanity("f-u-c-k")).toBe(true);
     expect(containsProfanity("StudyFuckers")).toBe(true);
+    expect(containsProfanity("f4ck this group")).toBe(true);
     expect(containsProfanity("you ass")).toBe(true);
   });
 

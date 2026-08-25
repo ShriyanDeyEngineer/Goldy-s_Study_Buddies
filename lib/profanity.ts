@@ -11,7 +11,7 @@
  *
  * Matching rules:
  *   - STRONG words are caught with bypass hardening — leetspeak
- *     substitutions (f4ck, fvck), separators between letters ("f u c k",
+ *     substitutions (f4ck, fvck, f*ck — masked vowels count as the vowel), separators between letters ("f u c k",
  *     "f-u-c-k", "f.u.c.k"), zero-width/invisible unicode spacers, and
  *     repeated letters ("fuuuck") — and the WHOLE surrounding word is
  *     masked, so "fucking" becomes "****", not "****ing".
@@ -25,17 +25,17 @@
 
 // Letters mapped to the set of characters commonly used to stand in for them.
 const LEET: Record<string, string> = {
-  a: "a4@",
+  a: "a4@*",
   b: "b8",
   c: "c(<{",
-  e: "e3",
+  e: "e3*",
   g: "g9",
-  i: "i1!|",
+  i: "i1!|*",
   l: "l1|",
-  o: "o0",
+  o: "o0*",
   s: "s5$",
   t: "t7+",
-  u: "uv",
+  u: "uv4*",
 };
 
 // Characters that may be stuffed between letters to dodge a literal match:
