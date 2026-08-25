@@ -163,6 +163,8 @@ export interface MessageOriginalRow {
   message_id: string;
   sender_id: string;
   original_content: string;
+  /** The masked text everyone actually saw, captured at send time. */
+  censored_content: string;
   created_at: string;
 }
 

@@ -436,9 +436,13 @@ Throttle the network (DevTools → Slow 3G) to make failures obvious.
 - [ ] **Reports**: /admin lists reports with reporter/reported names
       (suspended accounts still show names + a status chip); Start
       review/Resolve/Dismiss move the status.
-- [ ] **Flagged messages**: /admin/messages shows the uncensored text of
-      masked chat/DM messages with sender + kind; a non-admin querying
-      message_originals through the API gets zero rows.
+- [ ] **Flagged messages**: /admin/messages logs EVERY message the filter
+      altered — sending a plain "this is shit" appears just like a
+      "s h i t" dodge. Each row shows BOTH versions side by side: "Shown
+      in chat" (the masked text, e.g. "this is ****") and "Original
+      (uncensored)". The `message_originals` table has both in their own
+      columns (`censored_content` / `original_content`). A non-admin
+      querying message_originals through the API gets zero rows.
 - [ ] **Course requests**: "Add a Course" now files an in-app request (no
       Gmail); duplicate pending request refused; a course already in the
       catalog refused with the "search instead" message. Admin sees it

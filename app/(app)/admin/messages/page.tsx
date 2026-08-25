@@ -1,8 +1,10 @@
 /**
- * /admin/messages — the uncensored log. Every chat/DM message the filter
- * masked keeps its ORIGINAL text in message_originals (0017); this page
- * is where admins see what the person actually tried to say. What other
- * users see stays censored.
+ * /admin/messages — the flagged-message log. EVERY chat/DM message the
+ * filter altered gets a row here — a plain "shit" masked to **** just as
+ * much as a spaced-out "s h i t" dodge. Each entry shows both versions
+ * side by side: the masked text everyone saw, and the original the
+ * sender actually typed (0017/0023). Other users only ever see the
+ * masked version.
  */
 import { getSessionProfile } from "@/lib/supabase/server";
 import type { MessageOriginalRow } from "@/lib/types";
@@ -35,8 +37,10 @@ export default async function AdminMessagesPage() {
   return (
     <div>
       <p className="mb-4 text-sm text-ink-muted">
-        Messages the profanity filter masked, shown here UNCENSORED — other
-        users only ever see the masked version. Latest 200.
+        Every message the profanity filter altered — ordinary swears and
+        bypass attempts alike — with what everyone saw next to what the
+        sender actually typed. Other users only ever see the masked
+        version. Latest 200.
       </p>
       {originals.length === 0 ? (
         <p className="text-sm text-ink-muted">Nothing has been masked yet.</p>
@@ -58,9 +62,24 @@ export default async function AdminMessagesPage() {
                   </Badge>
                   {formatDistanceToNow(new Date(original.created_at), { addSuffix: true })}
                 </div>
-                <p className="mt-1 whitespace-pre-wrap break-words text-sm text-ink">
-                  {original.original_content}
-                </p>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <div className="rounded-lg bg-cream px-3 py-2">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                      Shown in chat
+                    </p>
+                    <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-ink">
+                      {original.censored_content}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-danger/5 px-3 py-2">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-danger">
+                      Original (uncensored)
+                    </p>
+                    <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-ink">
+                      {original.original_content}
+                    </p>
+                  </div>
+                </div>
               </li>
             );
           })}
