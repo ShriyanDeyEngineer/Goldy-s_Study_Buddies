@@ -304,3 +304,30 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] Bypass check: submitting the form without the box (e.g. re-enabling
       the button in devtools) bounces back to the same page with "Please
       accept the Terms of Service to continue." — it never reaches Google.
+
+## Feature round 2 — 2026-08-23
+
+- [ ] **Android course request**: on an Android phone, submitting the
+      add-course request opens the default mail app (Gmail) with the
+      prefilled email — NOT the Play Store. iPhone still opens the Gmail
+      app when installed, falling back to Apple Mail.
+- [ ] **Resources**: group page shows a Resources section; members add a
+      note (5,000-char cap) or a link (http/https only, opens in a new
+      tab); a profane title is refused inline; the author and the manager
+      see a delete button, other members don't; deletion asks first.
+- [ ] **Filter hardening**: "f4ck", "fvck", "f*ck", "fuuuck", and
+      "f u c k" all mask as **** in chat; whole word masked ("fucking" →
+      "****"). "Dickson"/"assessment" still pass everywhere.
+- [ ] **Sex at onboarding**: step 1 requires Male / Female / Prefer not
+      to say, with the permanence note. After finishing, Edit profile
+      shows it read-only. People page has an "Any sex" dropdown —
+      filtering by Male/Female excludes prefer-not-to-say students; the
+      chip removes it. Server refuses changing a chosen Male/Female
+      (SEX_LOCKED).
+- [ ] **Catalog expansion**: `npm run import-courses --
+      scripts/course-catalog-expansion.csv` loads ~120 registrar-verified
+      courses; re-running reports skips, no duplicates; ACCT 2051 (not
+      2050) and CHEM 1071/1072 exist; catalog search finds SPAN 1001.
+- [ ] **Mobile**: at 375px the marketing header is two rows (logo +
+      buttons, then nav); a 50-character group name wraps on the group
+      page instead of scrolling the page sideways.
