@@ -58,6 +58,16 @@ export function renderNotification(n: NotificationRow): Rendered {
       return { message: "Someone wants to be your study buddy.", href: p.user_id ? `/profile/${p.user_id}` : "/friends" };
     case "buddy_request_accepted":
       return { message: "You've got a new study buddy!", href: p.user_id ? `/profile/${p.user_id}` : "/friends" };
+    case "course_request_approved":
+      return {
+        message: `Your course request for ${p.department_code} ${p.course_number} was approved — it's in the catalog now.`,
+        href: p.course_id ? `/courses/${p.course_id}` : "/courses",
+      };
+    case "course_request_declined":
+      return {
+        message: `Your course request for ${p.department_code} ${p.course_number} was declined.`,
+        href: "/courses",
+      };
     default:
       return { message: "Something new happened.", href: "/notifications" };
   }

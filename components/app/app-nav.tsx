@@ -15,6 +15,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   MessageSquare,
+  ShieldCheck,
   UsersRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,13 @@ const LINKS = [
   { href: "/messages", label: "Messages", icon: MessageSquare },
 ];
 
+/** The Admin section, appended only for is_admin accounts. */
+const ADMIN_LINK = { href: "/admin", label: "Admin", icon: ShieldCheck };
+
+function navLinks(isAdmin: boolean) {
+  return isAdmin ? [...LINKS, ADMIN_LINK] : LINKS;
+}
+
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
 }
@@ -35,13 +43,15 @@ function isActive(pathname: string, href: string) {
 export interface NavBadgeProps {
   userId: string;
   initialUnreadMessages: number;
+  /** Shows the Admin nav item (server-verified; the pages 404 anyway). */
+  isAdmin?: boolean;
 }
 
-export function AppNavLinks({ userId, initialUnreadMessages }: NavBadgeProps) {
+export function AppNavLinks({ userId, initialUnreadMessages, isAdmin = false }: NavBadgeProps) {
   const pathname = usePathname();
   return (
     <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-      {LINKS.map((link) => (
+      {navLinks(isAdmin).map((link) => (
         <Link
           key={link.href}
           href={link.href}
@@ -63,14 +73,14 @@ export function AppNavLinks({ userId, initialUnreadMessages }: NavBadgeProps) {
   );
 }
 
-export function MobileNav({ userId, initialUnreadMessages }: NavBadgeProps) {
+export function MobileNav({ userId, initialUnreadMessages, isAdmin = false }: NavBadgeProps) {
   const pathname = usePathname();
   return (
     <nav
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
     >
-      {LINKS.map((link) => (
+      {navLinks(isAdmin).map((link) => (
         <Link
           key={link.href}
           href={link.href}

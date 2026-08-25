@@ -344,3 +344,28 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       /notifications) has a mail icon that flips read state without
       navigating; the badge count follows, including from the
       /notifications page (bell recounts via realtime).
+
+## Admin dashboard — 2026-08-25
+
+- [ ] **Gate**: a non-admin visiting /admin (or any subpage) gets a 404;
+      no Admin item in their nav. An is_admin account sees "Admin" in the
+      desktop nav and mobile bar.
+- [ ] **Observation**: admin opens /admin/groups → any group → sees full
+      chat log, members, meetups, resources of a group they never joined;
+      the group's member list does NOT include the admin, and members see
+      nothing. The observation page has no composer/RSVP/add buttons.
+- [ ] **Still a normal user**: the same admin can join a group the normal
+      way, chat, and RSVP like anyone else.
+- [ ] **Reports**: /admin lists reports with reporter/reported names
+      (suspended accounts still show names + a status chip); Start
+      review/Resolve/Dismiss move the status.
+- [ ] **Flagged messages**: /admin/messages shows the uncensored text of
+      masked chat/DM messages with sender + kind; a non-admin querying
+      message_originals through the API gets zero rows.
+- [ ] **Course requests**: "Add a Course" now files an in-app request (no
+      Gmail); duplicate pending request refused; a course already in the
+      catalog refused with the "search instead" message. Admin sees it
+      under /admin/requests, can EDIT the fields, then Approve (course
+      appears in catalog, student gets an approval notification linking
+      to it) or Decline (student notified). Non-admin calling the
+      approve/decline RPCs gets NOT_ADMIN.

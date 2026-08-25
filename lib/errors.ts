@@ -86,6 +86,10 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   INVALID_COURSE_NUMBER: "Course numbers look like 1133 or 1301W.",
   INVALID_COURSE_NAME: "Course names need to be 1–200 characters.",
 
+  // ── Admin / course requests ──────────────────────────────────────────
+  NOT_ADMIN: "Only admins can do that.",
+  COURSE_EXISTS: "That course is already in the catalog — search for it instead.",
+
   // ── Reports ──────────────────────────────────────────────────────────
   INVALID_CATEGORY: "Pick the reason that fits best.",
   DESCRIPTION_TOO_LONG: "Keep the description under 1,000 characters.",

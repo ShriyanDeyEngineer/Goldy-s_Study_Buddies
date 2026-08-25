@@ -64,7 +64,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 md:pb-8">
         {children}
       </main>
-      <MobileNav userId={typedProfile.id} initialUnreadMessages={unreadMessages} />
+      <MobileNav
+        userId={typedProfile.id}
+        initialUnreadMessages={unreadMessages}
+        isAdmin={typedProfile.is_admin}
+      />
     </div>
   );
 }
