@@ -25,38 +25,32 @@ export function GopherLogo({ className }: { className?: string }) {
       <rect x="8" y="46" width="48" height="5" rx="2" />
 
       {/* ===== left student ===== */}
-      {/* head */}
+      {/* head — a clean silhouette, no facial features */}
       <circle cx="20" cy="20" r="9" />
-      {/* eyes, looking down toward the shared book */}
-      <circle cx="18.5" cy="21" r="1" fill="#fff" />
-      <circle cx="24" cy="21" r="1" fill="#fff" />
       
       {/* body */}
       <path d="M 9 46 C 9 34 14 28 20 28 C 26 28 31 34 31 46 Z" />
       
-      {/* pencil, held at the student's side with a gap, pointing up and outward */}
-      <g transform="translate(6 37) rotate(-125)">
-        <rect x="0" y="-0.6" width="8" height="1.2" rx="0.6" />
-        <path d="M 8 -0.6 L 10 0 L 8 0.6 Z" />
-        <rect x="0" y="-0.6" width="1.2" height="1.2" fill="#fff" fillOpacity="0.6" />
+      {/* pencil beside the student — sized like a real pencil in hand */}
+      <g transform="translate(6.5 45) rotate(-105)">
+        <rect x="0" y="-1.2" width="12" height="2.4" rx="1" />
+        <path d="M 12 -1.2 L 15.2 0 L 12 1.2 Z" />
+        <rect x="0" y="-1.2" width="1.8" height="2.4" fill="#fff" fillOpacity="0.6" />
       </g>
 
 
       {/* ===== right student ===== */}
-      {/* head */}
+      {/* head — a clean silhouette, no facial features */}
       <circle cx="44" cy="20" r="9" />
-      {/* eyes, looking down toward the shared book */}
-      <circle cx="40" cy="21" r="1" fill="#fff" />
-      <circle cx="45.5" cy="21" r="1" fill="#fff" />
       
       {/* body */}
       <path d="M 33 46 C 33 34 38 28 44 28 C 50 28 55 34 55 46 Z" />
       
-      {/* pencil, held at the student's side with a gap, pointing up and outward */}
-      <g transform="translate(57 37) rotate(-55)">
-        <rect x="0" y="-0.6" width="8" height="1.2" rx="0.6" />
-        <path d="M 8 -0.6 L 10 0 L 8 0.6 Z" />
-        <rect x="0" y="-0.6" width="1.2" height="1.2" fill="#fff" fillOpacity="0.6" />
+      {/* pencil beside the student — mirrored */}
+      <g transform="translate(57.5 45) rotate(-75)">
+        <rect x="0" y="-1.2" width="12" height="2.4" rx="1" />
+        <path d="M 12 -1.2 L 15.2 0 L 12 1.2 Z" />
+        <rect x="0" y="-1.2" width="1.8" height="2.4" fill="#fff" fillOpacity="0.6" />
       </g>
 
 
