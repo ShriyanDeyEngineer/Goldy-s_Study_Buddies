@@ -77,6 +77,10 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   BLOCKED: "You can't send that request.",
   NOT_BLOCKED: "You haven't blocked this person.",
 
+  // ── Profile: sex ─────────────────────────────────────────────────────
+  INVALID_SEX: "Choose male, female, or prefer not to say.",
+  SEX_LOCKED: "This setting is permanent and can't be changed.",
+
   // ── Courses ──────────────────────────────────────────────────────────
   INVALID_DEPARTMENT: "Department codes look like CSCI or MATH (2–8 letters).",
   INVALID_COURSE_NUMBER: "Course numbers look like 1133 or 1301W.",

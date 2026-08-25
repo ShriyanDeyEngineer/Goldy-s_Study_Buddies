@@ -85,15 +85,23 @@ export const profileSchema = z.object({
     .default([]),
 });
 
-/** Onboarding step 1 collects just the identity basics. */
-export const onboardingSchema = profileSchema.pick({
-  display_name: true,
-  college: true,
-  major: true,
-  class_standing: true,
-  graduation_month: true,
-  graduation_year: true,
-});
+/** Onboarding step 1 collects just the identity basics. Sex is asked
+ *  ONCE here (male/female/prefer not to say) and never editable in the
+ *  profile form — the database's set_sex() enforces the permanence. */
+export const onboardingSchema = profileSchema
+  .pick({
+    display_name: true,
+    college: true,
+    major: true,
+    class_standing: true,
+    graduation_month: true,
+    graduation_year: true,
+  })
+  .extend({
+    sex: z.enum(["male", "female", "undisclosed"], {
+      errorMap: () => ({ message: "Choose an option — 'prefer not to say' is fine." }),
+    }),
+  });
 
 /**
  * The privacy flags. Every key optional; true = "hide this from others".

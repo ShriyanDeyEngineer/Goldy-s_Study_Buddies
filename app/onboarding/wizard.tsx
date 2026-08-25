@@ -61,7 +61,11 @@ export function OnboardingWizard({
   // owns the first broken field so the student actually sees it.
   React.useEffect(() => {
     if (!state.fieldErrors) return;
-    if (state.fieldErrors.display_name) setStep(0);
+    if (
+      state.fieldErrors.display_name ||
+      state.fieldErrors.sex ||
+      state.fieldErrors.graduation_year
+    ) setStep(0);
     else if (state.fieldErrors.bio || state.fieldErrors.avatar) setStep(2);
   }, [state.fieldErrors]);
 
@@ -140,6 +144,30 @@ export function OnboardingWizard({
                 aria-describedby="display_name-error"
               />
               <FieldError id="display_name-error" error={state.fieldErrors?.display_name} />
+            </div>
+            <div>
+              <Label htmlFor="sex">Sex</Label>
+              <Select
+                id="sex"
+                name="sex"
+                defaultValue=""
+                required
+                aria-invalid={!!state.fieldErrors?.sex}
+                aria-describedby="sex-note sex-error"
+              >
+                <option value="" disabled>
+                  Choose…
+                </option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="undisclosed">Prefer not to say</option>
+              </Select>
+              <p id="sex-note" className="mt-1 text-xs text-ink-muted">
+                Used only for the people filter. Picking Male or Female is
+                permanent — it can&rsquo;t be changed later. &ldquo;Prefer not to
+                say&rdquo; keeps you out of sex-filtered results.
+              </p>
+              <FieldError id="sex-error" error={state.fieldErrors?.sex} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>

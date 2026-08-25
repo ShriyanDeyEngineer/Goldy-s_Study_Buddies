@@ -26,6 +26,8 @@ export interface ProfileRow {
   social_links: string[];
   privacy: PrivacyFlags;
   is_available_for_buddies: boolean;
+  /** male | female | undisclosed; null = account predates the field. */
+  sex: "male" | "female" | "undisclosed" | null;
   /** Email me about group/friend events (webhook honors this). */
   email_notifications: boolean;
   account_status: "active" | "suspended" | "banned" | "deleted";

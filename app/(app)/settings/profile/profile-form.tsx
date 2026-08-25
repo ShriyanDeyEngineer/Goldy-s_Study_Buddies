@@ -52,6 +52,20 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
             onFileCheck={setAvatarClientError}
           />
 
+          {profile.sex && (
+            <p className="text-sm text-ink-muted">
+              Sex:{" "}
+              <span className="font-medium text-ink">
+                {profile.sex === "male"
+                  ? "Male"
+                  : profile.sex === "female"
+                    ? "Female"
+                    : "Prefer not to say"}
+              </span>
+              {profile.sex !== "undisclosed" && " (permanent — set at sign-up)"}
+            </p>
+          )}
+
           <div>
             <Label htmlFor="display_name">Display name</Label>
             <Input
