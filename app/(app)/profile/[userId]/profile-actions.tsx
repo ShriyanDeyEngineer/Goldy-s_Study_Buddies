@@ -69,16 +69,28 @@ export function ProfileActions({
   relationship: Relationship;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = React.useState(false);
+  const [running, setRunning] = React.useState(false);
+  const [refreshing, startRefresh] = React.useTransition();
+  // Which button state is correct depends on the whole relationship (are
+  // we friends? whose request is pending?), so this one is NOT faked
+  // client-side — a wrong guess here would offer the wrong action. What
+  // it does instead is stay visibly busy until the recomputed state has
+  // actually arrived: `busy` used to drop the moment the action returned,
+  // leaving the button idle but still showing the OLD state for the whole
+  // refresh, which is precisely what read as "my click did nothing".
+  const busy = running || refreshing;
 
   /** Run an action, toast any error, refresh so the server recomputes. */
   async function run(action: () => Promise<{ error?: string }>, successNote?: string) {
-    setBusy(true);
+    setRunning(true);
     const { error } = await action();
-    setBusy(false);
-    if (error) toast.error(error);
-    else if (successNote) toast.success(successNote);
-    router.refresh();
+    setRunning(false);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    if (successNote) toast.success(successNote);
+    startRefresh(() => router.refresh());
   }
 
   // A profile you've blocked shows only Unblock + Report — every other

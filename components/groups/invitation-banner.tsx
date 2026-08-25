@@ -21,20 +21,27 @@ export function InvitationBanner({
   inviterName: string | null;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = React.useState(false);
+  const [running, setRunning] = React.useState(false);
+  const [refreshing, startRefresh] = React.useTransition();
+  // Accepting replaces this banner with the whole member view, so keep
+  // the buttons busy until that view is here rather than dropping back to
+  // an idle "Accept invitation" that has already been accepted.
+  const busy = running || refreshing;
 
   async function respond(accept: boolean) {
-    setBusy(true);
+    setRunning(true);
     const { result, error } = await respondToInvitationAction(invitationId, accept);
-    setBusy(false);
+    setRunning(false);
     if (error) {
       toast.error(error);
-    } else if (result === "joined") {
+      return;
+    }
+    if (result === "joined") {
       toast.success("You've joined the group.");
     } else if (result === "cancelled_full") {
       toast.warning("Ah, bad luck — the group filled up before you accepted.");
     }
-    router.refresh();
+    startRefresh(() => router.refresh());
   }
 
   return (

@@ -36,29 +36,40 @@ export function JoinButton({
   size?: "sm" | "md";
 }) {
   const router = useRouter();
-  const [busy, setBusy] = React.useState(false);
+  const [running, setRunning] = React.useState(false);
+  const [refreshing, startRefresh] = React.useTransition();
+  // Joining swaps the whole page (non-member preview → member view), so
+  // there is nothing honest to render optimistically. Instead the button
+  // stays in its loading state until the new page has actually arrived,
+  // rather than going idle mid-flight still reading "Join".
+  const busy = running || refreshing;
 
   async function handleJoin() {
-    setBusy(true);
+    setRunning(true);
     const { result, error } = await joinGroupAction(groupId);
-    setBusy(false);
+    setRunning(false);
     if (error) {
       toast.error(error);
-    } else if (result === "joined") {
-      toast.success("You've joined the group.");
-    } else {
-      toast.success("Request sent to the group manager.");
+      return;
     }
-    router.refresh();
+    toast.success(
+      result === "joined"
+        ? "You've joined the group."
+        : "Request sent to the group manager.",
+    );
+    startRefresh(() => router.refresh());
   }
 
   async function handleWithdraw() {
-    setBusy(true);
+    setRunning(true);
     const { error } = await withdrawJoinRequestAction(groupId);
-    setBusy(false);
-    if (error) toast.error(error);
-    else toast.success("Request withdrawn.");
-    router.refresh();
+    setRunning(false);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    toast.success("Request withdrawn.");
+    startRefresh(() => router.refresh());
   }
 
   switch (state) {
