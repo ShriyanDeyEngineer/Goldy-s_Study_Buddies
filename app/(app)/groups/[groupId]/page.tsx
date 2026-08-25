@@ -54,21 +54,23 @@ export default async function GroupPage({
   const { supabase, profile } = await getSessionProfile();
   if (!profile) return null;
 
-  const groupRes = await supabase
-    .from("study_groups")
-    .select("*, courses(*)")
-    .eq("id", groupId)
-    .maybeSingle();
+  // Both queries key off ids we already have (the route param and my own
+  // id), so they go together — chaining the membership check behind the
+  // group fetch cost a whole extra round trip on every render AND every
+  // post-action refresh, for no dependency.
+  const [groupRes, membershipRes] = await Promise.all([
+    supabase.from("study_groups").select("*, courses(*)").eq("id", groupId).maybeSingle(),
+    supabase
+      .from("study_group_members")
+      .select("user_id")
+      .eq("group_id", groupId)
+      .eq("user_id", profile.id)
+      .maybeSingle(),
+  ]);
   const group = groupRes.data as (StudyGroupRow & { courses: CourseRow }) | null;
   if (!group) notFound();
 
   // Membership decides which page this is. (RLS lets me see my own row.)
-  const membershipRes = await supabase
-    .from("study_group_members")
-    .select("user_id")
-    .eq("group_id", groupId)
-    .eq("user_id", profile.id)
-    .maybeSingle();
   const isMember = !!membershipRes.data;
   const isManager = group.manager_id === profile.id;
 
@@ -187,10 +189,15 @@ export default async function GroupPage({
         .select("*")
         .eq("group_id", groupId)
         .order("scheduled_at", { ascending: true }),
+      // Only OPEN polls: PollsSection renders nothing else, and a closed
+      // poll dragged its whole slot grid (up to 400 rows) and every vote
+      // on it through the next two waves just to be filtered out in the
+      // browser.
       supabase
         .from("availability_polls")
         .select("*")
         .eq("group_id", groupId)
+        .eq("status", "open")
         .order("created_at", { ascending: false }),
       supabase
         .from("group_resources")

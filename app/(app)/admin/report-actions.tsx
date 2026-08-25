@@ -30,27 +30,28 @@ export function ReportStatusButtons({
   status: ReportStatus;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = React.useState(false);
+  // The chip and the available next steps flip immediately; the refresh
+  // that follows only reconciles the rest of the row.
+  const [shown, setShown] = React.useState(status);
+  React.useEffect(() => setShown(status), [status]);
 
   async function move(next: ReportStatus) {
-    setBusy(true);
+    const previous = shown;
+    setShown(next);
     const { error } = await setReportStatusAction(reportId, next);
-    setBusy(false);
-    if (error) toast.error(error);
-    else router.refresh();
+    if (error) {
+      setShown(previous);
+      toast.error(error);
+      return;
+    }
+    router.refresh();
   }
 
   return (
     <div className="flex shrink-0 items-center gap-2">
-      <Badge variant={BADGE_VARIANT[status]}>{status}</Badge>
-      {NEXT_STEPS[status].map((next) => (
-        <Button
-          key={next}
-          size="sm"
-          variant="outline"
-          disabled={busy}
-          onClick={() => move(next)}
-        >
+      <Badge variant={BADGE_VARIANT[shown]}>{shown}</Badge>
+      {NEXT_STEPS[shown].map((next) => (
+        <Button key={next} size="sm" variant="outline" onClick={() => move(next)}>
           {next === "reviewing" ? "Start review" : next === "resolved" ? "Resolve" : "Dismiss"}
         </Button>
       ))}

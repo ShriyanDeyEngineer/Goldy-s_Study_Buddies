@@ -39,25 +39,28 @@ export default async function CoursesPage({
   // The whole catalog + group counts in two queries, filtered in code:
   // at university scale this is a few hundred rows, and doing the search
   // here keeps "match code OR number OR name" trivially readable.
-  const [coursesRes, groupsRes, joinableGroupsRes] = await Promise.all([
+  const [coursesRes, groupsRes] = await Promise.all([
     supabase
       .from("courses")
       .select("*")
       .eq("is_active", true)
       .order("department_code")
       .order("course_number"),
-    supabase.from("study_groups").select("course_id").eq("status", "active"),
-    supabase.from("study_groups").select("course_id").eq("mode", "open").eq("status", "active"),
+    // One scan for both counters: the open groups are a subset of the
+    // active ones, so asking twice scanned the same table twice.
+    supabase.from("study_groups").select("course_id, mode").eq("status", "active"),
   ]);
 
   const groupCounts = new Map<string, number>();
+  const joinableGroupCounts = new Map<string, number>();
   for (const row of groupsRes.data ?? []) {
     groupCounts.set(row.course_id, (groupCounts.get(row.course_id) ?? 0) + 1);
-  }
-
-  const joinableGroupCounts = new Map<string, number>();
-  for (const row of joinableGroupsRes.data ?? []) {
-    joinableGroupCounts.set(row.course_id, (joinableGroupCounts.get(row.course_id) ?? 0) + 1);
+    if (row.mode === "open") {
+      joinableGroupCounts.set(
+        row.course_id,
+        (joinableGroupCounts.get(row.course_id) ?? 0) + 1,
+      );
+    }
   }
 
   const allCourses = (coursesRes.data ?? []) as CourseRow[];

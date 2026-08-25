@@ -48,14 +48,22 @@ export function FriendLists({
   profiles: Record<string, PublicProfile>;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = React.useState(false);
+  const [running, setRunning] = React.useState(false);
+  const [refreshing, startRefresh] = React.useTransition();
+  // Stay busy through the refresh, not just the action — see the note in
+  // profile-actions.tsx. Otherwise the buttons go idle while the lists
+  // still show the pre-action state.
+  const busy = running || refreshing;
 
   async function run(action: () => Promise<{ error?: string }>) {
-    setBusy(true);
+    setRunning(true);
     const { error } = await action();
-    setBusy(false);
-    if (error) toast.error(error);
-    router.refresh();
+    setRunning(false);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    startRefresh(() => router.refresh());
   }
 
   const incomingFriend = friendRequests.filter((r) => r.recipient_id === currentUserId);

@@ -350,6 +350,41 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       navigating; the badge count follows, including from the
       /notifications page (bell recounts via realtime).
 
+## Responsiveness — 2026-08-25
+
+Every check here is "the UI moves on the click, not after a round trip."
+Throttle the network (DevTools → Slow 3G) to make failures obvious.
+
+- [ ] **RSVP**: Attending / Maybe / Can't make it highlights the moment you
+      click, on a throttled connection, with no page refresh. The
+      "N people attending" line moves with it. Clicking rapidly between
+      all three settles on the last one you picked.
+- [ ] **RSVP failure**: with the network offline, clicking an RSVP shows an
+      error toast AND the highlight snaps back to the previous answer.
+- [ ] **Notification read toggle**: the mail icon flips and the row
+      un-highlights instantly on /notifications; the bell badge follows.
+- [ ] **Course lists**: adding/removing a course in Edit courses updates
+      the chips and the tab counts instantly; other controls stay
+      clickable throughout (they used to all freeze).
+- [ ] **Per-tab search**: typing in "Taking now" then switching to
+      "Already taken" shows an EMPTY search box, not the carried-over
+      query and results.
+- [ ] **Buddy toggle** on /people flips instantly.
+- [ ] **Resources**: deleting a resource removes the row immediately; a
+      failed delete puts it back with an error toast.
+- [ ] **Members**: Approve/Deny removes the request row immediately;
+      removing a member drops them from the roster immediately.
+- [ ] **Report status** (/admin): the chip changes immediately.
+- [ ] **Join / invitation / friend / buddy buttons**: these change the
+      whole page shape, so they are NOT instant — but the button must stay
+      in its loading state until the new state appears. It must never go
+      back to an idle button still reading "Join" after a successful join.
+- [ ] **Closed polls**: a group with several closed polls loads as fast as
+      one with none (closed polls are no longer fetched at all). Open
+      polls still render, vote, and refresh live.
+- [ ] **Skeletons**: navigating to a group, people, friends, messages,
+      notifications, or a profile shows a skeleton, not a blank screen.
+
 ## Admin dashboard — 2026-08-25
 
 - [ ] **Gate**: a non-admin visiting /admin (or any subpage) gets a 404;
