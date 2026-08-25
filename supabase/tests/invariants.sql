@@ -290,15 +290,19 @@ begin
     raise exception 'FAIL: new manager was not notified';
   end if;
 
-  -- Everyone leaves → the group disbands itself, which (0022) hard-
-  -- deletes the row instead of leaving a tombstone.
+  -- Everyone leaves → the group disbands itself: a tombstone stamped
+  -- with disbanded_at, which the purge deletes seven days later (0022).
   perform pg_temp.impersonate(u2);
   perform public.leave_group(v_group);
   perform pg_temp.impersonate(u3);
   perform public.leave_group(v_group);
 
-  if exists (select 1 from public.study_groups where id = v_group) then
-    raise exception 'FAIL: empty group still exists (expected hard delete)';
+  select status into v_status from public.study_groups where id = v_group;
+  if v_status <> 'disbanded' then
+    raise exception 'FAIL: empty group is % (expected disbanded)', v_status;
+  end if;
+  if (select disbanded_at from public.study_groups where id = v_group) is null then
+    raise exception 'FAIL: disbanded_at not stamped on self-disband';
   end if;
 
   raise notice 'PASS: succession is longest-tenured-first; last member out disbands';
@@ -335,20 +339,21 @@ begin
 
   perform public.disband_group(v_group);
 
-  -- Since 0022, disband hard-deletes the group; the cascades must take
-  -- every kind of child row with it — and notifications, whose payloads
-  -- copy the group's name, must survive.
-  if exists (select 1 from public.study_groups where id = v_group) then
-    raise exception 'FAIL: group row survived disband (expected hard delete)';
-  end if;
+  -- Right after disband: the classic tombstone assertions.
   if exists (select 1 from public.study_group_members where group_id = v_group) then
     raise exception 'FAIL: members remain after disband';
   end if;
-  if exists (select 1 from public.join_requests where group_id = v_group) then
-    raise exception 'FAIL: join-request rows survived disband';
+  if exists (select 1 from public.join_requests where group_id = v_group and status = 'pending') then
+    raise exception 'FAIL: pending requests remain after disband';
   end if;
-  if exists (select 1 from public.meetups where group_id = v_group) then
-    raise exception 'FAIL: meetup rows survived disband';
+  if exists (
+    select 1 from public.meetups
+    where group_id = v_group and scheduled_at > now() and not is_cancelled
+  ) then
+    raise exception 'FAIL: future meetups not cancelled by disband';
+  end if;
+  if (select member_count from public.study_groups where id = v_group) <> 0 then
+    raise exception 'FAIL: member_count nonzero after disband';
   end if;
   if not exists (
     select 1 from public.notifications where recipient_id = u2 and type = 'group_disbanded'
@@ -361,7 +366,24 @@ begin
     raise exception 'FAIL: pending requester was not notified of disband';
   end if;
 
-  raise notice 'PASS: disband deletes the group and all its content, notifying everyone first';
+  -- The seven-day rule (0022): age the tombstone past the window and run
+  -- the purge — the group and EVERY child row must be gone.
+  update public.study_groups
+    set disbanded_at = now() - interval '8 days'
+    where id = v_group;
+  perform public.purge_stale_rows();
+
+  if exists (select 1 from public.study_groups where id = v_group) then
+    raise exception 'FAIL: purge kept a week-old disbanded group';
+  end if;
+  if exists (select 1 from public.join_requests where group_id = v_group) then
+    raise exception 'FAIL: join-request rows survived the purge';
+  end if;
+  if exists (select 1 from public.meetups where group_id = v_group) then
+    raise exception 'FAIL: meetup rows survived the purge';
+  end if;
+
+  raise notice 'PASS: disband tombstones for seven days, then the purge deletes everything';
 end $$;
 
 -- ── INVARIANT 7: closed→open approves min(pending, space), oldest first ─────

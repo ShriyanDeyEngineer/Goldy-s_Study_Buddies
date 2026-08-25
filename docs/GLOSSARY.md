@@ -73,11 +73,13 @@ these words are the contract.
 - **Manager succession** — when the manager leaves a non-empty group, the
   member with the earliest `joined_at` (ties: earliest account creation)
   becomes manager automatically. Deterministic, never random.
-- **Disband** — the manager's typed-name-confirmed teardown: everyone is
-  notified, then the group and EVERYTHING inside it (chat, meetups, polls,
-  resources, request history) is deleted from the database in one
-  transaction. Nothing is kept — nobody could have accessed any of it
-  after disband anyway. Old links to the group show a not-found page.
+- **Disband** — the manager's typed-name-confirmed teardown: all members
+  removed, future meetups cancelled, pending requests declined, everyone
+  notified — one transaction. The group row stays as a tombstone for
+  SEVEN DAYS (old links explain themselves, and admins can still review
+  the chat if something was reported); then the nightly purge deletes the
+  group and everything inside it — chat, meetups, polls, resources, and
+  request history — from the database for good.
 
 ## Scheduling
 

@@ -5,7 +5,11 @@
 -- rows stayed forever:
 --   - disbanding a group kept the group row (status 'disbanded') AND all
 --     of its chat, meetups, polls, resources, and request history — none
---     of it reachable by anyone, since disband removes every member;
+--     of it reachable by members, since disband removes every member.
+--     Now: the tombstone stays for SEVEN DAYS (old links keep explaining
+--     themselves, and admins can still review the chat if something was
+--     reported), then the nightly purge deletes the group and everything
+--     inside it;
 --   - closing an availability poll kept the poll plus every slot (up to
 --     400) and every vote, though the UI never renders closed polls;
 --   - deleting an account always kept a scrubbed profile row, even when
@@ -27,13 +31,23 @@
 -- extension isn't available.
 -- ============================================================================
 
--- ── Disband now deletes the group outright ──────────────────────────────────
--- Same signature and callers as before (disband_group, leave_group_core);
--- caller still holds the group's row lock. Notifications go out first —
--- their payload carries a COPY of the name, so they outlive the row —
--- then one DELETE cascades members, join requests, invitations, meetups
--- (and their RSVPs), chat messages, polls (slots, votes), and resources.
--- Old links to the group now 404 instead of showing a tombstone page.
+-- ── Disband: tombstone for seven days, then gone ────────────────────────────
+-- Disband itself behaves exactly as before (members removed + notified,
+-- pending requests/invitations cancelled + notified, future meetups
+-- cancelled, tombstone row kept so old links explain themselves) — but it
+-- now STAMPS disbanded_at, and purge_stale_rows() below deletes the group
+-- and everything inside it once that stamp is seven days old. The window
+-- also means admins can still open /admin/groups and review a disbanded
+-- group's chat for a week if something was reported.
+
+alter table public.study_groups
+  add column if not exists disbanded_at timestamptz;
+
+comment on column public.study_groups.disbanded_at is
+  'When the group was disbanded. Seven days later the nightly purge '
+  'deletes the row, cascading away chat, meetups, polls, resources, and '
+  'request history. NULL for active groups.';
+
 create or replace function public.disband_group_core(p_group public.study_groups, p_skip_notify uuid)
 returns void
 language plpgsql
@@ -44,7 +58,9 @@ declare
   r record;
 begin
   for r in
-    select m.user_id from public.study_group_members m where m.group_id = p_group.id
+    delete from public.study_group_members
+      where group_id = p_group.id
+      returning user_id
   loop
     if r.user_id <> p_skip_notify then
       perform public.app_notify(r.user_id, 'group_disbanded',
@@ -53,22 +69,35 @@ begin
   end loop;
 
   for r in
-    select jr.user_id from public.join_requests jr
-    where jr.group_id = p_group.id and jr.status = 'pending'
+    update public.join_requests
+      set status = 'cancelled', resolved_at = now()
+      where group_id = p_group.id and status = 'pending'
+      returning user_id
   loop
     perform public.app_notify(r.user_id, 'group_disbanded',
       jsonb_build_object('group_name', p_group.name, 'course_id', p_group.course_id));
   end loop;
 
   for r in
-    select gi.invited_user_id from public.group_invitations gi
-    where gi.group_id = p_group.id and gi.status = 'pending'
+    update public.group_invitations
+      set status = 'cancelled', resolved_at = now()
+      where group_id = p_group.id and status = 'pending'
+      returning invited_user_id
   loop
     perform public.app_notify(r.invited_user_id, 'group_disbanded',
       jsonb_build_object('group_name', p_group.name, 'course_id', p_group.course_id));
   end loop;
 
-  delete from public.study_groups where id = p_group.id;
+  update public.meetups
+    set is_cancelled = true,
+        cancellation_reason = coalesce(cancellation_reason, 'The group was disbanded.')
+    where group_id = p_group.id
+      and scheduled_at > now()
+      and not is_cancelled;
+
+  update public.study_groups
+    set member_count = 0, status = 'disbanded', disbanded_at = now()
+    where id = p_group.id;
 end;
 $$;
 
@@ -164,6 +193,9 @@ begin
      and not exists (select 1 from public.meetups m where m.creator_id = p_uid)
      and not exists (select 1 from public.availability_polls ap where ap.creator_id = p_uid)
      and not exists (select 1 from public.group_resources gr where gr.author_id = p_uid)
+     -- A disbanded group's tombstone still points at its last manager
+     -- (manager_id has no CASCADE) for the seven-day grace window.
+     and not exists (select 1 from public.study_groups sg where sg.manager_id = p_uid)
   then
     -- Nothing points at this person: no tombstone needed, the row goes.
     delete from public.profiles where id = p_uid;
@@ -211,6 +243,17 @@ begin
   delete from public.notifications
     where read_at is not null and read_at < now() - interval '30 days';
 
+  -- Disbanded groups past their seven-day grace window. This one DELETE
+  -- cascades away the whole group: chat, meetups (and RSVPs), polls
+  -- (slots, votes), resources, and request/invitation history.
+  -- coalesce() covers rows disbanded before disbanded_at existed —
+  -- their updated_at was last touched by the disband itself. Runs
+  -- BEFORE the tombstone sweep below on purpose: deleting a group can
+  -- free the deleted-user profiles it was the last thing referencing.
+  delete from public.study_groups
+    where status = 'disbanded'
+      and coalesce(disbanded_at, updated_at) < now() - interval '7 days';
+
   -- Tombstones whose last reference has since disappeared (e.g. the one
   -- group that held a deleted user's messages later disbanded). Same
   -- guards as scrub_account_core — the moment nothing points at a
@@ -225,7 +268,8 @@ begin
                       where r.reporter_id = p.id or r.reported_user_id = p.id)
       and not exists (select 1 from public.meetups m where m.creator_id = p.id)
       and not exists (select 1 from public.availability_polls ap where ap.creator_id = p.id)
-      and not exists (select 1 from public.group_resources gr where gr.author_id = p.id);
+      and not exists (select 1 from public.group_resources gr where gr.author_id = p.id)
+      and not exists (select 1 from public.study_groups sg where sg.manager_id = p.id);
 end;
 $$;
 
@@ -247,10 +291,6 @@ $cron$;
 
 -- ── One-time cleanup of rows accumulated under the old rules ────────────────
 
--- Disbanded tombstone groups (cascades wipe their chat/meetups/polls/
--- resources/request history).
-delete from public.study_groups where status = 'disbanded';
-
 -- Closed polls and, by cascade, their slots and votes.
 delete from public.availability_polls where status = 'closed';
 
@@ -263,15 +303,8 @@ delete from public.course_requests cr
   where p.id = cr.requester_id and p.account_status = 'deleted'
     and cr.status = 'pending';
 
--- Tombstones nothing references any more (same checks as the function).
-delete from public.profiles p
-  where p.account_status = 'deleted'
-    and not exists (select 1 from public.group_messages gm where gm.sender_id = p.id)
-    and not exists (select 1 from public.direct_messages dm
-                    where dm.sender_id = p.id or dm.recipient_id = p.id)
-    and not exists (select 1 from public.message_originals mo where mo.sender_id = p.id)
-    and not exists (select 1 from public.reports r
-                    where r.reporter_id = p.id or r.reported_user_id = p.id)
-    and not exists (select 1 from public.meetups m where m.creator_id = p.id)
-    and not exists (select 1 from public.availability_polls ap where ap.creator_id = p.id)
-    and not exists (select 1 from public.group_resources gr where gr.author_id = p.id);
+-- And run the purge once right now: existing disbanded groups older than
+-- seven days (by updated_at — see the coalesce note above) and already-
+-- unreferenced tombstones go immediately; anything younger ages out on
+-- the nightly schedule.
+select public.purge_stale_rows();
