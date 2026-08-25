@@ -95,32 +95,6 @@ export async function openGmailCompose(data: GmailComposeData): Promise<void>
     window.location.href = `googlegmail://co?${appParams}`;
   }
 
-  else if(userPlatform === "android")
-  {
-    const appParams = new URLSearchParams({
-      to: DESTINATION_EMAIL,
-      subject: subject,
-      body: body,
-    });
-
-    const mailtoParams = new URLSearchParams({
-      subject: subject,
-      body: body,
-    });
-    const mailtoFallback = `mailto:${DESTINATION_EMAIL}?${mailtoParams.toString()}`;
-
-    // Android Chrome ignores bare custom schemes (e.g. "googlegmail://") on
-    // top-level navigation — no app opens and no error is raised, so a
-    // blur/visibilitychange + setTimeout fallback (as used for iOS above)
-    // isn't reliable here: the OS intent handoff itself can fire "blur"
-    // even when no handler is found, cancelling the fallback before it runs.
-    // "intent://" URLs are Chrome's supported mechanism for this: it tries
-    // the native app and natively falls back to browser_fallback_url if the
-    // app isn't installed, with no timers required.
-    const intentUrl = `intent://co?${appParams.toString()}#Intent;scheme=googlegmail;package=com.google.android.gm;S.browser_fallback_url=${encodeURIComponent(mailtoFallback)};end`;
-
-    window.location.href = intentUrl;
-  }
 }
 
 
