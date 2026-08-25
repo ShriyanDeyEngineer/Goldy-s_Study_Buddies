@@ -3,12 +3,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions",
+  title: "Privacy Policy",
   description:
-    "The legal materials.",
+    "How Goldy's Study Buddies collects, uses, and protects your information.",
 };
 
-export default function TermsPage() {
+export default function PrivacyPolicyPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 font-['Times_New_Roman']">
         <div className="mx-auto max-w-2xl">
