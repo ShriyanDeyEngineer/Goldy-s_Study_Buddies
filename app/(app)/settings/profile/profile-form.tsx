@@ -31,9 +31,14 @@ import { AvatarPicker } from "@/components/ui/avatar-picker";
 
 export function ProfileForm({ profile }: { profile: ProfileRow }) {
   const [state, formAction, pending] = useActionState(updateProfileAction, {});
-  // Social links get add/remove rows; seeded from the saved list.
-  const [links, setLinks] = React.useState<string[]>(
-    profile.social_links.length > 0 ? profile.social_links : [],
+  // Social links get add/remove rows; seeded from the saved list. Each
+  // row carries a stable id for its React key — keying by array index
+  // made removing a middle row shift every defaultValue below it onto
+  // the wrong input. Ids come from a counter (not crypto.randomUUID) so
+  // the server render and hydration agree.
+  const nextLinkId = React.useRef(profile.social_links.length);
+  const [links, setLinks] = React.useState<{ id: number; url: string }[]>(
+    profile.social_links.map((url, index) => ({ id: index, url })),
   );
   // Instant client-side verdict on the chosen file (size/type). The
   // server still re-checks; this just stops silent failures.
@@ -177,12 +182,19 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
             </legend>
             <div className="space-y-2">
               {links.map((link, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={link.id} className="flex items-center gap-2">
                   <Input
                     className="placeholder:opacity-50"
                     name="social_links"
                     type="url"
-                    defaultValue={link}
+                    value={link.url}
+                    onChange={(event) =>
+                      setLinks((current) =>
+                        current.map((l) =>
+                          l.id === link.id ? { ...l, url: event.target.value } : l,
+                        ),
+                      )
+                    }
                     placeholder="https://instagram.com/JaneDoe"
                     aria-label={`Social link ${index + 1}`}
                   />
@@ -192,7 +204,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
                     className="h-9 w-9 shrink-0 text-ink-muted hover:text-danger"
                     aria-label={`Remove social link ${index + 1}`}
                     onClick={() =>
-                      setLinks((current) => current.filter((_, i) => i !== index))
+                      setLinks((current) => current.filter((l) => l.id !== link.id))
                     }
                   >
                     <Trash2 aria-hidden className="h-4 w-4" />
@@ -205,7 +217,12 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
                 size="sm"
                 variant="ghost"
                 className="mt-2"
-                onClick={() => setLinks((current) => [...current, ""])}
+                onClick={() =>
+                  setLinks((current) => [
+                    ...current,
+                    { id: nextLinkId.current++, url: "" },
+                  ])
+                }
               >
                 <Plus aria-hidden className="h-3.5 w-3.5" />
                 Add a link
