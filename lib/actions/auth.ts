@@ -14,9 +14,30 @@
  */
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl, safeInternalPath } from "@/lib/site";
+
+/**
+ * The origin the CURRENT request arrived on — not the canonical
+ * NEXT_PUBLIC_SITE_URL. The OAuth code exchange needs a verifier cookie
+ * set on the host where sign-in STARTED, so the round trip must end on
+ * that same host: a student on the LAN URL or a preview deployment who
+ * got bounced back to the canonical host had no cookie there, and their
+ * sign-in died as "interrupted". Supabase's redirect allow-list still
+ * has the final say — an unlisted origin falls back to the Site URL,
+ * which is today's behavior, never anything worse.
+ */
+async function requestOrigin(): Promise<string> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  if (!host) return getSiteUrl();
+  const proto =
+    h.get("x-forwarded-proto") ??
+    (/^(localhost|127\.|192\.168\.|10\.)/.test(host) ? "http" : "https");
+  return `${proto}://${host}`;
+}
 import { friendlyError } from "@/lib/errors";
 
 /**
@@ -44,7 +65,7 @@ export async function signInWithGoogleAction(formData: FormData): Promise<void> 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`,
+      redirectTo: `${await requestOrigin()}/auth/callback?next=${encodeURIComponent(next)}`,
       queryParams: {
         hd: "umn.edu", // UX hint only — never a security boundary
         prompt: "select_account",

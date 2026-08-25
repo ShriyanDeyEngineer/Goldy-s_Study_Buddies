@@ -29,6 +29,14 @@ export default function AuthErrorPage() {
             The Google sign-in was interrupted — the window may have been closed,
             or the link already used. Try again.
           </p>
+          <ul className="mx-auto mt-3 max-w-sm list-disc space-y-1 pl-5 text-left text-sm text-ink-muted">
+            <li>
+              Finish in the same browser you started in. If this page opened
+              inside another app (Instagram, Discord, GroupMe), open the site
+              in Chrome or Safari and sign in there.
+            </li>
+            <li>Start fresh from the Sign in page — don&rsquo;t reuse an old tab.</li>
+          </ul>
           <div className="mt-6 flex flex-col gap-3">
             <Button asChild variant="secondary">
               <Link href="/login">Try signing in again</Link>
