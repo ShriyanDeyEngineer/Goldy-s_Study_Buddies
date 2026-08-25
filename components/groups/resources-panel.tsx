@@ -46,7 +46,22 @@ export function ResourcesPanel({
   profiles: Record<string, PublicProfile>;
 }) {
   const router = useRouter();
-  const [busyId, setBusyId] = React.useState<string | null>(null);
+  // Deleted rows disappear immediately instead of after a full group-page
+  // re-render; restored if the server rejects the delete.
+  const [removedIds, setRemovedIds] = React.useState<string[]>([]);
+  React.useEffect(() => setRemovedIds([]), [resources]);
+  const visible = resources.filter((r) => !removedIds.includes(r.id));
+
+  async function remove(resourceId: string) {
+    setRemovedIds((ids) => [...ids, resourceId]);
+    const { error } = await deleteResourceAction(resourceId, groupId);
+    if (error) {
+      setRemovedIds((ids) => ids.filter((id) => id !== resourceId));
+      toast.error(error);
+      return;
+    }
+    router.refresh();
+  }
 
   return (
     <div>
@@ -55,14 +70,14 @@ export function ResourcesPanel({
         <AddResourceDialog groupId={groupId} />
       </div>
 
-      {resources.length === 0 ? (
+      {visible.length === 0 ? (
         <p className="mt-2 text-sm text-ink-muted">
           Share notes and links here — study guides, formula sheets, a link to
           the group&rsquo;s Google Doc.
         </p>
       ) : (
         <ul className="mt-3 space-y-2">
-          {resources.map((resource) => {
+          {visible.map((resource) => {
             const author = profiles[resource.author_id];
             const canDelete = resource.author_id === currentUserId || isManager;
             const Icon = resource.kind === "link" ? Link2 : StickyNote;
@@ -102,19 +117,12 @@ export function ResourcesPanel({
                       title="Delete this resource?"
                       description="It disappears for the whole group. There is no undo."
                       confirmLabel="Delete"
-                      onConfirm={async () => {
-                        setBusyId(resource.id);
-                        const { error } = await deleteResourceAction(resource.id, groupId);
-                        setBusyId(null);
-                        if (error) toast.error(error);
-                        else router.refresh();
-                      }}
+                      onConfirm={() => remove(resource.id)}
                     >
                       <Button
                         size="icon"
                         variant="ghost"
                         aria-label={`Delete resource: ${resource.title}`}
-                        loading={busyId === resource.id}
                         className="shrink-0 text-ink-muted hover:text-danger"
                       >
                         <Trash2 aria-hidden className="h-4 w-4" />

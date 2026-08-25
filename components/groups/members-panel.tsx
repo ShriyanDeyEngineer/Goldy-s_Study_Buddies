@@ -43,14 +43,22 @@ export function MembersPanel({
   isManager: boolean;
 }) {
   const router = useRouter();
-  const [busyId, setBusyId] = React.useState<string | null>(null);
+  // Rows leave the queue / roster the moment you act, rather than after a
+  // full group-page re-render. Put back if the server refuses.
+  const [resolvedIds, setResolvedIds] = React.useState<string[]>([]);
+  React.useEffect(() => setResolvedIds([]), [pendingRequests, members]);
+  const isGone = (id: string) => resolvedIds.includes(id);
+  const visibleRequests = pendingRequests.filter((r) => !isGone(r.id));
 
   async function approve(request: JoinRequestRow) {
-    setBusyId(request.id);
+    setResolvedIds((ids) => [...ids, request.id]);
     const { result, error } = await approveJoinRequestAction(request.id, groupId);
-    setBusyId(null);
-    if (error) toast.error(error);
-    else if (result === "cancelled_full") {
+    if (error) {
+      setResolvedIds((ids) => ids.filter((id) => id !== request.id));
+      toast.error(error);
+      return;
+    }
+    if (result === "cancelled_full") {
       // The invariant-#2 message: the group filled while this waited.
       toast.warning("Your group is now full — that request was cancelled and the student was told.");
     } else {
@@ -60,10 +68,13 @@ export function MembersPanel({
   }
 
   async function deny(request: JoinRequestRow) {
-    setBusyId(request.id);
+    setResolvedIds((ids) => [...ids, request.id]);
     const { error } = await denyJoinRequestAction(request.id, groupId);
-    setBusyId(null);
-    if (error) toast.error(error);
+    if (error) {
+      setResolvedIds((ids) => ids.filter((id) => id !== request.id));
+      toast.error(error);
+      return;
+    }
     router.refresh();
   }
 
@@ -75,13 +86,13 @@ export function MembersPanel({
       <h2 className="font-display text-lg text-ink">Members</h2>
 
       {/* Manager-only: the request queue. */}
-      {isManager && pendingRequests.length > 0 && (
+      {isManager && visibleRequests.length > 0 && (
         <div className="rounded-xl bg-gold-light/40 p-3">
           <h3 className="mb-2 text-sm font-medium text-maroon">
-            Waiting to join ({pendingRequests.length})
+            Waiting to join ({visibleRequests.length})
           </h3>
           <ul className="space-y-2">
-            {pendingRequests.map((request) => {
+            {visibleRequests.map((request) => {
               const requester = profiles[request.user_id];
               return (
                 <li key={request.id} className="flex items-center gap-2">
@@ -98,19 +109,10 @@ export function MembersPanel({
                       asked {formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}
                     </p>
                   </div>
-                  <Button
-                    size="sm"
-                    loading={busyId === request.id}
-                    onClick={() => approve(request)}
-                  >
+                  <Button size="sm" onClick={() => approve(request)}>
                     Approve
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={busyId === request.id}
-                    onClick={() => deny(request)}
-                  >
+                  <Button size="sm" variant="outline" onClick={() => deny(request)}>
                     Deny
                   </Button>
                 </li>
@@ -121,7 +123,7 @@ export function MembersPanel({
       )}
 
       <ul className="space-y-2">
-        {members.map((member) => {
+        {members.filter((m) => !isGone(m.user_id)).map((member) => {
           const memberProfile = profiles[member.user_id];
           const isRowManager = member.user_id === managerId;
           const isSelf = member.user_id === currentUserId;
@@ -154,8 +156,15 @@ export function MembersPanel({
                   description="They'll lose access to this group's chat and meetups, and they'll be notified that they were removed. They can ask to join again later."
                   confirmLabel="Remove"
                   onConfirm={async () => {
+                    setResolvedIds((ids) => [...ids, member.user_id]);
                     const { error } = await removeMemberAction(groupId, member.user_id);
-                    if (error) toast.error(error);
+                    if (error) {
+                      setResolvedIds((ids) =>
+                        ids.filter((id) => id !== member.user_id),
+                      );
+                      toast.error(error);
+                      return;
+                    }
                     router.refresh();
                   }}
                 >

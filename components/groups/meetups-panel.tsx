@@ -12,6 +12,13 @@
  *
  * The attendee count is COUNTED from the RSVP rows passed in — never a
  * stored number (counter-drift pitfall #7).
+ *
+ * RSVP is OPTIMISTIC: your own answer is owned by local state the instant
+ * you click, and the server refresh that follows only reconciles everyone
+ * ELSE's answers. Deriving your own button state from the server prop
+ * meant every click sat dead for a full group-page re-render (five waves
+ * of queries) before the highlight moved — which read as "it didn't work"
+ * and had people reloading the page by hand.
  */
 "use client";
 
@@ -154,20 +161,41 @@ function MeetupCard({
   isPast: boolean;
   onChanged: () => void;
 }) {
-  const [busy, setBusy] = React.useState(false);
   const [cancelReason, setCancelReason] = React.useState("");
 
   const rows = attendance.filter((a) => a.meetup_id === meetup.id);
-  // Derived, never stored: the count always equals the rows (pitfall #7).
-  const attendingCount = rows.filter((a) => a.status === "attending").length;
-  const myRsvp = rows.find((a) => a.user_id === currentUserId)?.status ?? null;
+  const serverRsvp = rows.find((a) => a.user_id === currentUserId)?.status ?? null;
+  // Everyone else's answers stay server-truth; only my own is optimistic.
+  const othersAttending = rows.filter(
+    (a) => a.user_id !== currentUserId && a.status === "attending",
+  ).length;
+
+  const [myRsvp, setMyRsvp] = React.useState(serverRsvp);
+  // Re-sync when the server catches up (my own reconcile, someone else's
+  // change, or a realtime-driven refresh).
+  React.useEffect(() => setMyRsvp(serverRsvp), [serverRsvp]);
+
+  // Only the newest click may roll back — otherwise a slow first request
+  // failing would clobber a later successful one.
+  const rsvpSeq = React.useRef(0);
+
+  // Derived, never stored: the count always equals the rows (pitfall #7),
+  // with my own optimistic answer swapped in for my server row.
+  const attendingCount = othersAttending + (myRsvp === "attending" ? 1 : 0);
 
   async function setRsvp(status: "attending" | "maybe" | "not_attending") {
-    if (busy) return;
-    setBusy(true);
+    if (status === myRsvp) return;
+    const previous = myRsvp;
+    const seq = ++rsvpSeq.current;
+    setMyRsvp(status); // instant — the whole point
     const { error } = await rsvpAction(meetup.id, groupId, status);
-    setBusy(false);
-    if (error) toast.error(error);
+    if (seq !== rsvpSeq.current) return; // a newer click already won
+    if (error) {
+      setMyRsvp(previous);
+      toast.error(error);
+      return;
+    }
+    // Background reconcile for everyone else's counts; the UI already moved.
     onChanged();
   }
 
@@ -273,7 +301,6 @@ function MeetupCard({
                   key={option.value}
                   size="sm"
                   variant={myRsvp === option.value ? "primary" : "outline"}
-                  disabled={busy}
                   onClick={() => setRsvp(option.value)}
                   aria-pressed={myRsvp === option.value}
                 >
