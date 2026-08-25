@@ -1,7 +1,10 @@
 /**
  * The header notification bell: live unread badge, dropdown preview of
  * the latest notifications, "see all" link. Clicking an item marks it
- * read and navigates to the relevant page (spec §5.13).
+ * read and navigates to the relevant page (spec §5.13). Reading is
+ * always explicit: the per-item mail toggle, clicking through, or the
+ * "Mark all as read" button at the bottom of the dropdown — nothing is
+ * marked read just because the dropdown was open.
  *
  * Realtime: subscribes to INSERTs on MY notifications (server-side
  * filter; RLS also guards delivery). Subscribed on mount, UNSUBSCRIBED on
@@ -88,23 +91,17 @@ export function NotificationBell({
     };
   }, [userId]);
 
-  // Looking at the open dropdown for a few seconds counts as reading:
-  // the badge number disappears on its own instead of nagging until
-  // every item is clicked. Closing early cancels the timer.
-  React.useEffect(() => {
-    if (!open || unread === 0) return;
-    const timer = window.setTimeout(() => {
-      setUnread(0);
-      const now = new Date().toISOString();
-      setItems((existing) =>
-        existing
-          ? existing.map((n) => (n.read_at ? n : { ...n, read_at: now }))
-          : existing,
-      );
-      void markAllNotificationsReadAction();
-    }, 4000);
-    return () => window.clearTimeout(timer);
-  }, [open, unread]);
+  /** "Mark all as read" — the one bulk action, always explicit. */
+  async function markAllRead() {
+    setUnread(0);
+    const now = new Date().toISOString();
+    setItems((existing) =>
+      existing
+        ? existing.map((n) => (n.read_at ? n : { ...n, read_at: now }))
+        : existing,
+    );
+    await markAllNotificationsReadAction();
+  }
 
   /** The read/unread toggle beside each item. */
   async function toggleRead(notification: NotificationRow) {
@@ -239,6 +236,18 @@ export function NotificationBell({
             })
           )}
         </ul>
+        {unread > 0 && (
+          <div className="border-t border-line p-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full text-maroon"
+              onClick={() => void markAllRead()}
+            >
+              Mark all as read
+            </Button>
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   );

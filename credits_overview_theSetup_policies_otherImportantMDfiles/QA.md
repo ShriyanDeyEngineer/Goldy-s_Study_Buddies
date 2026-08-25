@@ -337,9 +337,14 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] **Icon**: hero/header icon shows two featureless silhouettes (no
       eye dots) over a shared book — no pencils or other props. Still
       recognizable at favicon size.
-- [ ] **Bell auto-clear**: with unread notifications, open the bell and
-      keep it open ~4 seconds — the red count disappears on its own and
-      the rows lose their highlight; closing before ~4s keeps the count.
+- [ ] **Bell stays unread until you act**: with unread notifications,
+      open the bell and leave it open — the red count NEVER clears on its
+      own. It clears only via the per-row mail toggle, clicking a
+      notification, or "Mark all as read".
+- [ ] **Mark all as read (bell)**: with unread notifications, the bottom
+      of the bell dropdown shows a "Mark all as read" button; clicking it
+      zeroes the badge, un-highlights every row, and the button
+      disappears. The same button on /notifications still works.
 - [ ] **Read/unread toggle**: every notification row (bell dropdown AND
       /notifications) has a mail icon that flips read state without
       navigating; the badge count follows, including from the
