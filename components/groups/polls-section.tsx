@@ -70,10 +70,16 @@ export function PollsSection({
   members: { id: string; display_name: string | null }[];
 }) {
   const router = useRouter();
+  // The page now asks for open polls only; this keeps rendering honest if
+  // a closed one ever arrives (e.g. from a stale cached payload).
   const openPolls = polls.filter((p) => p.status === "open");
 
   // Other members' painting appears live (RLS: this table = group members).
-  useLiveRefresh({ table: "availability_votes" });
+  // availability_votes carries no group_id to filter on, so every vote in
+  // ANY of your groups wakes this subscription — and each wake re-renders
+  // this whole group page. Subscribing only when a poll is actually open
+  // means groups without a live poll stop paying for other groups' votes.
+  useLiveRefresh({ table: "availability_votes", enabled: openPolls.length > 0 });
 
   return (
     <div className="border-t border-line pt-4">

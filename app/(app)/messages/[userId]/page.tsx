@@ -24,6 +24,10 @@ export default async function DmThreadPage({
   if (!profile) return null;
   if (userId === profile.id) notFound(); // no self-threads
 
+  // The mark-read write goes in the SAME batch as the reads: it depends
+  // on neither of them, and awaiting it afterwards put a round trip (and
+  // a row lock) on the critical path of every render and every refresh of
+  // this thread — even when there was nothing unread to mark.
   const [otherRes, messagesRes] = await Promise.all([
     supabase.from("public_profiles").select("*").eq("id", userId).maybeSingle(),
     supabase
@@ -34,13 +38,12 @@ export default async function DmThreadPage({
           `and(sender_id.eq.${userId},recipient_id.eq.${profile.id})`,
       )
       .order("created_at", { ascending: true }),
+    // Opening the thread clears its unread badge (spec §5.12).
+    markThreadReadAction(userId),
   ]);
 
   const other = otherRes.data as PublicProfile | null;
   if (!other) notFound(); // gone or suspended
-
-  // Opening the thread clears its unread badge (spec §5.12).
-  await markThreadReadAction(userId);
 
   return (
     <DmThread
