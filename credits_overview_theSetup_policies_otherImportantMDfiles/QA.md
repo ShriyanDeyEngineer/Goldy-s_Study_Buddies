@@ -335,7 +335,8 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 ## Icon & notification controls — 2026-08-24
 
 - [ ] **Icon**: hero/header icon shows two featureless silhouettes (no
-      eye dots) with clearly visible pencils at their sides.
+      eye dots) over a shared book — no pencils or other props. Still
+      recognizable at favicon size.
 - [ ] **Bell auto-clear**: with unread notifications, open the bell and
       keep it open ~4 seconds — the red count disappears on its own and
       the rows lose their highlight; closing before ~4s keeps the count.

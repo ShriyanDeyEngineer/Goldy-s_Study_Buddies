@@ -10,8 +10,14 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Icon depicting two students collaborating/studying together,
- * seated at a shared table with an open book between them and pencils at their sides.
+ * Icon depicting two students collaborating/studying together, seated at
+ * a shared table with an open book between them.
+ *
+ * Deliberately prop-free: the figures are armless silhouettes and the
+ * bodies span the whole table, so there is nowhere for a pencil to be
+ * held or to rest — earlier versions floated them outboard, where they
+ * read as whiskers and were the first thing to break down at favicon
+ * size. Two people + an open book already carries the meaning.
  */
 export function GopherLogo({ className }: { className?: string }) {
   return (
@@ -31,13 +37,6 @@ export function GopherLogo({ className }: { className?: string }) {
       {/* body */}
       <path d="M 9 46 C 9 34 14 28 20 28 C 26 28 31 34 31 46 Z" />
       
-      {/* pencil beside the student — sized like a real pencil in hand */}
-      <g transform="translate(6.5 45) rotate(-105)">
-        <rect x="0" y="-1.2" width="12" height="2.4" rx="1" />
-        <path d="M 12 -1.2 L 15.2 0 L 12 1.2 Z" />
-        <rect x="0" y="-1.2" width="1.8" height="2.4" fill="#fff" fillOpacity="0.6" />
-      </g>
-
 
       {/* ===== right student ===== */}
       {/* head — a clean silhouette, no facial features */}
@@ -46,13 +45,6 @@ export function GopherLogo({ className }: { className?: string }) {
       {/* body */}
       <path d="M 33 46 C 33 34 38 28 44 28 C 50 28 55 34 55 46 Z" />
       
-      {/* pencil beside the student — mirrored */}
-      <g transform="translate(57.5 45) rotate(-75)">
-        <rect x="0" y="-1.2" width="12" height="2.4" rx="1" />
-        <path d="M 12 -1.2 L 15.2 0 L 12 1.2 Z" />
-        <rect x="0" y="-1.2" width="1.8" height="2.4" fill="#fff" fillOpacity="0.6" />
-      </g>
-
 
       {/* ===== shared open book on the table ===== */}
       <path
