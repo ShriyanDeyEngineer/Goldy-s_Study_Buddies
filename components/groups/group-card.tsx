@@ -4,7 +4,8 @@
  * meetup if one is scheduled. The whole card links to the group page.
  */
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { CalendarDays, Users } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { pluralize } from "@/lib/utils";
@@ -17,6 +18,7 @@ export function GroupCard({
   capacity,
   mode,
   status,
+  nextMeetup,
 }: {
   groupId: string;
   name: string;
@@ -25,6 +27,10 @@ export function GroupCard({
   capacity: number;
   mode: "open" | "closed";
   status: string;
+  /** The group's next upcoming meetup, when one is scheduled. Rendered
+   *  as a relative time ("in 2 days") — relative phrasing is timezone-
+   *  agnostic, so this server component can't show the wrong hour. */
+  nextMeetup?: { title: string; scheduledAt: string } | null;
 }) {
   return (
     <Card className="transition-shadow hover:shadow-md">
@@ -59,6 +65,17 @@ export function GroupCard({
             <Users aria-hidden className="h-4 w-4" />
             {memberCount}/{capacity} {pluralize(capacity, "Seat", "Seats").split(" ")[1]}
           </span>
+          {nextMeetup && (
+            <span className="inline-flex min-w-0 items-center gap-1.5">
+              <CalendarDays aria-hidden className="h-4 w-4 shrink-0" />
+              <span className="truncate">
+                {nextMeetup.title}{" "}
+                {formatDistanceToNow(new Date(nextMeetup.scheduledAt), {
+                  addSuffix: true,
+                })}
+              </span>
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>

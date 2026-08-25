@@ -136,19 +136,27 @@ export default async function DashboardPage() {
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {myGroups.map((group) => (
-              <div key={group.id} className="relative">
-                <GroupCard
-                  groupId={group.id}
-                  name={group.name}
-                  courseLabel={courseCode(group.courses)}
-                  memberCount={group.member_count}
-                  capacity={group.capacity}
-                  mode={group.mode}
-                  status={group.status}
-                />
-              </div>
-            ))}
+            {myGroups.map((group) => {
+              const meetup = upcomingByGroup.get(group.id);
+              return (
+                <div key={group.id} className="relative">
+                  <GroupCard
+                    groupId={group.id}
+                    name={group.name}
+                    courseLabel={courseCode(group.courses)}
+                    memberCount={group.member_count}
+                    capacity={group.capacity}
+                    mode={group.mode}
+                    status={group.status}
+                    nextMeetup={
+                      meetup
+                        ? { title: meetup.title, scheduledAt: meetup.scheduled_at }
+                        : null
+                    }
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
