@@ -66,6 +66,18 @@ async function uploadAvatar(
   });
   if (error) return { url: null, error: friendlyError(error) };
 
+  // The timestamped names mean every re-upload used to leave the previous
+  // file behind forever. Sweep the folder down to the file we just wrote.
+  // Best-effort: a leftover breaks nothing (only the newest URL is ever
+  // referenced), so a failed sweep must not fail the save.
+  const { data: existing } = await supabase.storage.from("avatars").list(userId);
+  const stale = (existing ?? [])
+    .map((file) => `${userId}/${file.name}`)
+    .filter((filePath) => filePath !== path);
+  if (stale.length > 0) {
+    await supabase.storage.from("avatars").remove(stale);
+  }
+
   const { data } = supabase.storage.from("avatars").getPublicUrl(path);
   return { url: data.publicUrl };
 }

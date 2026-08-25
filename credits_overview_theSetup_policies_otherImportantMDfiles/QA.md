@@ -120,9 +120,10 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] Rename re-checks uniqueness; mode switch works.
 - [ ] Closed→open with 3 waiting and 2 seats: exactly the 2 OLDEST
       approved, the third cancelled + notified.
-- [ ] Disband requires typing the exact group name; after: members
-      notified, meetups cancelled, requests declined, group page shows
-      unavailable.
+- [ ] Disband requires typing the exact group name; after: members and
+      pending requesters notified, meetups cancelled, group page shows
+      unavailable. Seven days later the nightly purge deletes the group
+      and all its content from Supabase (see Data cleanup).
 - [ ] Manager leaves → longest-tenured member becomes manager (crown
       moves, notification arrives). Last member leaving disbands.
 
@@ -349,6 +350,42 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       /notifications) has a mail icon that flips read state without
       navigating; the badge count follows, including from the
       /notifications page (bell recounts via realtime).
+
+## Data cleanup — 2026-08-25
+
+Checks that "deleted on the website" means deleted in Supabase. These
+need the Supabase dashboard (Table Editor / Storage) open beside the app.
+
+- [ ] **Disband**: disband a group with chat, a meetup, a poll, and a
+      resource. Immediately after: the `study_groups` row shows status
+      `disbanded` with `disbanded_at` stamped; members got their "group
+      was disbanded" notification; an admin can still open the group
+      under /admin/groups and read its chat.
+- [ ] **Disband, seven days on**: backdate `disbanded_at` by 8 days in
+      the dashboard and run `select public.purge_stale_rows();` — the
+      `study_groups` row is GONE, and so are its rows in
+      `group_messages`, `meetups`, `meetup_attendance`,
+      `availability_polls`, `availability_slots`, `availability_votes`,
+      `group_resources`, `join_requests`, `group_invitations`.
+- [ ] **Last member leaves**: same tombstone-then-purge path via
+      everyone leaving.
+- [ ] **Close poll**: closing a poll deletes its `availability_polls`
+      row and every slot and vote; the group page stops showing it.
+- [ ] **Avatar sweep**: change your profile picture three times — the
+      Storage `avatars/<your-id>/` folder holds exactly ONE file.
+- [ ] **Delete account (fresh)**: delete a new account that never sent a
+      message — its `profiles` row is GONE entirely, along with its
+      `user_courses` rows and any pending course request.
+- [ ] **Delete account (with history)**: delete an account that has chat
+      messages — a scrubbed `profiles` row remains (name "Deleted User",
+      status `deleted`), old messages still render as "Deleted User",
+      but its `user_courses` rows and pending course requests are gone.
+- [ ] **Stale purge**: `select public.purge_stale_rows();` removes
+      week-old disbanded groups, resolved requests/invitations and read
+      notifications older than 30 days, and tombstones nothing references
+      — and nothing newer; pending rows, unread notifications, and
+      freshly disbanded groups are never touched. (Nightly via pg_cron
+      where available.)
 
 ## Responsiveness — 2026-08-25
 

@@ -290,7 +290,8 @@ begin
     raise exception 'FAIL: new manager was not notified';
   end if;
 
-  -- Everyone leaves → the group disbands itself.
+  -- Everyone leaves → the group disbands itself: a tombstone stamped
+  -- with disbanded_at, which the purge deletes seven days later (0022).
   perform pg_temp.impersonate(u2);
   perform public.leave_group(v_group);
   perform pg_temp.impersonate(u3);
@@ -299,6 +300,9 @@ begin
   select status into v_status from public.study_groups where id = v_group;
   if v_status <> 'disbanded' then
     raise exception 'FAIL: empty group is % (expected disbanded)', v_status;
+  end if;
+  if (select disbanded_at from public.study_groups where id = v_group) is null then
+    raise exception 'FAIL: disbanded_at not stamped on self-disband';
   end if;
 
   raise notice 'PASS: succession is longest-tenured-first; last member out disbands';
@@ -335,6 +339,7 @@ begin
 
   perform public.disband_group(v_group);
 
+  -- Right after disband: the classic tombstone assertions.
   if exists (select 1 from public.study_group_members where group_id = v_group) then
     raise exception 'FAIL: members remain after disband';
   end if;
@@ -355,8 +360,30 @@ begin
   ) then
     raise exception 'FAIL: members were not notified of disband';
   end if;
+  if not exists (
+    select 1 from public.notifications where recipient_id = u4 and type = 'group_disbanded'
+  ) then
+    raise exception 'FAIL: pending requester was not notified of disband';
+  end if;
 
-  raise notice 'PASS: disband removes members, cancels meetups+requests, notifies everyone';
+  -- The seven-day rule (0022): age the tombstone past the window and run
+  -- the purge — the group and EVERY child row must be gone.
+  update public.study_groups
+    set disbanded_at = now() - interval '8 days'
+    where id = v_group;
+  perform public.purge_stale_rows();
+
+  if exists (select 1 from public.study_groups where id = v_group) then
+    raise exception 'FAIL: purge kept a week-old disbanded group';
+  end if;
+  if exists (select 1 from public.join_requests where group_id = v_group) then
+    raise exception 'FAIL: join-request rows survived the purge';
+  end if;
+  if exists (select 1 from public.meetups where group_id = v_group) then
+    raise exception 'FAIL: meetup rows survived the purge';
+  end if;
+
+  raise notice 'PASS: disband tombstones for seven days, then the purge deletes everything';
 end $$;
 
 -- ── INVARIANT 7: closed→open approves min(pending, space), oldest first ─────

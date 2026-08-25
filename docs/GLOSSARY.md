@@ -31,6 +31,14 @@ these words are the contract.
   A hidden field is stripped from API responses in the database itself AND
   excludes the user from that field's search filter — otherwise showing up
   in "major = X" results would leak the hidden major.
+- **Account deletion** — self-service, typed-DELETE-confirmed. Leaves
+  every group (with normal succession/disband), severs the social graph,
+  and removes course lists, RSVPs, votes, notifications, and avatar
+  files. If nothing references the person any more, their profile row is
+  deleted outright; if their messages or shared content still exist, a
+  scrubbed "Deleted User" tombstone row stays behind — hard-deleting it
+  would cascade away OTHER people's chat history. The Google identity is
+  freed either way, so signing in again starts a brand-new account.
 - **Admin** — an account with `is_admin` set (by hand, in the database).
   Admins can read reports. There is no admin UI yet.
 - **Suspended / banned** — account statuses set by the team after reviewing
@@ -67,8 +75,11 @@ these words are the contract.
   becomes manager automatically. Deterministic, never random.
 - **Disband** — the manager's typed-name-confirmed teardown: all members
   removed, future meetups cancelled, pending requests declined, everyone
-  notified — one transaction. The group row remains as a tombstone
-  (status `disbanded`) so old links explain themselves.
+  notified — one transaction. The group row stays as a tombstone for
+  SEVEN DAYS (old links explain themselves, and admins can still review
+  the chat if something was reported); then the nightly purge deletes the
+  group and everything inside it — chat, meetups, polls, resources, and
+  request history — from the database for good.
 
 ## Scheduling
 
