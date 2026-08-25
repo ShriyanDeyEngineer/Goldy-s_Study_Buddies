@@ -20,6 +20,20 @@ export async function markNotificationReadAction(notificationId: string): Promis
     .is("read_at", null);
 }
 
+/** The per-notification read/unread toggle. RLS + the read_at column
+ *  grant scope this to the caller's own rows. */
+export async function setNotificationReadAction(
+  notificationId: string,
+  read: boolean,
+): Promise<void> {
+  const supabase = await createClient();
+  await supabase
+    .from("notifications")
+    .update({ read_at: read ? new Date().toISOString() : null })
+    .eq("id", notificationId);
+  revalidatePath("/notifications");
+}
+
 export async function markAllNotificationsReadAction(): Promise<void> {
   const supabase = await createClient();
   const {

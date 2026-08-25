@@ -331,3 +331,16 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] **Mobile**: at 375px the marketing header is two rows (logo +
       buttons, then nav); a 50-character group name wraps on the group
       page instead of scrolling the page sideways.
+
+## Icon & notification controls — 2026-08-24
+
+- [ ] **Icon**: hero/header icon shows two featureless silhouettes (no
+      eye dots) over a shared book — no pencils or other props. Still
+      recognizable at favicon size.
+- [ ] **Bell auto-clear**: with unread notifications, open the bell and
+      keep it open ~4 seconds — the red count disappears on its own and
+      the rows lose their highlight; closing before ~4s keeps the count.
+- [ ] **Read/unread toggle**: every notification row (bell dropdown AND
+      /notifications) has a mail icon that flips read state without
+      navigating; the badge count follows, including from the
+      /notifications page (bell recounts via realtime).

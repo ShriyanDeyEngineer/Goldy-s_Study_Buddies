@@ -71,7 +71,7 @@ export default function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section className="bg-maroon text-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-20 text-center sm:py-28">
-          <GopherLogo className="mb-6 h-16 w-16 text-gold" />
+          <GopherLogo className="h-20 w-20 text-gold" />
           <h1 className="max-w-2xl font-display text-4xl leading-tight sm:text-5xl">
             Find your study buddies
           </h1>

@@ -10,8 +10,14 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Icon depicting two students collaborating/studying together,
- * seated at a shared table with an open book between them and pencils at their sides.
+ * Icon depicting two students collaborating/studying together, seated at
+ * a shared table with an open book between them.
+ *
+ * Deliberately prop-free: the figures are armless silhouettes and the
+ * bodies span the whole table, so there is nowhere for a pencil to be
+ * held or to rest — earlier versions floated them outboard, where they
+ * read as whiskers and were the first thing to break down at favicon
+ * size. Two people + an open book already carries the meaning.
  */
 export function GopherLogo({ className }: { className?: string }) {
   return (
@@ -25,40 +31,20 @@ export function GopherLogo({ className }: { className?: string }) {
       <rect x="8" y="46" width="48" height="5" rx="2" />
 
       {/* ===== left student ===== */}
-      {/* head */}
+      {/* head — a clean silhouette, no facial features */}
       <circle cx="20" cy="20" r="9" />
-      {/* eyes, looking down toward the shared book */}
-      <circle cx="18.5" cy="21" r="1" fill="#fff" />
-      <circle cx="24" cy="21" r="1" fill="#fff" />
       
       {/* body */}
       <path d="M 9 46 C 9 34 14 28 20 28 C 26 28 31 34 31 46 Z" />
       
-      {/* pencil, held at the student's side with a gap, pointing up and outward */}
-      <g transform="translate(6 37) rotate(-125)">
-        <rect x="0" y="-0.6" width="8" height="1.2" rx="0.6" />
-        <path d="M 8 -0.6 L 10 0 L 8 0.6 Z" />
-        <rect x="0" y="-0.6" width="1.2" height="1.2" fill="#fff" fillOpacity="0.6" />
-      </g>
-
 
       {/* ===== right student ===== */}
-      {/* head */}
+      {/* head — a clean silhouette, no facial features */}
       <circle cx="44" cy="20" r="9" />
-      {/* eyes, looking down toward the shared book */}
-      <circle cx="40" cy="21" r="1" fill="#fff" />
-      <circle cx="45.5" cy="21" r="1" fill="#fff" />
       
       {/* body */}
       <path d="M 33 46 C 33 34 38 28 44 28 C 50 28 55 34 55 46 Z" />
       
-      {/* pencil, held at the student's side with a gap, pointing up and outward */}
-      <g transform="translate(57 37) rotate(-55)">
-        <rect x="0" y="-0.6" width="8" height="1.2" rx="0.6" />
-        <path d="M 8 -0.6 L 10 0 L 8 0.6 Z" />
-        <rect x="0" y="-0.6" width="1.2" height="1.2" fill="#fff" fillOpacity="0.6" />
-      </g>
-
 
       {/* ===== shared open book on the table ===== */}
       <path

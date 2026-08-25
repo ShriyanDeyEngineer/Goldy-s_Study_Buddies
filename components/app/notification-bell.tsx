@@ -12,10 +12,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Bell } from "lucide-react";
+import { Bell, Mail, MailOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { renderNotification } from "@/lib/notifications";
-import { markNotificationReadAction } from "@/lib/actions/notifications";
+import {
+  markAllNotificationsReadAction,
+  markNotificationReadAction,
+  setNotificationReadAction,
+} from "@/lib/actions/notifications";
 import type { NotificationRow } from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -37,6 +41,7 @@ export function NotificationBell({
 
   React.useEffect(() => {
     const supabase = createClient();
+
     const channel = supabase
       .channel(`notifications:${userId}`)
       .on(
@@ -55,6 +60,25 @@ export function NotificationBell({
           setItems((existing) => (existing ? [fresh, ...existing].slice(0, 8) : existing));
         },
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "notifications",
+          filter: `recipient_id=eq.${userId}`,
+        },
+        // Read-states change from the notifications page, mark-all, or
+        // another tab. The UPDATE payload doesn't carry the old row, so
+        // recount instead of guessing the delta.
+        async () => {
+          const { count } = await supabase
+            .from("notifications")
+            .select("id", { count: "exact", head: true })
+            .is("read_at", null);
+          setUnread(count ?? 0);
+        },
+      )
       .subscribe();
 
     // Unsubscribe on unmount — a leaked channel would double-count
@@ -63,6 +87,40 @@ export function NotificationBell({
       supabase.removeChannel(channel);
     };
   }, [userId]);
+
+  // Looking at the open dropdown for a few seconds counts as reading:
+  // the badge number disappears on its own instead of nagging until
+  // every item is clicked. Closing early cancels the timer.
+  React.useEffect(() => {
+    if (!open || unread === 0) return;
+    const timer = window.setTimeout(() => {
+      setUnread(0);
+      const now = new Date().toISOString();
+      setItems((existing) =>
+        existing
+          ? existing.map((n) => (n.read_at ? n : { ...n, read_at: now }))
+          : existing,
+      );
+      void markAllNotificationsReadAction();
+    }, 4000);
+    return () => window.clearTimeout(timer);
+  }, [open, unread]);
+
+  /** The read/unread toggle beside each item. */
+  async function toggleRead(notification: NotificationRow) {
+    const makeRead = !notification.read_at;
+    setUnread((count) => Math.max(0, count + (makeRead ? -1 : 1)));
+    setItems((existing) =>
+      existing
+        ? existing.map((n) =>
+            n.id === notification.id
+              ? { ...n, read_at: makeRead ? new Date().toISOString() : null }
+              : n,
+          )
+        : existing,
+    );
+    await setNotificationReadAction(notification.id, makeRead);
+  }
 
   /** Load the dropdown's contents the first time it opens (not before —
    *  most page views never open the bell). */
@@ -142,14 +200,17 @@ export function NotificationBell({
             items.map((notification) => {
               const { message } = renderNotification(notification);
               return (
-                <li key={notification.id}>
+                <li
+                  key={notification.id}
+                  className={cn(
+                    "flex items-stretch",
+                    !notification.read_at && "bg-gold-light/30",
+                  )}
+                >
                   <button
                     type="button"
                     onClick={() => handleClick(notification)}
-                    className={cn(
-                      "w-full px-4 py-3 text-left text-sm hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold",
-                      !notification.read_at && "bg-gold-light/30",
-                    )}
+                    className="min-w-0 flex-1 px-4 py-3 text-left text-sm hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
                   >
                     <span className="block text-ink">{message}</span>
                     <span className="mt-0.5 block text-xs text-ink-muted">
@@ -157,6 +218,21 @@ export function NotificationBell({
                         addSuffix: true,
                       })}
                     </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleRead(notification)}
+                    aria-label={
+                      notification.read_at ? "Mark as unread" : "Mark as read"
+                    }
+                    title={notification.read_at ? "Mark as unread" : "Mark as read"}
+                    className="flex shrink-0 items-center px-3 text-ink-muted hover:text-maroon focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
+                  >
+                    {notification.read_at ? (
+                      <Mail aria-hidden className="h-4 w-4" />
+                    ) : (
+                      <MailOpen aria-hidden className="h-4 w-4" />
+                    )}
                   </button>
                 </li>
               );
