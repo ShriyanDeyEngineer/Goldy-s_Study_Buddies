@@ -34,6 +34,9 @@ export async function GET(request: Request) {
       );
     }
     // Anything else (student cancelled at Google, provider hiccup…).
+    console.error(
+      `[auth/callback] provider error: ${searchParams.get("error")} — ${errorDescription}`,
+    );
     return NextResponse.redirect(`${origin}/auth/auth-error`);
   }
 
@@ -45,7 +48,10 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
-    // A code that won't exchange = already used or stale — try again.
+    // A code that won't exchange: already used, stale, or (most often)
+    // the verifier cookie lives on a different host/browser than this
+    // request — the log line is what tells those apart in production.
+    console.error(`[auth/callback] code exchange failed on ${origin}: ${error.message}`);
     return NextResponse.redirect(`${origin}/auth/auth-error`);
   }
 
