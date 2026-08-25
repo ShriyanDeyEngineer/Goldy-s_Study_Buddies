@@ -126,7 +126,7 @@ export default async function GroupPage({
             <p className="text-sm font-medium uppercase tracking-wide text-maroon">
               {courseCode(group.courses)}
             </p>
-            <h1 className="mt-1 font-display text-3xl text-ink">{group.name}</h1>
+            <h1 className="mt-1 break-words font-display text-3xl text-ink">{group.name}</h1>
 
             <div className="mt-4 flex items-center justify-center gap-4 text-sm text-ink-muted">
               <span className="inline-flex items-center gap-1.5">
@@ -257,7 +257,7 @@ export default async function GroupPage({
           <p className="text-sm font-medium uppercase tracking-wide text-maroon">
             {courseCode(group.courses)} · {group.courses.course_name}
           </p>
-          <h1 className="font-display text-3xl text-ink">{group.name}</h1>
+          <h1 className="break-words font-display text-3xl text-ink">{group.name}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant={group.mode === "open" ? "success" : "warning"}>
