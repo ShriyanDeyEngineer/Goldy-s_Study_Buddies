@@ -290,15 +290,15 @@ begin
     raise exception 'FAIL: new manager was not notified';
   end if;
 
-  -- Everyone leaves → the group disbands itself.
+  -- Everyone leaves → the group disbands itself, which (0022) hard-
+  -- deletes the row instead of leaving a tombstone.
   perform pg_temp.impersonate(u2);
   perform public.leave_group(v_group);
   perform pg_temp.impersonate(u3);
   perform public.leave_group(v_group);
 
-  select status into v_status from public.study_groups where id = v_group;
-  if v_status <> 'disbanded' then
-    raise exception 'FAIL: empty group is % (expected disbanded)', v_status;
+  if exists (select 1 from public.study_groups where id = v_group) then
+    raise exception 'FAIL: empty group still exists (expected hard delete)';
   end if;
 
   raise notice 'PASS: succession is longest-tenured-first; last member out disbands';
@@ -335,28 +335,33 @@ begin
 
   perform public.disband_group(v_group);
 
+  -- Since 0022, disband hard-deletes the group; the cascades must take
+  -- every kind of child row with it — and notifications, whose payloads
+  -- copy the group's name, must survive.
+  if exists (select 1 from public.study_groups where id = v_group) then
+    raise exception 'FAIL: group row survived disband (expected hard delete)';
+  end if;
   if exists (select 1 from public.study_group_members where group_id = v_group) then
     raise exception 'FAIL: members remain after disband';
   end if;
-  if exists (select 1 from public.join_requests where group_id = v_group and status = 'pending') then
-    raise exception 'FAIL: pending requests remain after disband';
+  if exists (select 1 from public.join_requests where group_id = v_group) then
+    raise exception 'FAIL: join-request rows survived disband';
   end if;
-  if exists (
-    select 1 from public.meetups
-    where group_id = v_group and scheduled_at > now() and not is_cancelled
-  ) then
-    raise exception 'FAIL: future meetups not cancelled by disband';
-  end if;
-  if (select member_count from public.study_groups where id = v_group) <> 0 then
-    raise exception 'FAIL: member_count nonzero after disband';
+  if exists (select 1 from public.meetups where group_id = v_group) then
+    raise exception 'FAIL: meetup rows survived disband';
   end if;
   if not exists (
     select 1 from public.notifications where recipient_id = u2 and type = 'group_disbanded'
   ) then
     raise exception 'FAIL: members were not notified of disband';
   end if;
+  if not exists (
+    select 1 from public.notifications where recipient_id = u4 and type = 'group_disbanded'
+  ) then
+    raise exception 'FAIL: pending requester was not notified of disband';
+  end if;
 
-  raise notice 'PASS: disband removes members, cancels meetups+requests, notifies everyone';
+  raise notice 'PASS: disband deletes the group and all its content, notifying everyone first';
 end $$;
 
 -- ── INVARIANT 7: closed→open approves min(pending, space), oldest first ─────
