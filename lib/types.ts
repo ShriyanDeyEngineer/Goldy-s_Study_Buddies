@@ -130,6 +130,17 @@ export interface AvailabilitySlotRow {
   ends_at: string;
 }
 
+export interface GroupResourceRow {
+  id: string;
+  group_id: string;
+  author_id: string;
+  kind: "note" | "link";
+  title: string;
+  /** Note body, or the URL for links. */
+  content: string;
+  created_at: string;
+}
+
 export interface GroupMessageRow {
   id: string;
   group_id: string;

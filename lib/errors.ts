@@ -56,6 +56,12 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   POLL_CLOSED: "This poll is closed.",
   INVALID_SLOTS: "Polls need 2–400 future time slots, each ending after it starts.",
 
+  // ── Resources ────────────────────────────────────────────────────────
+  RESOURCE_NOT_FOUND: "That resource is already gone.",
+  INVALID_KIND: "Choose a note or a link.",
+  INVALID_LINK: "Links must start with http:// or https://.",
+  INVALID_NOTE: "Notes need 1\u20135,000 characters.",
+
   // ── Messages ─────────────────────────────────────────────────────────
   EMPTY_MESSAGE: "Type a message first.",
   MESSAGE_TOO_LONG: "Messages max out at 2,000 characters.",
