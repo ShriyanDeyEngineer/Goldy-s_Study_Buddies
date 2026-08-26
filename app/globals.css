@@ -41,7 +41,7 @@
   /* The CSS variables --font-roboto / --font-dm-serif are injected by
      next/font in app/layout.tsx. Fallbacks cover the moment before the
      web fonts load. */
-  --font-sans: "Comic Sans MS", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--times-new-roman), ui-serif, Georgia, serif;
 }
 
