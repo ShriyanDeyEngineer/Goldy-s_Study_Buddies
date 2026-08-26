@@ -9,8 +9,31 @@
  * The palette is University of Minnesota–inspired (maroon + gold), but we
  * deliberately do NOT use official UMN artwork or trademarks anywhere.
  *
+ * ── HOW LIGHT/DARK WORKS ──────────────────────────────────────────────
+ * Every token is a two-step indirection:
+ *
+ *     :root  / .dark   define the raw VALUES (--bg, --ink, …)
+ *     @theme inline    maps them onto Tailwind names (--color-cream, …)
+ *
+ * Because the mapping is `inline`, a utility like `bg-cream` compiles to
+ * `background-color: var(--bg)` — it reads the value at the USE site, so
+ * re-defining --bg under .dark flips the whole app. Plain `@theme` would
+ * freeze the value at :root and dark mode would silently do nothing.
+ * DO NOT remove the `inline` keyword.
+ *
+ * Dark mode is for SIGNED-IN pages only. The .dark class is applied by
+ * app/(app)/layout.tsx to a wrapper div, so marketing and auth pages
+ * cannot inherit it. Nothing here needs to know that — it just works.
+ *
+ * The token NAMES are historical and describe the light theme (a "cream"
+ * page background is near-black in dark mode). Renaming them to --color-bg
+ * / --color-fg would be clearer but touches ~270 call sites; keeping the
+ * names means dark mode changed zero component files.
+ *
  * CONTRAST RULE (do not break this): never put gold text on the cream
  * background — it fails WCAG AA. Gold text is only readable on maroon.
+ * IN DARK MODE this relaxes: gold on the dark page background is 12.4:1,
+ * so gold text there is fine. Light mode keeps the old restriction.
  * All interactive elements must meet a 4.5:1 contrast ratio.
  *
  * Touch this file to: add a design token, adjust global element defaults,
@@ -18,24 +41,83 @@
  */
 @import "tailwindcss";
 
-@theme {
+/* Class-based dark mode. Tailwind v4 defaults the `dark:` variant to the
+   OS preference; we key it to our .dark class instead, because the theme
+   is a per-account setting stored in profiles.theme, not a device one. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Light theme (the default) ───────────────────────────────────────── */
+:root {
+  --bg: #fffaf0; /* page background                          */
+  --surface: #ffffff; /* cards                                    */
+  --ink: #1a1a1a; /* body text                                */
+  --ink-muted: #6b6b6b; /* secondary text                           */
+  --line: #ede6dc; /* borders                                  */
+
+  --maroon: #7a0019; /* primary brand: headers, primary buttons  */
+  --maroon-dark: #5b0013; /* hover states, footer background          */
+  --gold: #ffcc33; /* accents, CTAs, focus rings               */
+  --gold-light: #ffde7a; /* badges, subtle highlights                */
+
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+}
+
+/* ── Dark theme ──────────────────────────────────────────────────────────
+ * Warm-dark, not neutral-dark: the light theme is cream (hue ~37°), so a
+ * cold gray would read as a different product. Contrast figures below are
+ * against --bg unless noted.
+ *
+ * WHY MAROON CHANGES: #7a0019 on #17130f is 1.63:1 — a primary button
+ * would be a barely-visible smudge. #b82945 gets 3.05:1 against the page
+ * (clears the 3:1 minimum for UI surfaces) and 6.1:1 for white text on it.
+ * There is no way to keep the exact brand maroon and stay accessible here.
+ *
+ * WHY MAROON-DARK GETS LIGHTER: it is the `hover:bg-maroon-dark` state.
+ * On a dark page, hovering to something darker reads as "disabled", so the
+ * hover direction inverts — dark mode lifts instead of deepens.
+ */
+.dark {
+  --bg: #17130f; /* warm near-black; #000 is harsh and kills shadow */
+  --surface: #211c17; /* lighter than page = elevation, as in light mode */
+  --ink: #f5efe6; /* off-white; pure #fff halates on dark            */
+  --ink-muted: #a79e92; /* 7.0:1 on --bg, 6.5:1 on --surface              */
+  --line: #332c24; /* carries structure once shadows stop reading     */
+
+  --maroon: #b82945; /* lifted; see note above                         */
+  --maroon-dark: #c9354f; /* hover LIFTS in dark mode                       */
+  --gold: #ffcc33; /* unchanged — 12.4:1 on --bg, still on-brand      */
+  --gold-light: #4a3a12; /* badge FILLS invert: pale gold would glare       */
+
+  --success: #2fbf63;
+  --warning: #f0a32e;
+  --danger: #c7303a; /* deep enough for white button text (5.4:1)      */
+
+  /* Native scrollbars, form controls, and the caret follow the theme. */
+  color-scheme: dark;
+}
+
+/* ── Tailwind token mapping ──────────────────────────────────────────────
+ * `inline` is load-bearing — see the header comment. */
+@theme inline {
   /* ── Brand colors ─────────────────────────────────────────────────── */
-  --color-maroon: #7a0019; /* primary brand: headers, primary buttons   */
-  --color-maroon-dark: #5b0013; /* hover states, footer background          */
-  --color-gold: #ffcc33; /* accents, CTAs, focus rings               */
-  --color-gold-light: #ffde7a; /* badges, subtle highlights                */
+  --color-maroon: var(--maroon);
+  --color-maroon-dark: var(--maroon-dark);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
 
   /* ── Surfaces & text ──────────────────────────────────────────────── */
-  --color-cream: #fffaf0; /* page background                          */
-  --color-surface: #ffffff; /* cards                                    */
-  --color-ink: #1a1a1a; /* body text                                */
-  --color-ink-muted: #6b6b6b; /* secondary text                           */
-  --color-line: #ede6dc; /* borders                                  */
+  --color-cream: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
 
   /* ── Semantic status colors ───────────────────────────────────────── */
-  --color-success: #16a34a;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
 
   /* ── Typography ───────────────────────────────────────────────────── */
   /* The CSS variables --font-roboto / --font-dm-serif are injected by
@@ -53,17 +135,31 @@
   }
 
   body {
-    background-color: var(--color-cream);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
+    background-color: var(--bg);
+    color: var(--ink);
+    /* The literal stack rather than var(--font-sans): under `@theme inline`
+       Tailwind resolves theme values into the utilities, and we don't want
+       this rule depending on whether --font-sans is also emitted to :root.
+       --font-roboto is injected by next/font in app/layout.tsx. */
+    font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* The .dark class sits on a wrapper INSIDE body (dark mode is signed-in
+     only), so <body> itself keeps the light values and rubber-band
+     overscroll would flash cream behind a dark page. :has() lets body
+     follow its dark descendant. The literals are deliberate: this rule
+     fires outside the .dark scope, so the variables aren't flipped yet. */
+  body:has(.dark) {
+    background-color: #17130f;
+    color-scheme: dark;
   }
 
   /* Every keyboard-focused element gets the visible gold ring the
      accessibility spec requires. Components can layer their own ring on
      top, but nothing may remove focus visibility. */
   :focus-visible {
-    outline: 2px solid var(--color-gold);
+    outline: 2px solid var(--gold);
     outline-offset: 2px;
   }
 }

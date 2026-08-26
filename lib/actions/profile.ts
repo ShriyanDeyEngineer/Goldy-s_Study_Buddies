@@ -283,6 +283,29 @@ export async function setEmailNotificationsAction(enabled: boolean): Promise<voi
   revalidatePath("/settings/profile");
 }
 
+/** Light/dark for signed-in pages. Stored on the profile rather than in
+ *  localStorage so it follows the student between devices and so the app
+ *  layout can render the .dark wrapper server-side — no flash of a light
+ *  page on load. See migration 0013. */
+export async function setThemeAction(theme: "light" | "dark"): Promise<void> {
+  // Never trust the client with a value that lands in the DB, even from
+  // our own toggle — the CHECK in 0013 would reject anything else anyway,
+  // but failing here keeps the error out of Postgres.
+  if (theme !== "light" && theme !== "dark") return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  await supabase.from("profiles").update({ theme }).eq("id", user.id);
+
+  // The theme class lives on the (app) LAYOUT wrapper, not on any one
+  // page, so a page-scoped revalidate would leave the old class in place.
+  // "layout" scope from the root is the only thing that re-renders it.
+  revalidatePath("/", "layout");
+}
+
 /** Add/remove a course on one of the three lists (current/taken/future). */
 export async function setCourseEnrollmentAction(
   courseId: string,
