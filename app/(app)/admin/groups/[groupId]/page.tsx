@@ -18,6 +18,7 @@ import {
   type PublicProfile,
   type StudyGroupRow,
 } from "@/lib/types";
+import { adminPersonLabel } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { format, formatDistanceToNow } from "date-fns";
@@ -88,7 +89,7 @@ export default async function AdminGroupPage({
   const profiles = Object.fromEntries(
     ((profilesRes.data ?? []) as PublicProfile[]).map((p) => [p.id, p]),
   );
-  const nameOf = (id: string) => profiles[id]?.display_name ?? "Deleted User";
+  const nameOf = (id: string) => adminPersonLabel(profiles[id]?.display_name, id);
 
   return (
     <div>

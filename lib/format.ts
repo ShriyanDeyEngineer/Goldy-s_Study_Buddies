@@ -16,3 +16,20 @@ export function formatDuration(minutes: number): string {
   if (rest === 0) return `${hours} h`;
   return `${hours} h ${rest} min`;
 }
+
+/**
+ * Admin-only: resolves a person's display name, appending their id when
+ * the account reads as deleted. Covers both the missing-row case (no
+ * profiles match for the id at all) and the tombstoned case, where the
+ * profiles row still exists but account deletion overwrote display_name
+ * with the literal string "Deleted User" (see migration 0017) — either
+ * way the id itself always comes from the foreign key on the row being
+ * displayed, not from the profile lookup.
+ */
+export function adminPersonLabel(
+  displayName: string | null | undefined,
+  id: string,
+): string {
+  const name = displayName ?? "Deleted User";
+  return name === "Deleted User" ? `Deleted User (${id})` : name;
+}

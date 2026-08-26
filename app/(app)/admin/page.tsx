@@ -7,6 +7,7 @@
 import { getSessionProfile } from "@/lib/supabase/server";
 import type { ReportRow } from "@/lib/types";
 import { REPORT_CATEGORIES } from "@/lib/constants";
+import { adminPersonLabel } from "@/lib/format";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReportStatusButtons } from "./report-actions";
 import { formatDistanceToNow } from "date-fns";
@@ -93,10 +94,10 @@ export default async function AdminReportsPage() {
                           href={`/profile/${report.reported_user_id}`}
                           className="font-medium text-maroon underline underline-offset-2"
                         >
-                          {reported?.display_name ?? "Deleted User"}
+                          {adminPersonLabel(reported?.display_name, report.reported_user_id)}
                         </Link>{" "}
                         was reported for <span className="font-medium">{category}</span> by{" "}
-                        {reporter?.display_name ?? "Deleted User"}
+                        {adminPersonLabel(reporter?.display_name, report.reporter_id)}
                         {reported && reported.account_status !== "active" && (
                           <span className="ml-2 rounded-full bg-danger/10 px-2 py-0.5 text-xs text-danger">
                             account {reported.account_status}

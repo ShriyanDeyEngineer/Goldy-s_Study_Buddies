@@ -6,6 +6,7 @@
  */
 import { getSessionProfile } from "@/lib/supabase/server";
 import type { CourseRequestRow, PublicProfile } from "@/lib/types";
+import { adminPersonLabel } from "@/lib/format";
 import { RequestReviewForm } from "./request-review-form";
 import { formatDistanceToNow } from "date-fns";
 
@@ -51,7 +52,7 @@ export default async function AdminRequestsPage() {
               <li key={request.id}>
                 <RequestReviewForm
                   request={request}
-                  requesterName={names[request.requester_id] ?? "Deleted User"}
+                  requesterName={adminPersonLabel(names[request.requester_id], request.requester_id)}
                 />
               </li>
             ))}
@@ -70,7 +71,7 @@ export default async function AdminRequestsPage() {
                 <span className="text-ink">
                   {request.department_code} {request.course_number} — {request.course_name}
                   <span className="ml-2 text-xs text-ink-muted">
-                    by {names[request.requester_id] ?? "Deleted User"}
+                    by {adminPersonLabel(names[request.requester_id], request.requester_id)}
                   </span>
                 </span>
                 <span

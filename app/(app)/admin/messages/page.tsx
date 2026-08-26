@@ -8,6 +8,7 @@
  */
 import { getSessionProfile } from "@/lib/supabase/server";
 import type { MessageOriginalRow } from "@/lib/types";
+import { adminPersonLabel } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -55,7 +56,7 @@ export default async function AdminMessagesPage() {
                     href={`/profile/${original.sender_id}`}
                     className="font-medium text-maroon underline underline-offset-2"
                   >
-                    {sender?.display_name ?? "Deleted User"}
+                    {adminPersonLabel(sender?.display_name, original.sender_id)}
                   </Link>
                   <Badge variant={original.message_kind === "group" ? "gold" : "outline"}>
                     {original.message_kind === "group" ? "group chat" : "DM"}
