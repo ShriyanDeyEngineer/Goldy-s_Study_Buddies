@@ -231,6 +231,13 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] **Email notifications** (only with RESEND + webhook configured):
       friend request from another account → email within seconds. Toggle
       off under Edit profile → no email, bell still fires.
+- [ ] **Meetup email detail**: scheduling a meetup emails every OTHER
+      member a detailed message: who scheduled it, the meetup title, the
+      time window labeled Central Time with the duration, the location
+      (or the join link for online), who's RSVP'd attending so far (the
+      creator at minimum), a link to the group page, and a prefilled
+      Google Calendar link. Other notification types keep the one-line
+      email.
 - [ ] **Onboarding shortcut**: a Google-named account opens the wizard on
       "What are you taking?" (step 2); Back shows the prefilled name with
       the "from your Google account" hint; nameless accounts start at
