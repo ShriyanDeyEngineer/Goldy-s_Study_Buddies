@@ -127,7 +127,7 @@ export default async function DashboardPage() {
         {myGroups.length === 0 ? (
           <EmptyState
             title="You're not in any groups yet"
-            description="Pick one of your courses and join an open group — or start your own and let classmates come to you."
+            description="Pick one of your courses and join an open group or start your own and let classmates come to you!"
             action={
               <Button asChild>
                 <Link href="/courses">Browse courses</Link>
