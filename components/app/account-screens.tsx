@@ -30,20 +30,33 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SuspendedScreen({ status }: { status: "suspended" | "banned" }) {
+const LOCKOUT_COPY = {
+  banned: {
+    title: "Your account has been banned",
+    body: "A review found activity that breaks our community rules, and this account can no longer use Goldy's Study Buddies.",
+  },
+  suspended: {
+    title: "Your account is suspended",
+    body: "Your account was suspended after a report was reviewed. If you believe this is a mistake, contact the team using the address on our home page footer.",
+  },
+  deleted: {
+    title: "This account has been deleted",
+    body: "This account was deleted and its profile removed. Old messages remain, shown as Unknown. To use Goldy's Study Buddies again, contact the team using the address on our home page footer.",
+  },
+} as const;
+
+export function SuspendedScreen({
+  status,
+}: {
+  status: "suspended" | "banned" | "deleted";
+}) {
   return (
     <Shell>
       <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-danger/10">
         <Ban aria-hidden className="h-7 w-7 text-danger" />
       </span>
-      <h1 className="font-display text-2xl text-ink">
-        {status === "banned" ? "Your account has been banned" : "Your account is suspended"}
-      </h1>
-      <p className="mt-2 text-sm text-ink-muted">
-        {status === "banned"
-          ? "A review found activity that breaks our community rules, and this account can no longer use Goldy's Study Buddies."
-          : "Your account was suspended after a report was reviewed. If you believe this is a mistake, contact the team using the address on our home page footer."}
-      </p>
+      <h1 className="font-display text-2xl text-ink">{LOCKOUT_COPY[status].title}</h1>
+      <p className="mt-2 text-sm text-ink-muted">{LOCKOUT_COPY[status].body}</p>
       <form action={signOutAction} className="mt-6">
         <Button type="submit" variant="outline">
           Sign out

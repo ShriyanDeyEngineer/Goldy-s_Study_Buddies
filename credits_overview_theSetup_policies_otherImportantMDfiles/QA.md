@@ -262,3 +262,22 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
 - [ ] **Live**: a second member's painting appears without refresh.
 - [ ] **Security**: sending a slot id from ANOTHER poll to
       set_availability_votes is ignored (not an error, not a vote).
+
+## Chat filter & account deletion — 2026-08-20
+
+- [ ] **Chat filter**: sending "this is bullshit" in group chat shows
+      "this is bull****" instantly for the sender AND for a second
+      account; same in DMs. "assessment", "cockpit", "Dickens" pass
+      through untouched. The database row stores the masked text (the
+      filter can't be bypassed by calling the RPC directly).
+- [ ] **Delete account**: Edit profile → Delete account requires typing
+      DELETE. After confirming: signed out, landed on the home page.
+- [ ] **After deletion (check from U2)**: U1 gone from U2's friends and
+      buddies lists; pending requests between them cancelled; U1 absent
+      from search and suggestions; U1's profile URL 404s; U1's old group
+      and DM messages still visible, sender shown as "Unknown" with no
+      avatar; groups U1 managed got a new manager (or disbanded if U1
+      was the only member).
+- [ ] **After deletion (as U1)**: signing in with the same Google account
+      shows the "This account has been deleted" screen; no app pages
+      reachable.

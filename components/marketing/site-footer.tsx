@@ -36,17 +36,31 @@ export function SiteFooter() {
         <div className="text-sm">
           <h2 className="mb-3 font-medium text-gold">The team</h2>
           <p className="text-white/80">{TEAM.join(" · ")}</p>
-          <p className="mt-3">
-            <a href={`mailto:${CONTACT_EMAIL}`} className="text-white/80 underline underline-offset-2 hover:text-gold">
+          <p className="mt-3 text-white/80 font-bold">
+            Please send any feedback or report any issues to our email: &#8200;
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-white/80 underline underline-offset-2 hover:text-gold font-normal">
               {CONTACT_EMAIL}
             </a>
           </p>
         </div>
       </div>
       <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60">
-        Built by UMN students, for UMN students. Not officially affiliated with the
-        University of Minnesota. Please send any feedback or report any issues to the email provided above.
+        Built by UMN students, for UMN students. Not officially affiliated with the University of Minnesota.
+
+        <p className="mt-2 text-center text-xs text-white/60">
+          <Link href="/terms_of_service" className="text-white/80 hover:text-gold">Terms & Conditions</Link>
+          &#8200;||&#8200;
+          <Link href="/privacy_policy" className="text-white/80 hover:text-gold">Privacy Policy</Link>
+        </p>
+        
       </div>
     </footer>
   );
 }
+
+/**
+ Paste the following on line 55 once appropriate to use
+ <p className="mt-2 text-center text-xs text-white/60">
+    ©2026 Goldy's Study Buddies. All rights reserved.
+  </p>
+ */

@@ -8,6 +8,7 @@ import { getSessionProfile } from "@/lib/supabase/server";
 import type { ProfileRow } from "@/lib/types";
 import { ProfileForm } from "./profile-form";
 import { PrivacyForm } from "./privacy-form";
+import { DeleteAccountCard } from "./delete-account";
 
 export const metadata = { title: "Edit profile" };
 
@@ -33,6 +34,7 @@ export default async function ProfileSettingsPage() {
       <div className="space-y-8">
         <ProfileForm profile={typedProfile} />
         <PrivacyForm profile={typedProfile} />
+        <DeleteAccountCard />
       </div>
     </div>
   );
