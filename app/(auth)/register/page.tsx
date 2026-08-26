@@ -23,7 +23,7 @@ export default async function RegisterPage({
       <CardContent>
         <h1 className="font-display text-2xl text-ink">Join Goldy&rsquo;s Study Buddies</h1>
         <p className="mt-1 mb-6 text-sm text-ink-muted">
-          For University of Minnesota students — continue with your UMN
+          For University of Minnesota students. Continue with your UMN
           Google account (the one ending in @umn.edu).
         </p>
 
