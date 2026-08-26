@@ -48,9 +48,9 @@ export function SiteFooter() {
         Built by UMN students, for UMN students. Not officially affiliated with the University of Minnesota.
 
         <p className="mt-2 text-center text-xs text-white/60">
-          <Link href="/terms_of_service" className="text-white/80 hover:text-gold font-['Times_New_Roman']">Terms & Conditions</Link>
+          <Link href="/terms_of_service" target="_self" className="text-white/80 hover:text-gold font-['Times_New_Roman']">Terms & Conditions</Link>
           &#8200;||&#8200;
-          <Link href="/privacy_policy" className="text-white/80 hover:text-gold font-['Times_New_Roman']">Privacy Policy</Link>
+          <Link href="/privacy_policy" target="_self" className="text-white/80 hover:text-gold font-['Times_New_Roman']">Privacy Policy</Link>
         </p>
         <p className="mt-2 text-center text-xs text-white/60 font-['Times_New_Roman']">
           ©2026 Goldy's Study Buddies. All rights reserved.

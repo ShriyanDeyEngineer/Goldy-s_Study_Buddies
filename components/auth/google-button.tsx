@@ -71,11 +71,20 @@ export function GoogleButton({
           I agree to the{" "}
           <Link
             href="/terms_of_service"
-            target="_blank"
+            target="_self"
             rel="noopener"
             className="font-medium text-maroon underline underline-offset-2"
           >
             Terms of Service
+          </Link>
+          {" "}and{" "}
+          <Link
+            href="/privacy_policy"
+            target="_self"
+            rel="noopener"
+            className="font-medium text-maroon underline underline-offset-2"
+          >
+            Privacy Policy
           </Link>
           .
         </label>
