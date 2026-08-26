@@ -29,9 +29,10 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
+import { buildMeetupEmail } from "@/lib/meetup-email";
 import { renderNotification } from "@/lib/notifications";
 import { getSiteUrl } from "@/lib/site";
-import type { NotificationRow } from "@/lib/types";
+import type { MeetupRow, NotificationRow } from "@/lib/types";
 
 /** Types worth an email. Everything else stays in-app only. */
 const EMAIL_WORTHY = new Set([
@@ -106,17 +107,84 @@ export async function POST(request: Request) {
   const { message, href } = renderNotification(notification);
   const link = `${getSiteUrl()}${href}`;
 
-  await sendEmail({
-    to: profile.email,
-    subject: `Goldy's Study Buddies: ${message}`,
-    text:
-      `Hi ${profile.display_name ?? "there"},\n\n` +
-      `${message}\n\n` +
-      `Open it here: ${link}\n\n` +
-      `— Goldy's Study Buddies\n` +
-      `You're getting this because a group or classmate did something that involves you. ` +
-      `Turn these emails off any time under Edit profile → Notifications.`,
-  });
+  // meetup_created gets the detailed email (who scheduled it, when/where,
+  // who's attending); everything else keeps the generic one-liner. Falls
+  // back to the generic email if the meetup vanished between the insert
+  // and the webhook firing.
+  const rich =
+    notification.type === "meetup_created"
+      ? await buildRichMeetupEmail(admin, notification, profile.display_name)
+      : null;
+
+  await sendEmail(
+    rich
+      ? { to: profile.email, subject: rich.subject, text: rich.text }
+      : {
+          to: profile.email,
+          subject: `Goldy's Study Buddies: ${message}`,
+          text:
+            `Hi ${profile.display_name ?? "there"},\n\n` +
+            `${message}\n\n` +
+            `Open it here: ${link}\n\n` +
+            `— Goldy's Study Buddies\n` +
+            `You're getting this because a group or classmate did something that involves you. ` +
+            `Turn these emails off any time under Edit profile → Notifications.`,
+        },
+  );
 
   return NextResponse.json({ sent: true });
+}
+
+/**
+ * Fetch everything the detailed meetup email needs (service role — the
+ * webhook has no user session) and hand it to the pure builder. Returns
+ * null when the meetup can't be loaded or was already cancelled, so the
+ * caller falls back to the generic email instead of failing the send.
+ */
+async function buildRichMeetupEmail(
+  admin: ReturnType<typeof createAdminClient>,
+  notification: NotificationRow,
+  recipientName: string | null,
+): Promise<{ subject: string; text: string } | null> {
+  const meetupId = notification.payload?.meetup_id;
+  const groupId = notification.payload?.group_id;
+  if (!meetupId) return null;
+
+  const [meetupRes, attendanceRes] = await Promise.all([
+    admin.from("meetups").select("*").eq("id", meetupId).maybeSingle(),
+    admin
+      .from("meetup_attendance")
+      .select("user_id")
+      .eq("meetup_id", meetupId)
+      .eq("status", "attending"),
+  ]);
+  const meetup = meetupRes.data as MeetupRow | null;
+  if (!meetup || meetup.is_cancelled) return null;
+
+  // One name lookup covers the creator and every attendee.
+  const attendeeIds = (attendanceRes.data ?? []).map((a) => a.user_id as string);
+  const nameIds = [...new Set([meetup.creator_id, ...attendeeIds])];
+  const namesRes = await admin
+    .from("profiles")
+    .select("id, display_name")
+    .in("id", nameIds);
+  const nameById = new Map(
+    (namesRes.data ?? []).map((p) => [p.id as string, p.display_name as string | null]),
+  );
+
+  return buildMeetupEmail({
+    recipientName,
+    groupName: notification.payload?.group_name ?? "your group",
+    title: meetup.title,
+    creatorName: nameById.get(meetup.creator_id) ?? null,
+    scheduledAtIso: meetup.scheduled_at,
+    durationMinutes: meetup.duration_minutes ?? 60,
+    format: meetup.format,
+    location: meetup.location,
+    meetingLink: meetup.meeting_link,
+    attendeeNames: attendeeIds
+      .map((id) => nameById.get(id))
+      .filter((n): n is string => !!n),
+    groupUrl: `${getSiteUrl()}/groups/${groupId ?? ""}`,
+  });
 }
