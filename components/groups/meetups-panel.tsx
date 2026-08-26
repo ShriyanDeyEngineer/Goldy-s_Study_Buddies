@@ -39,6 +39,7 @@ import { formatDuration } from "@/lib/format";
 import type {
   MeetupAttendanceRow,
   MeetupRow,
+  PublicProfile,
 } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -59,6 +60,7 @@ export function MeetupsPanel({
   attendance,
   groupName,
   courseLabel,
+  profiles,
 }: {
   groupId: string;
   currentUserId: string;
@@ -67,6 +69,7 @@ export function MeetupsPanel({
   attendance: MeetupAttendanceRow[];
   groupName: string;
   courseLabel: string;
+  profiles: Record<string, PublicProfile>;
 }) {
   const router = useRouter();
   const now = Date.now();
@@ -101,6 +104,7 @@ export function MeetupsPanel({
                   meetup={meetup}
                   attendance={attendance}
                   currentUserId={currentUserId}
+                  profiles={profiles}
                   canCancel={isManager || meetup.creator_id === currentUserId}
                   groupId={groupId}
                   groupName={groupName}
@@ -123,6 +127,7 @@ export function MeetupsPanel({
                     meetup={meetup}
                     attendance={attendance}
                     currentUserId={currentUserId}
+                    profiles={profiles}
                     canCancel={false}
                     groupId={groupId}
                     groupName={groupName}
@@ -150,6 +155,7 @@ function MeetupCard({
   courseLabel,
   isPast,
   onChanged,
+  profiles,
 }: {
   meetup: MeetupRow;
   attendance: MeetupAttendanceRow[];
@@ -160,6 +166,7 @@ function MeetupCard({
   courseLabel: string;
   isPast: boolean;
   onChanged: () => void;
+  profiles: Record<string, PublicProfile>;
 }) {
   const [cancelReason, setCancelReason] = React.useState("");
 
@@ -182,6 +189,16 @@ function MeetupCard({
   // Derived, never stored: the count always equals the rows (pitfall #7),
   // with my own optimistic answer swapped in for my server row.
   const attendingCount = othersAttending + (myRsvp === "attending" ? 1 : 0);
+
+  // Same swap-in for the name list: everyone else's rows plus my own
+  // optimistic answer, not the server row (see RSVP effect above).
+  const attendingUserIds = rows
+    .filter((a) => a.user_id !== currentUserId && a.status === "attending")
+    .map((a) => a.user_id);
+  if (myRsvp === "attending") attendingUserIds.push(currentUserId);
+  const attendingNames = attendingUserIds.map(
+    (id) => profiles[id]?.display_name ?? "A student",
+  );
 
   async function setRsvp(status: "attending" | "maybe" | "not_attending") {
     if (status === myRsvp) return;
@@ -308,6 +325,12 @@ function MeetupCard({
                 </Button>
               ))}
             </div>
+          )}
+          {attendingNames.length > 0 && (
+            <p className="mt-2 text-sm text-ink-muted">
+              <span className="font-medium text-ink">Attending: </span>
+              {attendingNames.join(", ")}
+            </p>
           )}
           {canCancel && !isPast && (
             <ConfirmDialog

@@ -297,6 +297,7 @@ export default async function GroupPage({
           attendance={attendance}
           groupName={group.name}
           courseLabel={courseCode(group.courses)}
+          profiles={profilesById}
         />
         <MembersPanel
           groupId={group.id}
