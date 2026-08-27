@@ -11,10 +11,10 @@ export const metadata: Metadata = {
     "The student team behind Goldy's Study Buddies and why we built it.",
 };
 
-const FOUNDERS = [
-  { name: "Shriyan Dey", },
-  { name: "Angad Virdi", },
-  { name: "Aadi Sharma", },
+const CONTRIBUTORS = [
+  { name: "Shriyan Dey" },
+  { name: "Angad Virdi" },
+  { name: "Aadi Sharma" },
   { name: "Joy Deng" },
 ];
 
@@ -40,11 +40,11 @@ export default function AboutPage() {
 
       <h2 className="mt-14 text-center font-display text-2xl text-ink">The Team</h2>
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {FOUNDERS.map((founder) => (
-          <Card key={founder.name}>
+        {CONTRIBUTORS.map((contributor) => (
+          <Card key={contributor.name}>
             <CardContent className="flex flex-col items-center text-center">
-              <Avatar name={founder.name} size="xl" />
-              <h3 className="mt-4 font-medium text-ink">{founder.name}</h3>
+              <Avatar name={contributor.name} size="xl" />
+              <h3 className="mt-4 font-medium text-ink">{contributor.name}</h3>
             </CardContent>
           </Card>
         ))}
