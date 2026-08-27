@@ -144,7 +144,7 @@ export default async function CourseDetailPage({
                     <Card>
                       <CardContent className="flex items-center justify-between gap-4">
                         <div className="min-w-0">
-                          <Link href={`/groups/${group.id}`} className="truncate font-display text-lg text-ink hover:underline focus-visible:outline-2 focus-visible:outline-gold">
+                          <Link href={`/groups/${group.id}`} className="truncate font-display text-lg text-ink hover:underline focus-visible:outline-2 focus-visible:outline-maroon">
                             {group.name}
                           </Link>
                           <div className="mt-1.5 flex items-center gap-3 text-sm text-ink-muted">

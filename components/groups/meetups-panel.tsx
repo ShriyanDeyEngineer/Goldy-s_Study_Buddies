@@ -256,7 +256,7 @@ function MeetupCard({
             rel="noopener noreferrer"
             title="Add to Google Calendar"
             aria-label="Add to Google Calendar"
-            className="rounded-lg p-1.5 hover:bg-cream hover:text-maroon focus-visible:outline-2 focus-visible:outline-gold mt-0.5 flex align-center justify-start pl-0 gap-1"
+            className="rounded-lg p-1.5 hover:bg-cream hover:text-maroon focus-visible:outline-2 focus-visible:outline-maroon mt-0.5 flex align-center justify-start pl-0 gap-1"
           >
             <CalendarPlus aria-hidden className="h-5 w-5" />
             <p className="font-bold text-sm">ADD TO CALENDAR</p>
@@ -344,7 +344,7 @@ function MeetupCard({
                   maxLength={300}
                   placeholder="Reason (optional)"
                   aria-label="Cancellation reason (optional)"
-                  className="h-10 w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-muted focus-visible:outline-2 focus-visible:outline-gold"
+                  className="h-10 w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-muted focus-visible:outline-2 focus-visible:outline-maroon"
                 />
               }
               onConfirm={async () => {

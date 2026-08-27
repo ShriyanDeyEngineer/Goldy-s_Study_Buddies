@@ -188,7 +188,7 @@ export default async function ProfilePage({
                   <li key={`${key}-${course.id}`}>
                     <Link
                       href={`/courses/${course.id}`}
-                      className="inline-block rounded-full border border-line bg-surface px-3 py-1 text-sm text-ink hover:border-maroon focus-visible:outline-2 focus-visible:outline-gold"
+                      className="inline-block rounded-full border border-line bg-surface px-3 py-1 text-sm text-ink hover:border-maroon focus-visible:outline-2 focus-visible:outline-maroon"
                       title={course.course_name}
                     >
                       {course.department_code} {course.course_number}

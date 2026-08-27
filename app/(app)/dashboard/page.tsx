@@ -236,7 +236,7 @@ export default async function DashboardPage() {
               <li key={course.id}>
                 <Link
                   href={`/courses/${course.id}`}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-gold"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-maroon"
                 >
                   <span className="min-w-0">
                     <span className="block font-medium text-ink">{courseCode(course)}</span>

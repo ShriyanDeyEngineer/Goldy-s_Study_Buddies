@@ -142,7 +142,7 @@ export default async function CoursesPage({
               <li key={course.id}>
                 <Link
                   href={`/courses/${course.id}`}
-                  className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
+                  className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon"
                 >
                   <span className="min-w-0">
                     <span className="font-medium text-ink">{courseCode(course)}</span>

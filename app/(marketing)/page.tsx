@@ -79,14 +79,18 @@ export default function HomePage() {
             Find study partners and join or create study groups for your UMN courses.
             <span className="font-bold text-gold"> It's FREE to use</span>, built by students, for students.
           </p>
+          {/* Both buttons sit directly on this section's maroon
+              background, so — unlike the rest of the app — they keep the
+              gold focus ring instead of the site-wide maroon default: a
+              maroon ring would vanish here. */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild variant="secondary" size="lg">
+            <Button asChild variant="secondary" size="lg" className="focus-visible:outline-gold">
               <Link href="/register">Get Started</Link>
             </Button>
             <Button
               asChild
               size="lg"
-              className="border border-white/40 bg-transparent text-white hover:bg-white/10"
+              className="border border-white/40 bg-transparent text-white hover:bg-white/10 focus-visible:outline-gold"
             >
               <Link href="#how-it-works">See How it Works</Link>
             </Button>

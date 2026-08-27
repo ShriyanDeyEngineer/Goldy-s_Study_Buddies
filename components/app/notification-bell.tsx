@@ -207,7 +207,7 @@ export function NotificationBell({
                   <button
                     type="button"
                     onClick={() => handleClick(notification)}
-                    className="min-w-0 flex-1 px-4 py-3 text-left text-sm hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
+                    className="min-w-0 flex-1 px-4 py-3 text-left text-sm hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon"
                   >
                     <span className="block text-ink">{message}</span>
                     <span className="mt-0.5 block text-xs text-ink-muted">
@@ -223,7 +223,7 @@ export function NotificationBell({
                       notification.read_at ? "Mark as unread" : "Mark as read"
                     }
                     title={notification.read_at ? "Mark as unread" : "Mark as read"}
-                    className="flex shrink-0 items-center px-3 text-ink-muted hover:text-maroon focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
+                    className="flex shrink-0 items-center px-3 text-ink-muted hover:text-maroon focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon"
                   >
                     {notification.read_at ? (
                       <Mail aria-hidden className="h-4 w-4" />

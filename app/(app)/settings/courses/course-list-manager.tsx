@@ -178,7 +178,7 @@ export function CourseListManager({
                             type="button"
                             onClick={() => void setEnrollment(course.id, list.key, false)}
                             aria-label={`Remove ${courseCode(course)} from "${list.title}"`}
-                            className="rounded-full p-0.5 text-ink-muted hover:text-danger focus-visible:outline-2 focus-visible:outline-gold"
+                            className="rounded-full p-0.5 text-ink-muted hover:text-danger focus-visible:outline-2 focus-visible:outline-maroon"
                           >
                             <X aria-hidden className="h-3.5 w-3.5" />
                           </button>

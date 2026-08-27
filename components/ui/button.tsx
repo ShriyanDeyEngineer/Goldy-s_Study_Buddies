@@ -25,7 +25,7 @@ const buttonVariants = cva(
   // Base styles shared by every variant. The gold focus ring is an
   // accessibility requirement — do not remove it.
   "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors " +
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold " +
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-maroon " +
     "disabled:pointer-events-none disabled:opacity-50 whitespace-nowrap cursor-pointer",
   {
     variants: {

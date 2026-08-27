@@ -57,7 +57,7 @@ export function AppNavLinks({ userId, initialUnreadMessages, isAdmin = false }: 
           href={link.href}
           aria-current={isActive(pathname, link.href) ? "page" : undefined}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-gold",
+            "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-maroon",
             isActive(pathname, link.href)
               ? "bg-maroon text-white"
               : "text-ink-muted hover:bg-line/50 hover:text-ink",
@@ -86,7 +86,7 @@ export function MobileNav({ userId, initialUnreadMessages, isAdmin = false }: Na
           href={link.href}
           aria-current={isActive(pathname, link.href) ? "page" : undefined}
           className={cn(
-            "flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold",
+            "flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon",
             isActive(pathname, link.href) ? "text-maroon" : "text-ink-muted",
           )}
         >

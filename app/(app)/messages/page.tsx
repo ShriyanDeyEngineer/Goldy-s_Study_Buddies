@@ -44,7 +44,7 @@ export default async function MessagesPage() {
             <li key={conversation.other_id}>
               <Link
                 href={`/messages/${conversation.other_id}`}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon"
               >
                 <Avatar
                   src={conversation.avatar_url}

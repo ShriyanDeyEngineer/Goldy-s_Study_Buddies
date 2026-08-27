@@ -73,7 +73,7 @@ export function NotificationList({ notifications }: { notifications: Notificatio
             <button
               type="button"
               onClick={() => open(notification)}
-              className="min-w-0 flex-1 px-4 py-3 text-left hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
+              className="min-w-0 flex-1 px-4 py-3 text-left hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon"
             >
               <span className="block text-sm text-ink">{message}</span>
               <span className="mt-0.5 block text-xs text-ink-muted">
@@ -86,7 +86,7 @@ export function NotificationList({ notifications }: { notifications: Notificatio
               onClick={() => toggleRead(notification)}
               aria-label={readAt ? "Mark as unread" : "Mark as read"}
               title={readAt ? "Mark as unread" : "Mark as read"}
-              className="flex shrink-0 items-center px-4 text-ink-muted hover:text-maroon focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold"
+              className="flex shrink-0 items-center px-4 text-ink-muted hover:text-maroon focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon"
             >
               {readAt ? (
                 <Mail aria-hidden className="h-4 w-4" />

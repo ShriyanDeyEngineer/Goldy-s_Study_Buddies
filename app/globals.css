@@ -9,8 +9,13 @@
  * The palette is University of Minnesota–inspired (maroon + gold), but we
  * deliberately do NOT use official UMN artwork or trademarks anywhere.
  *
- * CONTRAST RULE (do not break this): never put gold text on the cream
- * background — it fails WCAG AA. Gold text is only readable on maroon.
+ * CONTRAST RULE (do not break this): never put gold text — or a gold
+ * outline/ring — on the cream/surface/line background; it fails WCAG AA
+ * and (for rings) the 3:1 non-text minimum. Gold is only readable on
+ * maroon/maroon-dark. That's why the default focus ring below is maroon
+ * (correct on the cream/white surfaces nearly everything renders on) with
+ * gold used only as a per-element override on the few maroon-background
+ * spots (the marketing hero buttons, the footer links).
  * All interactive elements must meet a 4.5:1 contrast ratio.
  *
  * Touch this file to: add a design token, adjust global element defaults,
@@ -20,9 +25,11 @@
 
 @theme {
   /* ── Brand colors ─────────────────────────────────────────────────── */
-  --color-maroon: #7a0019; /* primary brand: headers, primary buttons   */
+  --color-maroon: #7a0019; /* primary brand: headers, primary buttons,  */
+                            /* and the default focus ring (see below)   */
   --color-maroon-dark: #5b0013; /* hover states, footer background          */
-  --color-gold: #ffcc33; /* accents, CTAs, focus rings               */
+  --color-gold: #ffcc33; /* accents, CTAs; focus rings ONLY where the */
+                          /* surrounding background is maroon          */
   --color-gold-light: #ffde7a; /* badges, subtle highlights                */
 
   /* ── Surfaces & text ──────────────────────────────────────────────── */
@@ -33,9 +40,16 @@
   --color-line: #ede6dc; /* borders                                  */
 
   /* ── Semantic status colors ───────────────────────────────────────── */
-  --color-success: #16a34a;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
+  /* Darker ("700-step") shades, not the more common brighter 600-step —
+     these render as TEXT on a pale ~10%-opacity tint of themselves
+     (badge.tsx and every role="alert"/role="status" banner), and the
+     brighter step measured under 3:1 there, failing WCAG AA outright.
+     These pass at ~4.8–6.5:1 while still reading unmistakably as
+     green/amber/red, and only IMPROVE the white-on-solid-fill usages
+     (badges/buttons using the full-strength color as a background). */
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
 
   /* ── Typography ───────────────────────────────────────────────────── */
   /* The CSS variables --font-roboto / --font-dm-serif are injected by
@@ -59,11 +73,16 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Every keyboard-focused element gets the visible gold ring the
-     accessibility spec requires. Components can layer their own ring on
-     top, but nothing may remove focus visibility. */
+  /* Every keyboard-focused element gets a visible ring the accessibility
+     spec requires. Maroon is the default because nearly every surface in
+     the app is cream/white (maroon clears 10:1+ there; gold only clears
+     ~1.5:1 and fails the 3:1 minimum for a non-text UI indicator). The
+     few elements that sit directly on a maroon/maroon-dark background
+     (marketing hero buttons, footer links) override back to gold
+     per-element — see the CONTRAST RULE note above. Components can layer
+     their own ring color on top, but nothing may remove focus visibility. */
   :focus-visible {
-    outline: 2px solid var(--color-gold);
+    outline: 2px solid var(--color-maroon);
     outline-offset: 2px;
   }
 }

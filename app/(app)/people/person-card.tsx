@@ -28,7 +28,7 @@ export function PersonCard({ person }: { person: PersonSearchResult }) {
         <div className="min-w-0 flex-1">
           <Link
             href={`/profile/${person.id}`}
-            className="font-medium text-ink hover:underline focus-visible:outline-2 focus-visible:outline-gold"
+            className="font-medium text-ink hover:underline focus-visible:outline-2 focus-visible:outline-maroon"
           >
             {person.display_name}
           </Link>

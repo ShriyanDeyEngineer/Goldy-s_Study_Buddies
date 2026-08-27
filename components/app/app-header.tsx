@@ -29,7 +29,7 @@ export function AppHeader({
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link
           href="/dashboard"
-          className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+          className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-maroon"
         >
           <LogoLockup className="text-lg" />
         </Link>

@@ -396,7 +396,7 @@ export function AvailabilityGrid({
                       onKeyDown={(e) => onCellKey(e, id)}
                       className={cn(
                         ROW_H,
-                        "border-b border-l border-line/60 transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold",
+                        "border-b border-l border-line/60 transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon",
                         isHour ? "border-b-line" : "border-b-line/40",
                         shade(count),
                         isMine && "shadow-[inset_0_0_0_2px_var(--color-maroon)]",
