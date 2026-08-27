@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 };
 
 const FOUNDERS = [
-  { name: "Shriyan Dey", role: "Co-founder" },
-  { name: "Angad Virdi", role: "Co-founder" },
-  { name: "Aadi Sharma", role: "Developer" },
-  { name: "Joy Deng", role: "Developer" },
+  { name: "Shriyan Dey", },
+  { name: "Angad Virdi", },
+  { name: "Aadi Sharma", },
+  { name: "Joy Deng" },
 ];
 
 export default function AboutPage() {
@@ -45,7 +45,6 @@ export default function AboutPage() {
             <CardContent className="flex flex-col items-center text-center">
               <Avatar name={founder.name} size="xl" />
               <h3 className="mt-4 font-medium text-ink">{founder.name}</h3>
-              <p className="text-sm text-ink-muted">{founder.role}</p>
             </CardContent>
           </Card>
         ))}
