@@ -177,9 +177,9 @@ export function CreateGroupForm({
                     className="mt-1 accent-maroon"
                   />
                   <span>
-                    <span className="block text-sm font-medium text-ink">Open</span>
+                    <span className="block text-sm font-medium text-ink">Open &#40;Recommended&#41;</span>
                     <span className="block text-sm text-ink-muted">
-                      Anyone in the course joins instantly. Best for getting started fast.
+                      Anyone in the course can join instantly. Best for meeting new people and getting started fast.
                     </span>
                   </span>
                 </label>
@@ -194,7 +194,7 @@ export function CreateGroupForm({
                   <span>
                     <span className="block text-sm font-medium text-ink">Closed</span>
                     <span className="block text-sm text-ink-muted">
-                      People request to join and you approve each one. Best for keeping it small.
+                      People request to join and you approve each one.
                     </span>
                   </span>
                 </label>
