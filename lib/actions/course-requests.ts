@@ -8,7 +8,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { addCourseSchema } from "@/lib/validation/course";
+import { addCourseSchema, courseRequestSchema } from "@/lib/validation/course";
 import { friendlyError } from "@/lib/errors";
 import type { ActionResult } from "@/lib/actions/types";
 
@@ -16,7 +16,7 @@ export async function createCourseRequestAction(
   _prev: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const parsed = addCourseSchema.safeParse({
+  const parsed = courseRequestSchema.safeParse({
     department_code: formData.get("department_code"),
     course_number: formData.get("course_number"),
     course_name: formData.get("course_name"),

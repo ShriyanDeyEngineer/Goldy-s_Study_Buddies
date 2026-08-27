@@ -7,7 +7,7 @@
 import { describe, expect, it } from "vitest";
 import { messageContentSchema } from "@/lib/validation/message";
 import { createGroupSchema } from "@/lib/validation/group";
-import { addCourseSchema } from "@/lib/validation/course";
+import { addCourseSchema, courseRequestSchema } from "@/lib/validation/course";
 import { profileSchema } from "@/lib/validation/profile";
 import { reportSchema } from "@/lib/validation/report";
 
@@ -90,6 +90,34 @@ describe("add-a-course", () => {
       department_code: "CSCI",
       course_number: "1133",
       course_name: "Intro",
+      ...override,
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("course request (student-filed — name is optional here)", () => {
+  it("accepts an empty course name", () => {
+    const result = courseRequestSchema.safeParse({
+      department_code: "csci",
+      course_number: "1133",
+      course_name: "",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.course_name).toBe("");
+  });
+
+  it.each([
+    ["1-letter department", { department_code: "C" }],
+    ["digits in department", { department_code: "CS1" }],
+    ["letters-first number", { course_number: "W1301" }],
+    ["name over 200 characters", { course_name: "x".repeat(201) }],
+  ])("still rejects %s", (_name, override) => {
+    const result = courseRequestSchema.safeParse({
+      department_code: "CSCI",
+      course_number: "1133",
+      course_name: "",
       ...override,
     });
     expect(result.success).toBe(false);

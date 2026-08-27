@@ -84,7 +84,11 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   // ── Courses ──────────────────────────────────────────────────────────
   INVALID_DEPARTMENT: "Department codes look like CSCI or MATH (2–8 letters).",
   INVALID_COURSE_NUMBER: "Course numbers look like 1133 or 1301W.",
+  // Approving a request into the catalog still requires a real name.
   INVALID_COURSE_NAME: "Course names need to be 1–200 characters.",
+  // Filing a request does not — course_name is optional there; this only
+  // fires if someone typed more than the limit.
+  COURSE_NAME_TOO_LONG: "Keep the course name under 200 characters.",
 
   // ── Admin / course requests ──────────────────────────────────────────
   NOT_ADMIN: "Only admins can do that.",
