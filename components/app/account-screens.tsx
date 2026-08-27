@@ -19,14 +19,14 @@ import { LogoLockup } from "@/components/gopher-logo";
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center px-4">
+    <main className="flex min-h-dvh flex-col items-center justify-center px-4">
       <div className="mb-8">
         <LogoLockup />
       </div>
       <Card className="w-full max-w-md">
         <CardContent className="text-center">{children}</CardContent>
       </Card>
-    </div>
+    </main>
   );
 }
 

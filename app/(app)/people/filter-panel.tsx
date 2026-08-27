@@ -238,7 +238,7 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
         type="button"
         onClick={onRemove}
         aria-label={`Remove filter ${label}`}
-        className="rounded-full p-0.5 hover:bg-gold focus-visible:outline-2 focus-visible:outline-maroon"
+        className="rounded-full p-2 hover:bg-gold focus-visible:outline-2 focus-visible:outline-maroon"
       >
         <X aria-hidden className="h-3 w-3" />
       </button>

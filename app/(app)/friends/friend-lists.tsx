@@ -55,7 +55,7 @@ export function FriendLists({
   // still show the pre-action state.
   const busy = running || refreshing;
 
-  async function run(action: () => Promise<{ error?: string }>) {
+  async function run(action: () => Promise<{ error?: string }>, successNote?: string) {
     setRunning(true);
     const { error } = await action();
     setRunning(false);
@@ -63,6 +63,7 @@ export function FriendLists({
       toast.error(error);
       return;
     }
+    if (successNote) toast.success(successNote);
     startRefresh(() => router.refresh());
   }
 
@@ -123,7 +124,7 @@ export function FriendLists({
             <Button
               size="sm"
               loading={busy}
-              onClick={() => run(() => respondFriendRequestAction(request.id, true))}
+              onClick={() => run(() => respondFriendRequestAction(request.id, true), "Friend request accepted.")}
             >
               Accept
             </Button>
@@ -131,7 +132,7 @@ export function FriendLists({
               size="sm"
               variant="outline"
               disabled={busy}
-              onClick={() => run(() => respondFriendRequestAction(request.id, false))}
+              onClick={() => run(() => respondFriendRequestAction(request.id, false), "Request declined.")}
             >
               Decline
             </Button>
@@ -145,7 +146,7 @@ export function FriendLists({
             <Button
               size="sm"
               loading={busy}
-              onClick={() => run(() => respondBuddyRequestAction(request.id, true))}
+              onClick={() => run(() => respondBuddyRequestAction(request.id, true), "Study buddy request accepted.")}
             >
               Accept
             </Button>
@@ -153,7 +154,7 @@ export function FriendLists({
               size="sm"
               variant="outline"
               disabled={busy}
-              onClick={() => run(() => respondBuddyRequestAction(request.id, false))}
+              onClick={() => run(() => respondBuddyRequestAction(request.id, false), "Request declined.")}
             >
               Decline
             </Button>
@@ -171,7 +172,7 @@ export function FriendLists({
               title={`Unfriend ${profiles[id]?.display_name ?? "this person"}?`}
               description="You'll disappear from each other's friend lists. They won't be notified."
               confirmLabel="Unfriend"
-              onConfirm={() => run(() => removeFriendAction(id))}
+              onConfirm={() => run(() => removeFriendAction(id), "Unfriended.")}
             >
               <Button size="sm" variant="ghost" className="text-ink-muted">
                 Unfriend &#62;&#58;&#40;
@@ -191,7 +192,7 @@ export function FriendLists({
               title={`End your buddy connection with ${profiles[id]?.display_name ?? "this person"}?`}
               description="You can reconnect later if you both want to."
               confirmLabel="Disconnect"
-              onConfirm={() => run(() => disconnectBuddyAction(id))}
+              onConfirm={() => run(() => disconnectBuddyAction(id), "Buddy connection ended.")}
             >
               <Button size="sm" variant="ghost" className="text-ink-muted">
                 Disconnect
@@ -209,7 +210,7 @@ export function FriendLists({
               size="sm"
               variant="outline"
               disabled={busy}
-              onClick={() => run(() => cancelFriendRequestAction(request.id))}
+              onClick={() => run(() => cancelFriendRequestAction(request.id), "Request cancelled.")}
             >
               Cancel
             </Button>
@@ -222,7 +223,7 @@ export function FriendLists({
               size="sm"
               variant="outline"
               disabled={busy}
-              onClick={() => run(() => cancelBuddyRequestAction(request.id))}
+              onClick={() => run(() => cancelBuddyRequestAction(request.id), "Request cancelled.")}
             >
               Cancel
             </Button>
@@ -237,7 +238,7 @@ export function FriendLists({
               size="sm"
               variant="outline"
               loading={busy}
-              onClick={() => run(() => unblockUserAction(id))}
+              onClick={() => run(() => unblockUserAction(id), "Unblocked.")}
             >
               Unblock
             </Button>

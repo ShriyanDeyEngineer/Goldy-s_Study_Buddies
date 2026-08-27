@@ -165,6 +165,15 @@ export function NotificationBell({
           }
         >
           <Bell aria-hidden className="h-5 w-5" />
+          {/* The visible badge below is aria-hidden (its info is already
+              in the button's aria-label); this is the actual announcer,
+              so a live arrival is heard even while the bell isn't
+              focused. */}
+          <span aria-live="polite" className="sr-only">
+            {unread > 0
+              ? `${unread} unread notification${unread === 1 ? "" : "s"}`
+              : "No unread notifications"}
+          </span>
           {unread > 0 && (
             <span
               aria-hidden="true"

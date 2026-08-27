@@ -67,8 +67,9 @@ export function RequestReviewForm({
             defaultValue={request.department_code}
             maxLength={8}
             aria-invalid={!!state.fieldErrors?.department_code}
+            aria-describedby={`dept-${request.id}-error`}
           />
-          <FieldError error={state.fieldErrors?.department_code} />
+          <FieldError id={`dept-${request.id}-error`} error={state.fieldErrors?.department_code} />
         </div>
         <div>
           <Label htmlFor={`num-${request.id}`}>Number</Label>
@@ -78,8 +79,9 @@ export function RequestReviewForm({
             defaultValue={request.course_number}
             maxLength={7}
             aria-invalid={!!state.fieldErrors?.course_number}
+            aria-describedby={`num-${request.id}-error`}
           />
-          <FieldError error={state.fieldErrors?.course_number} />
+          <FieldError id={`num-${request.id}-error`} error={state.fieldErrors?.course_number} />
         </div>
         <div>
           <Label htmlFor={`name-${request.id}`}>Course name</Label>
@@ -89,8 +91,9 @@ export function RequestReviewForm({
             defaultValue={request.course_name}
             maxLength={200}
             aria-invalid={!!state.fieldErrors?.course_name}
+            aria-describedby={`name-${request.id}-error`}
           />
-          <FieldError error={state.fieldErrors?.course_name} />
+          <FieldError id={`name-${request.id}-error`} error={state.fieldErrors?.course_name} />
         </div>
       </div>
       {state.error && (

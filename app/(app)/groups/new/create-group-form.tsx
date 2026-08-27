@@ -80,7 +80,7 @@ export function CreateGroupForm({
                 <p className="text-sm font-medium text-ink">The course</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="department_code">Department</Label>
+                    <Label htmlFor="department_code">Department (required)</Label>
                     <Input
                       className="placeholder:opacity-50"
                       id="department_code"
@@ -96,7 +96,7 @@ export function CreateGroupForm({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="course_number">Course number</Label>
+                    <Label htmlFor="course_number">Course number (required)</Label>
                     <Input
                       className="placeholder:opacity-50"
                       id="course_number"
@@ -113,7 +113,7 @@ export function CreateGroupForm({
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="course_name">Course name</Label>
+                  <Label htmlFor="course_name">Course name (required)</Label>
                   <Input
                     className="placeholder:opacity-50"
                     id="course_name"
@@ -129,7 +129,7 @@ export function CreateGroupForm({
             )}
 
             <div>
-              <Label htmlFor="name">Group name</Label>
+              <Label htmlFor="name">Group name (required)</Label>
               <Input
                 className="placeholder:opacity-50"
                 id="name"
@@ -173,6 +173,7 @@ export function CreateGroupForm({
                     name="mode"
                     value="open"
                     defaultChecked
+                    aria-describedby="mode-error"
                     className="mt-1 accent-maroon"
                   />
                   <span>
@@ -183,7 +184,13 @@ export function CreateGroupForm({
                   </span>
                 </label>
                 <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-3 has-checked:border-maroon has-checked:bg-cream/60">
-                  <input type="radio" name="mode" value="closed" className="mt-1 accent-maroon" />
+                  <input
+                    type="radio"
+                    name="mode"
+                    value="closed"
+                    aria-describedby="mode-error"
+                    className="mt-1 accent-maroon"
+                  />
                   <span>
                     <span className="block text-sm font-medium text-ink">Closed</span>
                     <span className="block text-sm text-ink-muted">
@@ -192,7 +199,7 @@ export function CreateGroupForm({
                   </span>
                 </label>
               </div>
-              <FieldError error={state.fieldErrors?.mode} />
+              <FieldError id="mode-error" error={state.fieldErrors?.mode} />
             </fieldset>
 
             {course && classmates.length > 0 && (
@@ -234,7 +241,7 @@ export function CreateGroupForm({
                     a few.
                   </p>
                 )}
-                <FieldError error={state.fieldErrors?.invitee_ids} />
+                <FieldError id="invitee_ids-error" error={state.fieldErrors?.invitee_ids} />
               </fieldset>
             )}
 

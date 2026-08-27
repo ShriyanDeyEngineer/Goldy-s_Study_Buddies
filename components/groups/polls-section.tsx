@@ -84,7 +84,7 @@ export function PollsSection({
   return (
     <div className="border-t border-line pt-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-ink">Availability polls</h3>
+        <h2 className="text-sm font-medium text-ink">Availability polls</h2>
         <NewPollDialog groupId={groupId} />
       </div>
 
@@ -120,7 +120,7 @@ export function PollsSection({
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <h4 className="font-medium text-ink">{poll.title}</h4>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-ink-muted" aria-live="polite">
                     {pluralize(voterCount, "person has", "people have")} responded ·{" "}
                     {pluralize(pollSlots.length, "time slot")}
                   </p>
@@ -132,7 +132,11 @@ export function PollsSection({
                     className="text-ink-muted"
                     onClick={async () => {
                       const { error } = await closeAvailabilityPollAction(poll.id, groupId);
-                      if (error) toast.error(error);
+                      if (error) {
+                        toast.error(error);
+                        return;
+                      }
+                      toast.success("Poll closed.");
                       router.refresh();
                     }}
                   >
@@ -286,7 +290,7 @@ function NewPollDialog({ groupId }: { groupId: string }) {
           <input type="hidden" name="group_id" value={groupId} />
 
           <div>
-            <Label htmlFor="poll-title">What&rsquo;s it for?</Label>
+            <Label htmlFor="poll-title">What&rsquo;s it for? (required)</Label>
             <Input
               id="poll-title"
               name="title"
@@ -362,6 +366,7 @@ function NewPollDialog({ groupId }: { groupId: string }) {
                   value={endHour}
                   onChange={(e) => setEndHour(Number(e.target.value))}
                   aria-invalid={hoursInverted}
+                  aria-describedby="poll-slots-error"
                 >
                   {HOUR_OPTIONS.slice(1).map((h) => (
                     <option key={h} value={h}>
@@ -379,7 +384,7 @@ function NewPollDialog({ groupId }: { groupId: string }) {
               : `${pluralize(dayCount, "day")} × ${hourLabel(startHour)}–${hourLabel(endHour)} = ${pluralize(previewSlots.length, "half-hour slot")}${tooMany ? ` (max ${POLL_SLOTS_MAX})` : ""}`}
           </p>
 
-          <FieldError error={clientError ?? state.fieldErrors?.slots} />
+          <FieldError id="poll-slots-error" error={clientError ?? state.fieldErrors?.slots} />
           {state.error && (
             <p role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
               {state.error}

@@ -115,7 +115,7 @@ export function MeetupFormDialog({
           <input type="hidden" name="scheduled_at" />
 
           <div>
-            <Label htmlFor="meetup-title">Title</Label>
+            <Label htmlFor="meetup-title">Title (required)</Label>
             <Input
               id="meetup-title"
               name="title"
@@ -129,7 +129,7 @@ export function MeetupFormDialog({
           </div>
 
           <div>
-            <Label htmlFor="meetup-when">Date and time (your local time)</Label>
+            <Label htmlFor="meetup-when">Date and time (required, your local time)</Label>
             <Input
               id="meetup-when"
               name="scheduled_at_local"
@@ -183,11 +183,12 @@ export function MeetupFormDialog({
               value={format}
               onChange={(e) => setFormat(e.target.value as "online" | "in_person")}
               aria-invalid={!!state.fieldErrors?.format}
+              aria-describedby="meetup-format-error"
             >
               <option value="in_person">In person</option>
               <option value="online">Online</option>
             </Select>
-            <FieldError error={state.fieldErrors?.format} />
+            <FieldError id="meetup-format-error" error={state.fieldErrors?.format} />
           </div>
 
           {/* Conditional fields — both stay mounted so a typed value

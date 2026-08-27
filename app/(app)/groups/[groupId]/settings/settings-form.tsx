@@ -41,7 +41,7 @@ export function SettingsForm({
             <input type="hidden" name="group_id" value={groupId} />
 
             <div>
-              <Label htmlFor="name">Group name</Label>
+              <Label htmlFor="name">Group name (required)</Label>
               <Input
                 id="name"
                 name="name"
@@ -63,6 +63,7 @@ export function SettingsForm({
                     name="mode"
                     value="open"
                     defaultChecked={currentMode === "open"}
+                    aria-describedby="mode-error"
                     className="mt-1 accent-maroon"
                   />
                   <span>
@@ -87,6 +88,7 @@ export function SettingsForm({
                     name="mode"
                     value="closed"
                     defaultChecked={currentMode === "closed"}
+                    aria-describedby="mode-error"
                     className="mt-1 accent-maroon"
                   />
                   <span>
@@ -97,7 +99,7 @@ export function SettingsForm({
                   </span>
                 </label>
               </div>
-              <FieldError error={state.fieldErrors?.mode} />
+              <FieldError id="mode-error" error={state.fieldErrors?.mode} />
             </fieldset>
 
             {state.error && (

@@ -75,6 +75,7 @@ export function MembersPanel({
       toast.error(error);
       return;
     }
+    toast.success("Request denied.");
     router.refresh();
   }
 
@@ -145,7 +146,7 @@ export function MembersPanel({
               </div>
               {isRowManager && (
                 <span title="Group manager" aria-label="Group manager">
-                  <Crown aria-hidden className="h-4 w-4 text-gold" fill="currentColor" />
+                  <Crown aria-hidden className="h-4 w-4 text-maroon" fill="currentColor" />
                 </span>
               )}
               {/* Manager can remove anyone but themselves (they leave via
@@ -171,7 +172,7 @@ export function MembersPanel({
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 text-ink-muted hover:text-danger"
+                    className="text-ink-muted hover:text-danger"
                     aria-label={`Remove ${memberProfile?.display_name ?? "member"} from group`}
                   >
                     <UserX aria-hidden className="h-4 w-4" />

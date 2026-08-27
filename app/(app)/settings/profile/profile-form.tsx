@@ -72,7 +72,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
           )}
 
           <div>
-            <Label htmlFor="display_name">Display name</Label>
+            <Label htmlFor="display_name">Display name (required)</Label>
             <Input
               id="display_name"
               name="display_name"
@@ -144,6 +144,8 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
                   name="graduation_year"
                   defaultValue={profile.graduation_year ?? ""}
                   aria-label="Graduation year"
+                  aria-invalid={!!state.fieldErrors?.graduation_year}
+                  aria-describedby="graduation_year-error"
                 >
                   <option value="">Year</option>
                   {Array.from(
@@ -156,7 +158,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
                   ))}
                 </Select>
               </div>
-              <FieldError error={state.fieldErrors?.graduation_year} />
+              <FieldError id="graduation_year-error" error={state.fieldErrors?.graduation_year} />
             </div>
           </div>
 
@@ -197,11 +199,12 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
                     }
                     placeholder="https://instagram.com/JaneDoe"
                     aria-label={`Social link ${index + 1}`}
+                    aria-describedby="social_links-error"
                   />
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-9 w-9 shrink-0 text-ink-muted hover:text-danger"
+                    className="shrink-0 text-ink-muted hover:text-danger"
                     aria-label={`Remove social link ${index + 1}`}
                     onClick={() =>
                       setLinks((current) => current.filter((l) => l.id !== link.id))
@@ -228,7 +231,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
                 Add a link
               </Button>
             )}
-            <FieldError error={state.fieldErrors?.social_links} />
+            <FieldError id="social_links-error" error={state.fieldErrors?.social_links} />
           </fieldset>
 
           {state.error && (

@@ -149,16 +149,28 @@ export function UnreadMessagesBadge({
   className?: string;
 }) {
   const count = useUnreadMessages(userId, initial);
-  if (count <= 0) return null;
   return (
-    <span
-      aria-label={`${count} unread ${count === 1 ? "message" : "messages"}`}
-      className={cn(
-        "inline-flex min-w-4.5 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold leading-4.5 text-white",
-        className,
+    <>
+      {/* Always mounted (unlike the visible pill below) so the live
+          region's text actually changes on each update rather than
+          mounting/unmounting, which some screen readers won't announce
+          reliably. */}
+      <span aria-live="polite" className="sr-only">
+        {count > 0
+          ? `${count} unread ${count === 1 ? "message" : "messages"}`
+          : "No unread messages"}
+      </span>
+      {count > 0 && (
+        <span
+          aria-hidden="true"
+          className={cn(
+            "inline-flex min-w-4.5 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold leading-4.5 text-white",
+            className,
+          )}
+        >
+          {count > 99 ? "99+" : count}
+        </span>
       )}
-    >
-      {count > 99 ? "99+" : count}
-    </span>
+    </>
   );
 }

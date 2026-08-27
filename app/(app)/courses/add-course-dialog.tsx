@@ -57,7 +57,7 @@ export function AddCourseDialog({ triggerLabel = "Add a Course" }: { triggerLabe
         <form action={formAction} noValidate className="mt-4 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="request-dept">Department</Label>
+              <Label htmlFor="request-dept">Department (required)</Label>
               <Input
                 id="request-dept"
                 name="department_code"
@@ -70,7 +70,7 @@ export function AddCourseDialog({ triggerLabel = "Add a Course" }: { triggerLabe
               <FieldError id="request-dept-error" error={state.fieldErrors?.department_code} />
             </div>
             <div>
-              <Label htmlFor="request-number">Course number</Label>
+              <Label htmlFor="request-number">Course number (required)</Label>
               <Input
                 id="request-number"
                 name="course_number"
@@ -84,17 +84,13 @@ export function AddCourseDialog({ triggerLabel = "Add a Course" }: { triggerLabe
             </div>
           </div>
           <div>
-            <Label htmlFor="request-name">Course name</Label>
+            <Label htmlFor="request-name">Course name (optional)</Label>
             <Input
               id="request-name"
               name="course_name"
               placeholder="CSE Calculus I"
               maxLength={200}
-              required
-              aria-invalid={!!state.fieldErrors?.course_name}
-              aria-describedby="request-name-error"
             />
-            <FieldError id="request-name-error" error={state.fieldErrors?.course_name} />
           </div>
 
           {state.error && (

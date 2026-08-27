@@ -38,7 +38,10 @@ export function DropdownMenuItem({
     <DropdownPrimitive.Item
       className={cn(
         "flex cursor-pointer select-none items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink outline-none",
-        "data-[highlighted]:bg-cream data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        // bg-cream measured ~1:1 against this menu's bg-surface — invisible
+        // to a keyboard user arrowing through. bg-maroon/text-white (same
+        // treatment as the active nav link) clears 10:1+ instead.
+        "data-[highlighted]:bg-maroon data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className,
       )}
       {...props}

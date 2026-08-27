@@ -55,13 +55,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {/* Hidden until focused — lets a keyboard user jump past the logo,
+          nav links, bell, and avatar menu instead of tabbing through all
+          of it on every single page. */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-maroon focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+      >
+        Skip to main content
+      </a>
       <AppHeader
         profile={typedProfile}
         unreadNotifications={unreadNotifications}
         unreadMessages={unreadMessages}
       />
       {/* pb-20 keeps content clear of the mobile bottom bar. */}
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 md:pb-8">
+      <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 md:pb-8">
         {children}
       </main>
       <MobileNav

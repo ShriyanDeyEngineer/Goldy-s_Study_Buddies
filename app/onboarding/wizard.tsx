@@ -57,6 +57,20 @@ export function OnboardingWizard({
   const [courseQuery, setCourseQuery] = React.useState("");
   const [avatarClientError, setAvatarClientError] = React.useState<string | null>(null);
 
+  // Moving between steps swaps a whole fieldset in place with no
+  // navigation and no visible page change, so a screen-reader user gets
+  // no signal anything happened. Move focus to the new step's heading —
+  // the aria-live wrapper around it (below) announces the new title too.
+  const headingRef = React.useRef<HTMLHeadingElement>(null);
+  const isFirstRender = React.useRef(true);
+  React.useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    headingRef.current?.focus();
+  }, [step]);
+
   // If the server bounced us with field errors, jump to the step that
   // owns the first broken field so the student actually sees it.
   React.useEffect(() => {
@@ -103,9 +117,18 @@ export function OnboardingWizard({
       }}
     >
       {/* Progress header */}
-      <div className="mb-6 text-center">
+      <div className="mb-6 text-center" aria-live="polite">
         <p className="text-sm text-ink-muted">Step {step + 1} of 3</p>
-        <h1 className="mt-1 font-display text-2xl text-ink">{STEP_TITLES[step]}</h1>
+        {/* tabIndex + programmatic focus only — never a Tab stop, so the
+            missing focus-visible ring (outline-none) is intentional here,
+            unlike a normally-tabbable control. */}
+        <h1
+          ref={headingRef}
+          tabIndex={-1}
+          className="mt-1 font-display text-2xl text-ink outline-none"
+        >
+          {STEP_TITLES[step]}
+        </h1>
         <div className="mx-auto mt-3 flex max-w-45 gap-1.5" aria-hidden="true">
           {[0, 1, 2].map((i) => (
             <span
@@ -207,7 +230,13 @@ export function OnboardingWizard({
                       </option>
                     ))}
                   </Select>
-                  <Select name="graduation_year" defaultValue="" aria-label="Graduation year">
+                  <Select
+                    name="graduation_year"
+                    defaultValue=""
+                    aria-label="Graduation year"
+                    aria-invalid={!!state.fieldErrors?.graduation_year}
+                    aria-describedby="graduation_year-error"
+                  >
                     <option value="">Year</option>
                     {Array.from(
                       { length: GRAD_YEAR_MAX - GRAD_YEAR_MIN + 1 },
@@ -221,7 +250,7 @@ export function OnboardingWizard({
                       ))}
                   </Select>
                 </div>
-                <FieldError error={state.fieldErrors?.graduation_year} />
+                <FieldError id="graduation_year-error" error={state.fieldErrors?.graduation_year} />
               </div>
             </div>
           </fieldset>

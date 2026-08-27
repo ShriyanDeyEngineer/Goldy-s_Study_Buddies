@@ -66,7 +66,7 @@ export function ResourcesPanel({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-ink">Resources</h3>
+        <h2 className="text-sm font-medium text-ink">Resources</h2>
         <AddResourceDialog groupId={groupId} />
       </div>
 
@@ -144,6 +144,8 @@ function AddResourceDialog({ groupId }: { groupId: string }) {
   const [open, setOpen] = React.useState(false);
   const [kind, setKind] = React.useState<"note" | "link">("note");
   const router = useRouter();
+  const noteButtonRef = React.useRef<HTMLButtonElement>(null);
+  const linkButtonRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
     if (state.success && open) {
@@ -174,13 +176,29 @@ function AddResourceDialog({ groupId }: { groupId: string }) {
           <input type="hidden" name="kind" value={kind} />
 
           {/* note / link switch */}
-          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Resource type">
+          <div
+            className="grid grid-cols-2 gap-2"
+            role="radiogroup"
+            aria-label="Resource type"
+            onKeyDown={(e) => {
+              // Standard radiogroup arrow-key behavior: move the
+              // selection, don't just move focus (Tab/Enter already
+              // worked without this — this is the roving-tabindex part).
+              if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+              e.preventDefault();
+              const next = kind === "note" ? "link" : "note";
+              setKind(next);
+              (next === "note" ? noteButtonRef : linkButtonRef).current?.focus();
+            }}
+          >
             {(["note", "link"] as const).map((value) => (
               <button
                 key={value}
+                ref={value === "note" ? noteButtonRef : linkButtonRef}
                 type="button"
                 role="radio"
                 aria-checked={kind === value}
+                tabIndex={kind === value ? 0 : -1}
                 onClick={() => setKind(value)}
                 className={cn(
                   "flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium",
@@ -200,7 +218,7 @@ function AddResourceDialog({ groupId }: { groupId: string }) {
           </div>
 
           <div>
-            <Label htmlFor="resource-title">Title</Label>
+            <Label htmlFor="resource-title">Title (required)</Label>
             <Input
               id="resource-title"
               name="title"
@@ -214,7 +232,9 @@ function AddResourceDialog({ groupId }: { groupId: string }) {
           </div>
 
           <div>
-            <Label htmlFor="resource-content">{kind === "note" ? "Note" : "Link"}</Label>
+            <Label htmlFor="resource-content">
+              {kind === "note" ? "Note" : "Link"} (required)
+            </Label>
             {kind === "note" ? (
               <Textarea
                 id="resource-content"

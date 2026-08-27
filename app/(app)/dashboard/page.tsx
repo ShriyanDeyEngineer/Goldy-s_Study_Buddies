@@ -255,15 +255,12 @@ export default async function DashboardPage() {
       </section>
 
       {/* ── 4 + 5. Find people ─────────────────────────────────────────── */}
-      <section aria-labelledby="people-heading">
-        
+      <section aria-label="Find people">
         <div className="mb-4 flex items-center justify-center">
           <Button asChild variant="secondary" size="sm">
             <Link href="/people">Find & Connect with other Students</Link>
           </Button>
         </div>
-
-        
       </section>
     </div>
   );

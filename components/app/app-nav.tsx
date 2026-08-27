@@ -87,7 +87,10 @@ export function MobileNav({ userId, initialUnreadMessages, isAdmin = false }: Na
           aria-current={isActive(pathname, link.href) ? "page" : undefined}
           className={cn(
             "flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon",
-            isActive(pathname, link.href) ? "text-maroon" : "text-ink-muted",
+            // font-semibold is a second, non-color cue for the active tab —
+            // color alone (aria-current covers screen readers, but a
+            // low-vision/colorblind sighted user needs more than hue).
+            isActive(pathname, link.href) ? "font-semibold text-maroon" : "text-ink-muted",
           )}
         >
           {/* relative wrapper so the badge can sit on the icon's corner */}

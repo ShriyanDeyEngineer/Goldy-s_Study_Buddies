@@ -151,7 +151,7 @@ export default async function AdminGroupPage({
                     {nameOf(member.user_id)}
                   </Link>
                   {member.user_id === group.manager_id && (
-                    <Crown aria-label="Manager" className="h-3.5 w-3.5 shrink-0 text-gold" />
+                    <Crown aria-label="Manager" className="h-3.5 w-3.5 shrink-0 text-maroon" />
                   )}
                   <span className="ml-auto shrink-0 text-xs text-ink-muted">
                     joined {formatDistanceToNow(new Date(member.joined_at), { addSuffix: true })}

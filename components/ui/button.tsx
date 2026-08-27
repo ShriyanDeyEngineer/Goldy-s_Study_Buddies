@@ -22,7 +22,7 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  // Base styles shared by every variant. The gold focus ring is an
+  // Base styles shared by every variant. The focus ring is an
   // accessibility requirement — do not remove it.
   "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors " +
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-maroon " +
@@ -40,8 +40,9 @@ const buttonVariants = cva(
         sm: "h-8 px-3 text-sm",
         md: "h-10 px-4 text-sm",
         lg: "h-12 px-6 text-base",
-        /* icon buttons are square; remember to give them an aria-label! */
-        icon: "h-10 w-10",
+        /* icon buttons are square; remember to give them an aria-label!
+           44px clears the common ~44x44 minimum tap-target guideline. */
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: { variant: "primary", size: "md" },
