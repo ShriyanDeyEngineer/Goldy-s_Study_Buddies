@@ -89,7 +89,7 @@ export default async function FriendsPage() {
           description="Added study buddies will show up here."
           action={
             <Button asChild>
-              <Link href="/people">Find people</Link>
+              <Link href="/people">Start Connecting</Link>
             </Button>
           }
         />

@@ -23,8 +23,8 @@ import { UnreadMessagesBadge } from "@/components/app/unread-messages-badge";
 
 const LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/courses", label: "Join/Create Study Groups", icon: GraduationCap },
-  { href: "/people", label: "People", icon: UsersRound },
+  { href: "/courses", label: "Join & Create Study Groups", icon: GraduationCap },
+  { href: "/people", label: "Students", icon: UsersRound },
   { href: "/messages", label: "Messages", icon: MessageSquare },
 ];
 

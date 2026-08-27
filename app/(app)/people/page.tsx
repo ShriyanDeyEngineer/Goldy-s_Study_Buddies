@@ -73,9 +73,9 @@ export default async function PeoplePage({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-display text-3xl text-ink">Find people</h1>
+        <h1 className="font-display text-3xl text-ink">Connect with Your Fellow Students</h1>
         <p className="mt-1 text-ink-muted">
-          Search classmates, filter by course or college, or find a 1-on-1 study buddy.
+          Search classmates, filter by course or college, or find a 1 on 1 study buddy.
         </p>
       </div>
 

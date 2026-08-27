@@ -38,7 +38,7 @@ export default function AboutPage() {
         </p>
       </div>
 
-      <h2 className="mt-14 text-center font-display text-2xl text-ink">The team</h2>
+      <h2 className="mt-14 text-center font-display text-2xl text-ink">The Team</h2>
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {FOUNDERS.map((founder) => (
           <Card key={founder.name}>

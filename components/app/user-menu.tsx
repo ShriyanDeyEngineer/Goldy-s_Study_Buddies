@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LogOut, Settings, ShieldBan, UserRound } from "lucide-react";
+import { LogOut, Settings, UserRound, Users } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
 import { Avatar } from "@/components/ui/avatar";
 import {
@@ -51,7 +51,7 @@ export function UserMenu({
             without this link there was no way to find the unblock action. */}
         <DropdownMenuItem asChild>
           <Link href="/friends">
-            <ShieldBan aria-hidden className="h-4 w-4" />
+            <Users aria-hidden className="h-4 w-4" />
             Friends &amp; Buddies
           </Link>
         </DropdownMenuItem>

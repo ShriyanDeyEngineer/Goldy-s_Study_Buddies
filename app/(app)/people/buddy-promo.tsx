@@ -40,7 +40,7 @@ export function BuddyPromo({ available }: { available: boolean }) {
         <Sparkles aria-hidden className="h-4 w-4" />
         {on
           ? "You're discoverable as a study buddy — classmates can send you buddy requests."
-          : "Turn this on to appear in study-buddy searches and get 1-on-1 partner requests."}
+          : "Turn this on to appear in study-buddy searches and get 1 on 1 partner requests."}
       </p>
       <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm font-medium text-maroon">
         <Switch

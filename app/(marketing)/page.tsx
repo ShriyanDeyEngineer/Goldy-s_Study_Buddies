@@ -23,11 +23,11 @@ const STEPS = [
     body: "Users are verified through UMN and Google SSO. Everyone here is a real student.",
   },
   {
-    title: "Pick your courses",
+    title: "Pick Your Courses",
     body: "Tell us what you're taking — PHYS 1301W, MATH 1371, CSCI 1133, anything. We'll connect you with classmates.",
   },
   {
-    title: "Join or create a group",
+    title: "Join or Create a Group",
     body: "Join an open group instantly, request a closed one, or start your own and invite classmates.",
   },
 ];
@@ -35,32 +35,32 @@ const STEPS = [
 const FEATURES = [
   {
     icon: Users,
-    title: "Groups for your exact course",
+    title: "Groups for Your Exact Course",
     body: "Meet students taking the same courses as you.",
   },
   {
     icon: MessageCircle,
-    title: "Built-in group chat",
-    body: "Real-time chat for efficient planning and studying.",
+    title: "Group Chats",
+    body: "Live chat for efficient planning and studying for each study group.",
   },
   {
     icon: CalendarClock,
-    title: "Meetups that fit your schedule",
+    title: "Meetups that Fit Your Schedule",
     body: "Schedule online or in-person study sessions through the availability poll feature or chat feature and then create a new meeting and directly add it to your Google Calendar with the click of a button.",
   },
   {
     icon: Vote,
-    title: "Find a time that works for your group",
+    title: "Find a Time that Works for Your Group",
     body: "Availability polls show which slot works for the most people — no back-and-forth.",
   },
   {
     icon: Sparkles,
-    title: "Study buddies, 1-on-1",
+    title: "Study Buddies, 1 on 1",
     body: "Turn on the study buddy option to open yourself to pairing up with students sharing your courses.",
   },
   {
     icon: ShieldCheck,
-    title: "Students only, privacy first",
+    title: "Students Only, Privacy First",
     body: "Only verified UMN students have access. You also have blocking controls.",
   },
 ];
@@ -73,22 +73,22 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-20 text-center sm:py-28">
           <GopherLogo className="h-20 w-20 text-gold" />
           <h1 className="max-w-2xl font-display text-4xl leading-tight sm:text-5xl">
-            Find your study buddies
+            Find Your Study Buddies
           </h1>
           <p className="mt-4 max-w-xl text-lg text-white/85">
             Find study partners and join or create study groups for your UMN courses.
-            <span className="font-bold text-gold"> It's free to use</span>, built by students, for students.
+            <span className="font-bold text-gold"> It's FREE to use</span>, built by students, for students.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild variant="secondary" size="lg">
-              <Link href="/register">Get started</Link>
+              <Link href="/register">Get Started</Link>
             </Button>
             <Button
               asChild
               size="lg"
               className="border border-white/40 bg-transparent text-white hover:bg-white/10"
             >
-              <Link href="#how-it-works">See how it works</Link>
+              <Link href="#how-it-works">See How it Works</Link>
             </Button>
           </div>
         </div>
@@ -96,9 +96,9 @@ export default function HomePage() {
 
       {/* ── How it works ─────────────────────────────────────────────── */}
       <section id="how-it-works" className="mx-auto max-w-6xl scroll-mt-8 px-4 py-16 sm:py-20">
-        <h2 className="text-center font-display text-3xl text-ink">How it works</h2>
+        <h2 className="text-center font-display text-3xl text-ink">How it Works</h2>
         <p className="mx-auto mt-2 max-w-md text-center text-ink-muted">
-          Only 3 simple steps between you and your study group.
+          Only 3 Simple Steps Between You and Your Study Group.
         </p>
         <ol className="mt-10 grid gap-6 sm:grid-cols-3">
           {STEPS.map((step, index) => (
@@ -124,7 +124,7 @@ export default function HomePage() {
       <section className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
           <h2 className="text-center font-display text-3xl text-ink">
-            Everything a study group needs
+            Everything a Study Group Needs
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature) => (
@@ -145,13 +145,13 @@ export default function HomePage() {
       {/* ── Closing CTA ──────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16 text-center sm:py-20">
         <h2 className="font-display text-3xl text-ink">
-          Ready to find your study buddies and academic success?
+          Ready to Find Your Study Buddies and Academic Success?
         </h2>
         <p className="mx-auto mt-2 max-w-md text-ink-muted">
           Then click the button below!
         </p>
         <Button asChild size="lg" className="mt-8">
-          <Link href="/register">Find my study buddies!</Link>
+          <Link href="/register">Find My Study Buddies!</Link>
         </Button>
       </section>
     </>

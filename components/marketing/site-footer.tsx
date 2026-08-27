@@ -27,14 +27,14 @@ export function SiteFooter() {
           <ul className="space-y-2">
             <li><Link href="/" className="text-white/80 hover:text-gold">Home</Link></li>
             <li><Link href="/about" className="text-white/80 hover:text-gold">About us</Link></li>
-            <li><Link href="/why" className="text-white/80 hover:text-gold">Why use it</Link></li>
+            <li><Link href="/why" className="text-white/80 hover:text-gold">Why Use it</Link></li>
             <li><Link href="/testimonials" className="text-white/80 hover:text-gold">Testimonials</Link></li>
             <li><Link href="/register" className="text-white/80 hover:text-gold">Sign up</Link></li>
           </ul>
         </nav>
 
         <div className="text-sm">
-          <h2 className="mb-3 font-medium text-gold">The team</h2>
+          <h2 className="mb-3 font-medium text-gold">The Team</h2>
           <p className="text-white/80">{TEAM.join(" · ")}</p>
           <p className="mt-3 text-white/80 font-bold font-['Times_New_Roman']">
             Please send any feedback or report any issues to our email: &#8200;

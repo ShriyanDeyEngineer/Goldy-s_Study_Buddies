@@ -256,54 +256,14 @@ export default async function DashboardPage() {
 
       {/* ── 4 + 5. Find people ─────────────────────────────────────────── */}
       <section aria-labelledby="people-heading">
-        <h2 id="people-heading" className="mb-4 font-display text-xl text-ink">
-          Find people
-        </h2>
-        {/* Plain GET form → /people?q=…; the people page does the search. */}
-        <form action="/people" method="get" className="relative max-w-md">
-          <Search
-            aria-hidden
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
-          />
-          <Input
-            type="search"
-            name="q"
-            placeholder="Search classmates by name…"
-            aria-label="Search people (at least 2 characters)"
-            minLength={SEARCH_MIN_LENGTH}
-            maxLength={SEARCH_MAX_LENGTH}
-            className="pl-9"
-          />
-        </form>
+        
+        <div className="mb-4 flex items-center justify-center">
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/people">Find & Connect with other Students</Link>
+          </Button>
+        </div>
 
-        {suggested.length > 0 && (
-          <>
-            <h3 className="mb-3 mt-6 flex items-center gap-2 text-sm font-medium text-ink-muted">
-              <Sparkles aria-hidden className="h-4 w-4 text-gold" />
-              Suggested for you
-            </h3>
-            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {suggested.map((person) => (
-                <li key={person.id}>
-                  <Link
-                    href={`/profile/${person.id}`}
-                    className="flex flex-col items-center gap-2 rounded-xl border border-line bg-surface p-4 text-center shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-gold"
-                  >
-                    <Avatar src={person.avatar_url} name={person.display_name} size="lg" />
-                    <span className="w-full truncate text-sm font-medium text-ink">
-                      {person.display_name}
-                    </span>
-                    <span className="text-xs text-ink-muted">
-                      {person.shared_courses > 0
-                        ? pluralize(person.shared_courses, "shared class", "shared classes")
-                        : "Same grad year"}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+        
       </section>
     </div>
   );
