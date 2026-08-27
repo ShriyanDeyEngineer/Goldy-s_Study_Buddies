@@ -33,11 +33,11 @@ function Shell({ children }: { children: React.ReactNode }) {
 const LOCKOUT_COPY = {
   banned: {
     title: "Your account has been banned",
-    body: "A review found activity that breaks our community rules, and this account can no longer use Goldy's Study Buddies.",
+    body: "A review found activity that breaks our community rules, and this account can no longer use Goldy's Study Buddies. If you would like to attempt to repeal this ban, please contact the email address on our home page footer.",
   },
   suspended: {
     title: "Your account is suspended",
-    body: "Your account was suspended after a report was reviewed. If you believe this is a mistake, contact the team using the address on our home page footer.",
+    body: "Your account was suspended after a report was reviewed. If you believe this is a mistake, contact the team using the email address on our home page footer.",
   },
   deleted: {
     title: "This account has been deleted",
