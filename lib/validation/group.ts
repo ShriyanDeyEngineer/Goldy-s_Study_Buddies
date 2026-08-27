@@ -83,5 +83,6 @@ export const createGroupWithCourseSchema = z
 export const updateGroupSettingsSchema = z.object({
   group_id: uuid,
   name: groupNameSchema,
+  capacity: capacitySchema,
   mode: groupModeSchema,
 });

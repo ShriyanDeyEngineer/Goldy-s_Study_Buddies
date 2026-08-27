@@ -210,6 +210,7 @@ export async function updateGroupSettingsAction(
   const parsed = updateGroupSettingsSchema.safeParse({
     group_id: formData.get("group_id"),
     name: formData.get("name"),
+    capacity: formData.get("capacity"),
     mode: formData.get("mode"),
   });
   if (!parsed.success) {
@@ -220,12 +221,21 @@ export async function updateGroupSettingsAction(
   const { error } = await supabase.rpc("update_group_settings", {
     p_group_id: parsed.data.group_id,
     p_name: parsed.data.name,
+    p_capacity: parsed.data.capacity,
     p_mode: parsed.data.mode,
   });
   if (error) {
     const message = friendlyError(error);
     if (String(error.message).includes("NAME_TAKEN")) {
       return { fieldErrors: { name: [message] } };
+    }
+    // Below-current-membership and out-of-range both belong on the
+    // capacity field specifically, same reasoning as NAME_TAKEN above.
+    if (
+      String(error.message).includes("CAPACITY_BELOW_MEMBER_COUNT") ||
+      String(error.message).includes("INVALID_CAPACITY")
+    ) {
+      return { fieldErrors: { capacity: [message] } };
     }
     return { error: message };
   }

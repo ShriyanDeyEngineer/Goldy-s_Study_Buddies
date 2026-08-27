@@ -51,6 +51,8 @@ export default async function GroupSettingsPage({
       <SettingsForm
         groupId={group.id}
         currentName={group.name}
+        currentCapacity={group.capacity}
+        currentMemberCount={group.member_count}
         currentMode={group.mode}
         pendingNote={group.mode === "closed"}
       />

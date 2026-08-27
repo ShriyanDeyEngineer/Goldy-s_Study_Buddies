@@ -8,30 +8,40 @@
  */
 "use client";
 
+import * as React from "react";
 import { useActionState } from "react";
 import { toast } from "sonner";
 import { disbandGroupAction, updateGroupSettingsAction } from "@/lib/actions/groups";
-import { GROUP_NAME_MAX } from "@/lib/constants";
+import { GROUP_CAPACITY_MAX, GROUP_CAPACITY_MIN, GROUP_NAME_MAX } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TypedConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FieldError } from "@/components/ui/field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { pluralize } from "@/lib/utils";
 
 export function SettingsForm({
   groupId,
   currentName,
+  currentCapacity,
+  currentMemberCount,
   currentMode,
   pendingNote,
 }: {
   groupId: string;
   currentName: string;
+  currentCapacity: number;
+  /** The DB won't let capacity drop below this — checked here too, for an
+   *  immediate message instead of a round trip. */
+  currentMemberCount: number;
   currentMode: "open" | "closed";
   /** True when the group is currently closed (may have queued requests). */
   pendingNote: boolean;
 }) {
   const [state, formAction, pending] = useActionState(updateGroupSettingsAction, {});
+  const [capacity, setCapacity] = React.useState(currentCapacity);
+  const belowMemberCount = capacity < currentMemberCount;
 
   return (
     <div className="space-y-6">
@@ -52,6 +62,32 @@ export function SettingsForm({
                 aria-describedby="name-error"
               />
               <FieldError id="name-error" error={state.fieldErrors?.name} />
+            </div>
+
+            <div>
+              <Label htmlFor="capacity">Size limit</Label>
+              <Input
+                id="capacity"
+                name="capacity"
+                type="number"
+                min={GROUP_CAPACITY_MIN}
+                max={GROUP_CAPACITY_MAX}
+                value={capacity}
+                onChange={(e) => setCapacity(Number(e.target.value))}
+                aria-invalid={!!state.fieldErrors?.capacity || belowMemberCount}
+                aria-describedby="capacity-help capacity-error"
+              />
+              <p id="capacity-help" className="mt-1 text-xs text-ink-muted">
+                Between {GROUP_CAPACITY_MIN} and {GROUP_CAPACITY_MAX} people, you
+                included — {pluralize(currentMemberCount, "member")} right now.
+              </p>
+              {belowMemberCount && (
+                <p role="alert" className="mt-1.5 text-sm text-danger">
+                  The group already has {pluralize(currentMemberCount, "member")} —
+                  pick {currentMemberCount} or higher.
+                </p>
+              )}
+              <FieldError id="capacity-error" error={state.fieldErrors?.capacity} />
             </div>
 
             <fieldset>
@@ -113,7 +149,7 @@ export function SettingsForm({
               </p>
             )}
 
-            <Button type="submit" loading={pending}>
+            <Button type="submit" loading={pending} disabled={belowMemberCount}>
               Save changes
             </Button>
           </form>
