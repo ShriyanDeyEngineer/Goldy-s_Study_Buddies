@@ -30,6 +30,7 @@ describe("group creation", () => {
     return createGroupSchema.safeParse({
       course_id: UUID,
       name: "Problem Set Crew",
+      description: "",
       capacity: 8,
       mode: "open",
       invitee_ids: [],
@@ -53,6 +54,12 @@ describe("group creation", () => {
     expect(group({ name: "x".repeat(100) }).success).toBe(true);
     expect(group({ name: "" }).success).toBe(false);
     expect(group({ name: "x".repeat(101) }).success).toBe(false);
+  });
+
+  it("description is optional; 2000 passes, 2001 fails", () => {
+    expect(group({ description: "" }).success).toBe(true);
+    expect(group({ description: "x".repeat(2000) }).success).toBe(true);
+    expect(group({ description: "x".repeat(2001) }).success).toBe(false);
   });
 
   it("caps invitations at capacity − 1 (creator takes a seat)", () => {

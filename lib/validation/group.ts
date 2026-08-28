@@ -7,10 +7,11 @@
  * the server actions typed, trusted input.
  */
 import { z } from "zod";
-import { containsProfanity, PROFANITY_NAME_MESSAGE } from "@/lib/profanity";
+import { containsProfanity, PROFANITY_NAME_MESSAGE, PROFANITY_TEXT_MESSAGE } from "@/lib/profanity";
 import {
   GROUP_CAPACITY_MAX,
   GROUP_CAPACITY_MIN,
+  GROUP_DESCRIPTION_MAX,
   GROUP_NAME_MAX,
 } from "@/lib/constants";
 
@@ -22,6 +23,13 @@ export const groupNameSchema = z
   .min(1, "Give your group a name.")
   .max(GROUP_NAME_MAX, `Group names max out at ${GROUP_NAME_MAX} characters.`)
   .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE);
+
+/** Optional — same "empty is fine, just cap the length" shape as bio. */
+export const groupDescriptionSchema = z
+  .string()
+  .trim()
+  .max(GROUP_DESCRIPTION_MAX, `Keep the description under ${GROUP_DESCRIPTION_MAX} characters.`)
+  .refine((v) => !containsProfanity(v), PROFANITY_TEXT_MESSAGE);
 
 export const capacitySchema = z.coerce
   .number({ invalid_type_error: "Capacity must be a number." })
@@ -37,6 +45,7 @@ export const createGroupSchema = z
   .object({
     course_id: uuid,
     name: groupNameSchema,
+    description: groupDescriptionSchema,
     capacity: capacitySchema,
     mode: groupModeSchema,
     invitee_ids: z.array(uuid).default([]),
@@ -76,6 +85,7 @@ export const createGroupWithCourseSchema = z
       .max(200, "Keep the course name under 200 characters.")
       .refine((v) => !containsProfanity(v), PROFANITY_NAME_MESSAGE),
     name: groupNameSchema,
+    description: groupDescriptionSchema,
     capacity: capacitySchema,
     mode: groupModeSchema,
   });
@@ -83,6 +93,7 @@ export const createGroupWithCourseSchema = z
 export const updateGroupSettingsSchema = z.object({
   group_id: uuid,
   name: groupNameSchema,
+  description: groupDescriptionSchema,
   capacity: capacitySchema,
   mode: groupModeSchema,
 });

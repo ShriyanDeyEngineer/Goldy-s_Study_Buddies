@@ -51,6 +51,7 @@ export default async function GroupSettingsPage({
       <SettingsForm
         groupId={group.id}
         currentName={group.name}
+        currentDescription={group.description}
         currentCapacity={group.capacity}
         currentMemberCount={group.member_count}
         currentMode={group.mode}

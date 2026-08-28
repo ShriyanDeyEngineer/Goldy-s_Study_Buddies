@@ -17,6 +17,7 @@ import {
   GROUP_CAPACITY_DEFAULT,
   GROUP_CAPACITY_MAX,
   GROUP_CAPACITY_MIN,
+  GROUP_DESCRIPTION_MAX,
   GROUP_NAME_MAX,
 } from "@/lib/constants";
 import type { PublicProfile } from "@/lib/types";
@@ -27,6 +28,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FieldError } from "@/components/ui/field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { AddCourseDialog } from "../../courses/add-course-dialog";
 
 
@@ -141,6 +143,23 @@ export function CreateGroupForm({
                 aria-describedby="name-error"
               />
               <FieldError id="name-error" error={state.fieldErrors?.name} />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Group description (optional)</Label>
+              <Textarea
+                id="description"
+                name="description"
+                rows={3}
+                maxLength={GROUP_DESCRIPTION_MAX}
+                placeholder="What this group is about, when you usually meet, what to bring…"
+                aria-invalid={!!state.fieldErrors?.description}
+                aria-describedby="description-help description-error"
+              />
+              <p id="description-help" className="mt-1 text-xs text-ink-muted">
+                Up to {GROUP_DESCRIPTION_MAX} characters. Shows on the group&rsquo;s page.
+              </p>
+              <FieldError id="description-error" error={state.fieldErrors?.description} />
             </div>
 
             <div>

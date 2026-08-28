@@ -30,6 +30,7 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   DUPLICATE_REQUEST: "You already have a pending request.",
   NO_PENDING_REQUEST: "There's no pending request to withdraw.",
   INVALID_NAME: "Group names need to be 1–100 characters.",
+  INVALID_DESCRIPTION: "Keep the description under 2000 characters.",
   INVALID_CAPACITY: "Capacity must be between 2 and 50.",
   CAPACITY_BELOW_MEMBER_COUNT:
     "Capacity can't be lower than the group's current member count.",

@@ -58,6 +58,7 @@ export interface StudyGroupRow {
   id: string;
   course_id: string;
   name: string;
+  description: string | null;
   manager_id: string;
   mode: "open" | "closed";
   capacity: number;

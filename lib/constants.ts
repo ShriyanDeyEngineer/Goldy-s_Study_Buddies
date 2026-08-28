@@ -51,6 +51,7 @@ export const GROUP_CAPACITY_MIN = 2;
 export const GROUP_CAPACITY_MAX = 50;
 export const GROUP_CAPACITY_DEFAULT = 8;
 export const GROUP_NAME_MAX = 100;
+export const GROUP_DESCRIPTION_MAX = 2000;
 
 /** Chat and DMs share one limit (spec §5.8/§5.12). */
 export const MESSAGE_MAX_LENGTH = 2000;

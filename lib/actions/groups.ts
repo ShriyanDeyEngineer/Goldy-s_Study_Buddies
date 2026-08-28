@@ -26,6 +26,7 @@ export async function createGroupAction(
   const parsed = createGroupSchema.safeParse({
     course_id: formData.get("course_id"),
     name: formData.get("name"),
+    description: formData.get("description"),
     capacity: formData.get("capacity"),
     mode: formData.get("mode"),
     invitee_ids: formData.getAll("invitee_ids").map(String),
@@ -38,16 +39,21 @@ export async function createGroupAction(
   const { data: groupId, error } = await supabase.rpc("create_study_group", {
     p_course_id: parsed.data.course_id,
     p_name: parsed.data.name,
+    p_description: parsed.data.description,
     p_capacity: parsed.data.capacity,
     p_mode: parsed.data.mode,
     p_invitee_ids: parsed.data.invitee_ids,
   });
   if (error) {
-    // NAME_TAKEN belongs on the name field specifically (inline, per-field
-    // errors are a §5.6 requirement); everything else is form-level.
+    // NAME_TAKEN and INVALID_DESCRIPTION belong on their own fields
+    // (inline, per-field errors are a §5.6 requirement); everything else
+    // is form-level.
     const message = friendlyError(error);
     if (String(error.message).includes("NAME_TAKEN")) {
       return { fieldErrors: { name: [message] } };
+    }
+    if (String(error.message).includes("INVALID_DESCRIPTION")) {
+      return { fieldErrors: { description: [message] } };
     }
     return { error: message };
   }
@@ -70,6 +76,7 @@ export async function createGroupWithCourseAction(
     course_number: formData.get("course_number"),
     course_name: formData.get("course_name"),
     name: formData.get("name"),
+    description: formData.get("description"),
     capacity: formData.get("capacity"),
     mode: formData.get("mode"),
   });
@@ -101,6 +108,7 @@ export async function createGroupWithCourseAction(
   const { data: groupId, error } = await supabase.rpc("create_study_group", {
     p_course_id: courseId,
     p_name: parsed.data.name,
+    p_description: parsed.data.description,
     p_capacity: parsed.data.capacity,
     p_mode: parsed.data.mode,
     p_invitee_ids: [],
@@ -109,6 +117,9 @@ export async function createGroupWithCourseAction(
     const message = friendlyError(error);
     if (String(error.message).includes("NAME_TAKEN")) {
       return { fieldErrors: { name: [message] } };
+    }
+    if (String(error.message).includes("INVALID_DESCRIPTION")) {
+      return { fieldErrors: { description: [message] } };
     }
     return { error: message };
   }
@@ -210,6 +221,7 @@ export async function updateGroupSettingsAction(
   const parsed = updateGroupSettingsSchema.safeParse({
     group_id: formData.get("group_id"),
     name: formData.get("name"),
+    description: formData.get("description"),
     capacity: formData.get("capacity"),
     mode: formData.get("mode"),
   });
@@ -221,6 +233,7 @@ export async function updateGroupSettingsAction(
   const { error } = await supabase.rpc("update_group_settings", {
     p_group_id: parsed.data.group_id,
     p_name: parsed.data.name,
+    p_description: parsed.data.description,
     p_capacity: parsed.data.capacity,
     p_mode: parsed.data.mode,
   });
@@ -228,6 +241,9 @@ export async function updateGroupSettingsAction(
     const message = friendlyError(error);
     if (String(error.message).includes("NAME_TAKEN")) {
       return { fieldErrors: { name: [message] } };
+    }
+    if (String(error.message).includes("INVALID_DESCRIPTION")) {
+      return { fieldErrors: { description: [message] } };
     }
     // Below-current-membership and out-of-range both belong on the
     // capacity field specifically, same reasoning as NAME_TAKEN above.

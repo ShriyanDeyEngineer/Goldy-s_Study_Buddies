@@ -12,18 +12,25 @@ import * as React from "react";
 import { useActionState } from "react";
 import { toast } from "sonner";
 import { disbandGroupAction, updateGroupSettingsAction } from "@/lib/actions/groups";
-import { GROUP_CAPACITY_MAX, GROUP_CAPACITY_MIN, GROUP_NAME_MAX } from "@/lib/constants";
+import {
+  GROUP_CAPACITY_MAX,
+  GROUP_CAPACITY_MIN,
+  GROUP_DESCRIPTION_MAX,
+  GROUP_NAME_MAX,
+} from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TypedConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FieldError } from "@/components/ui/field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { pluralize } from "@/lib/utils";
 
 export function SettingsForm({
   groupId,
   currentName,
+  currentDescription,
   currentCapacity,
   currentMemberCount,
   currentMode,
@@ -31,6 +38,7 @@ export function SettingsForm({
 }: {
   groupId: string;
   currentName: string;
+  currentDescription: string | null;
   currentCapacity: number;
   /** The DB won't let capacity drop below this — checked here too, for an
    *  immediate message instead of a round trip. */
@@ -62,6 +70,24 @@ export function SettingsForm({
                 aria-describedby="name-error"
               />
               <FieldError id="name-error" error={state.fieldErrors?.name} />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Group description (optional)</Label>
+              <Textarea
+                id="description"
+                name="description"
+                rows={3}
+                defaultValue={currentDescription ?? ""}
+                maxLength={GROUP_DESCRIPTION_MAX}
+                placeholder="What this group is about, when you usually meet, what to bring…"
+                aria-invalid={!!state.fieldErrors?.description}
+                aria-describedby="description-help description-error"
+              />
+              <p id="description-help" className="mt-1 text-xs text-ink-muted">
+                Up to {GROUP_DESCRIPTION_MAX} characters. Shows on the group&rsquo;s page.
+              </p>
+              <FieldError id="description-error" error={state.fieldErrors?.description} />
             </div>
 
             <div>
