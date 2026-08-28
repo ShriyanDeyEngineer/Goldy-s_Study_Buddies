@@ -1,5 +1,3 @@
-# Goldy's Study Buddies
-
 Never study alone at the U again. A website for University of Minnesota
 students to find study partners and create or join study groups for their
 specific courses — built by students, for students, with the big intro
@@ -7,10 +5,7 @@ STEM courses (physics, chem, calc, intro CS) front and center.
 
 **Not officially affiliated with the University of Minnesota.**
 
-## Contributors
-ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), & joydeng-code (Joy Deng).
-
-## What it does
+## What this website does
 
 - **Verified UMN accounts, Google-only** — one button: "Continue with
   UMN Google". No passwords to forget, no verification emails to chase.
