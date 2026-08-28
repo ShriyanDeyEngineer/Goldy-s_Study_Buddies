@@ -177,7 +177,7 @@ export default function TermsPage() {
 
             <h2 className="font-display text-2xl text-ink text-left">11. Changes to These Terms</h2>
                 <p className="mt-4 text-ink-muted text-left">
-                    We may update these Terms from time to time. Material changes will be reflected by updating the "Last Updated" date above and, where appropriate, posted as a notice on the Service. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.
+                    We may update these Terms from time to time. Material changes will be reflected by updating the "Last Updated" date above. You will see when these terms have been updated when you are logging in or signing up. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.
                 </p>
 
             <br></br>

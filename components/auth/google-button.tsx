@@ -77,7 +77,7 @@ export function GoogleButton({
           >
             Terms of Service
           </Link>
-          ,{" "}
+          {" "}&#40;Last Updated: 8/19/26&#41;,{" "}
           <Link
             href="/privacy_policy"
             target="_self"
@@ -86,7 +86,7 @@ export function GoogleButton({
           >
             Privacy Policy
           </Link>
-          , and{" "}
+          {" "}&#40;Last Updated: 8/19/26&#41;, and{" "}
           <Link
             href="/communityRulesGuidelines"
             target="_self"
@@ -95,7 +95,7 @@ export function GoogleButton({
           >
             Community Guidelines
           </Link>
-          .
+          {" "}&#40;Last Updated: 8/28/26&#41;.
         </label>
       </div>
 
