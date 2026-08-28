@@ -5,8 +5,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms & Conditions",
   description:
-    "The legal materials.",
+    "More legal materials.",
 };
+
+const CONTACT_EMAIL = "goldysstudybuddies@gmail.com";
 
 export default function TermsPage() {
   return (
@@ -23,7 +25,7 @@ export default function TermsPage() {
                 Please read these Terms of Service "Terms" carefully before using Goldy's Study Buddies &#40;the "Service"&#41;. <span className="font-bold">BY CREATING AN ACCOUNT OR OTHERWISE ACCESSING THE SERVICE, YOU AGREE TO BE BOUND BY THESE TERMS. IF YOU DO NOT AGREE, DO NOT USE THE SERVICE.</span>
             </p>
             <p className="mt-4 text-ink-muted text-left">
-                These Terms should be read together with our &#91;Privacy Policy&#93;, which explains how we collect and use your information.
+                These Terms should be read together with our <a target="_self" href="/privacy_policy" className="text-blue-500 font-bold">Privacy Policy</a>, which explains how we collect and use your information.
             </p>
 
             <br></br>
@@ -193,8 +195,9 @@ export default function TermsPage() {
             <p className="mt-4 text-ink-muted text-left">
                 If you have any questions about these Terms, please contact us through our email:
             </p>
-            <p className="mt-4 text-ink-muted text-left font-bold">goldysstudybuddies@gmail.com</p>
-
+            <a href={`mailto:${CONTACT_EMAIL}`} className="mt-4 text-blue-500 text-left font-bold">
+              {CONTACT_EMAIL}
+            </a>
         </div>
     </div>
   );

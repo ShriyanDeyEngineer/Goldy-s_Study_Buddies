@@ -32,6 +32,7 @@ export function SiteFooter() {
             <li><Link href="/about" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">About us</Link></li>
             <li><Link href="/why" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Why Use it</Link></li>
             <li><Link href="/testimonials" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Testimonials</Link></li>
+            <li><Link href="/communityRulesGuidelines" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Community Guidelines</Link></li>
             <li><Link href="/register" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Sign up</Link></li>
           </ul>
         </nav>

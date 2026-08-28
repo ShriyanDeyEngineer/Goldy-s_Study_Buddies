@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     "How Goldy's Study Buddies collects, uses, and protects your information.",
 };
 
+const CONTACT_EMAIL = "goldysstudybuddies@gmail.com";
+
 export default function PrivacyPolicyPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 font-['Times_New_Roman']">
@@ -223,7 +225,7 @@ export default function PrivacyPolicyPage() {
                     - <span className="font-bold">Correct</span> inaccurate profile or account information.
                 </p>
                 <p className="mt-2 text-ink-muted text-left">
-                    - <span className="font-bold">Delete</span> your account and associated data at any time &#40;see Section 6&#41; To exercise any of these rights, email us at the address listed in Section 11 with your request and the university email associated with your account. We will respond within &#91;insert timeframe, e.g. "30 days"&#93;.
+                    - <span className="font-bold">Delete</span> your account and associated data at any time &#40;see Section 6&#41; To exercise any of these rights, email us at the address listed in Section 11 with your request and the university email associated with your account. We will respond within 30 days.
                 </p>
 
 
@@ -253,8 +255,9 @@ export default function PrivacyPolicyPage() {
             <p className="mt-4 text-ink-muted text-left">
                 If you have any questions, concerns, or requests regarding this Privacy Policy or your data, please contact us through our email:
             </p>
-            <p className="mt-4 text-ink-muted text-left font-bold">goldysstudybuddies@gmail.com</p>
-        
+            <a href={`mailto:${CONTACT_EMAIL}`} className="mt-4 text-blue-500 text-left font-bold">
+              {CONTACT_EMAIL}
+            </a>
         </div>
     </div>
   );
