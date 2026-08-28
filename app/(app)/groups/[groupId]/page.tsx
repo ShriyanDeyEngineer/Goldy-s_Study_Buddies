@@ -14,6 +14,7 @@
 import { notFound } from "next/navigation";
 import { getSessionProfile } from "@/lib/supabase/server";
 import { getJoinState } from "@/lib/groups/join-state";
+import { CHAT_PAGE_SIZE } from "@/lib/constants";
 import {
   courseCode,
   type AvailabilityPollRow,
@@ -179,11 +180,16 @@ export default async function GroupPage({
   // Everything the three panels need, fetched in parallel.
   const [messagesRes, membersRes, meetupsRes, pollsRes, resourcesRes, requestsRes] =
     await Promise.all([
+      // Most recent page only — an old, active group's chat could run to
+      // thousands of rows, and this query (plus its RLS check) re-runs on
+      // every member's every page load and every post-action refresh.
+      // GroupChat loads further history itself, on demand.
       supabase
         .from("group_messages")
         .select("*")
         .eq("group_id", groupId)
-        .order("created_at", { ascending: true }),
+        .order("created_at", { ascending: false })
+        .limit(CHAT_PAGE_SIZE),
       supabase
         .from("study_group_members")
         .select("*")
@@ -219,7 +225,9 @@ export default async function GroupPage({
         : Promise.resolve({ data: [] }),
     ]);
 
-  const messages = (messagesRes.data ?? []) as GroupMessageRow[];
+  // Fetched newest-first (for the .limit() above) — flip back to
+  // chronological order for display.
+  const messages = ((messagesRes.data ?? []) as GroupMessageRow[]).reverse();
   const members = (membersRes.data ?? []) as GroupMemberRow[];
   const meetups = (meetupsRes.data ?? []) as MeetupRow[];
   const polls = (pollsRes.data ?? []) as AvailabilityPollRow[];
@@ -297,6 +305,7 @@ export default async function GroupPage({
           groupId={group.id}
           currentUserId={profile.id}
           initialMessages={messages}
+          initialHasMore={messages.length === CHAT_PAGE_SIZE}
           initialProfiles={profilesById}
         />
         <MeetupsPanel

@@ -56,6 +56,12 @@ export const GROUP_DESCRIPTION_MAX = 2000;
 /** Chat and DMs share one limit (spec §5.8/§5.12). */
 export const MESSAGE_MAX_LENGTH = 2000;
 
+/** Group chat and DM threads load this many messages at a time — the
+ *  initial view, and each "load earlier" page after it. Keeps a single
+ *  fetch bounded no matter how long-lived or busy the conversation is,
+ *  instead of pulling the entire history on every page load. */
+export const CHAT_PAGE_SIZE = 50;
+
 /** Profiles (spec §5.11). */
 export const BIO_MAX_LENGTH = 500;
 export const DISPLAY_NAME_MAX = 50;

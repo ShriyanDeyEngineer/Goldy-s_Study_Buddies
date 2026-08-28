@@ -6,6 +6,7 @@
 import { notFound } from "next/navigation";
 import { getSessionProfile } from "@/lib/supabase/server";
 import { markThreadReadAction } from "@/lib/actions/messages";
+import { CHAT_PAGE_SIZE } from "@/lib/constants";
 import type { DirectMessageRow, PublicProfile } from "@/lib/types";
 import { DmThread } from "./dm-thread";
 
@@ -30,6 +31,9 @@ export default async function DmThreadPage({
   // this thread — even when there was nothing unread to mark.
   const [otherRes, messagesRes] = await Promise.all([
     supabase.from("public_profiles").select("*").eq("id", userId).maybeSingle(),
+    // Most recent page only — two people's ENTIRE history otherwise
+    // reloads in full every time either one opens the thread. DmThread
+    // loads further-back history itself, on demand.
     supabase
       .from("direct_messages")
       .select("*")
@@ -37,7 +41,8 @@ export default async function DmThreadPage({
         `and(sender_id.eq.${profile.id},recipient_id.eq.${userId}),` +
           `and(sender_id.eq.${userId},recipient_id.eq.${profile.id})`,
       )
-      .order("created_at", { ascending: true }),
+      .order("created_at", { ascending: false })
+      .limit(CHAT_PAGE_SIZE),
     // Opening the thread clears its unread badge (spec §5.12).
     markThreadReadAction(userId),
   ]);
@@ -45,11 +50,16 @@ export default async function DmThreadPage({
   const other = otherRes.data as PublicProfile | null;
   if (!other) notFound(); // gone or suspended
 
+  // Fetched newest-first (for the .limit() above) — flip back to
+  // chronological order for display.
+  const messages = ((messagesRes.data ?? []) as DirectMessageRow[]).reverse();
+
   return (
     <DmThread
       currentUserId={profile.id}
       other={other}
-      initialMessages={(messagesRes.data ?? []) as DirectMessageRow[]}
+      initialMessages={messages}
+      initialHasMore={messages.length === CHAT_PAGE_SIZE}
     />
   );
 }

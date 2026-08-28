@@ -18,7 +18,7 @@ import {
   markThreadReadAction,
   sendDirectMessageAction,
 } from "@/lib/actions/messages";
-import { MESSAGE_MAX_LENGTH } from "@/lib/constants";
+import { CHAT_PAGE_SIZE, MESSAGE_MAX_LENGTH } from "@/lib/constants";
 import { censorProfanity } from "@/lib/profanity";
 import type { DirectMessageRow, PublicProfile } from "@/lib/types";
 import { Avatar } from "@/components/ui/avatar";
@@ -30,16 +30,26 @@ export function DmThread({
   currentUserId,
   other,
   initialMessages,
+  initialHasMore,
 }: {
   currentUserId: string;
   other: PublicProfile;
   initialMessages: DirectMessageRow[];
+  /** Whether the server's initial fetch filled a whole page — a hint,
+   *  not a guarantee, that older history exists (see loadOlder below). */
+  initialHasMore: boolean;
 }) {
   const [messages, setMessages] = React.useState<DirectMessageRow[]>(initialMessages);
   const [draft, setDraft] = React.useState("");
   const [sending, setSending] = React.useState(false);
+  const [hasMore, setHasMore] = React.useState(initialHasMore);
+  const [loadingOlder, setLoadingOlder] = React.useState(false);
   const seenIds = React.useRef(new Set(initialMessages.map((m) => m.id)));
   const listRef = React.useRef<HTMLDivElement>(null);
+  // Set right before an older-history prepend so the auto-scroll effect
+  // below skips scrolling to the bottom for it — that's for new incoming
+  // messages, not history just loaded above the fold.
+  const prependingOlder = React.useRef(false);
 
   const overLimit = draft.length > MESSAGE_MAX_LENGTH;
   const empty = draft.trim().length === 0;
@@ -80,11 +90,62 @@ export function DmThread({
     };
   }, [currentUserId, appendMessage]);
 
-  // Keep the newest message in view.
+  // Keep the newest message in view — unless this change was an
+  // older-history prepend, which loadOlder handles its own scroll
+  // position for.
   React.useEffect(() => {
     const el = listRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    if (prependingOlder.current) {
+      prependingOlder.current = false;
+      return;
+    }
+    el.scrollTop = el.scrollHeight;
   }, [messages]);
+
+  /** Fetches the page of messages just before the oldest one currently
+   *  loaded (client-side, RLS-scoped — same read the initial server fetch
+   *  does, just further back), and prepends it without disturbing scroll
+   *  position. */
+  async function loadOlder() {
+    const el = listRef.current;
+    const oldest = messages[0];
+    if (!el || !oldest || loadingOlder || !hasMore) return;
+
+    setLoadingOlder(true);
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("direct_messages")
+      .select("*")
+      .or(
+        `and(sender_id.eq.${currentUserId},recipient_id.eq.${other.id}),` +
+          `and(sender_id.eq.${other.id},recipient_id.eq.${currentUserId})`,
+      )
+      .lt("created_at", oldest.created_at)
+      .order("created_at", { ascending: false })
+      .limit(CHAT_PAGE_SIZE);
+    setLoadingOlder(false);
+
+    if (error) {
+      toast.error("Couldn't load earlier messages.");
+      return;
+    }
+
+    const older = ((data ?? []) as DirectMessageRow[]).reverse();
+    if (older.length < CHAT_PAGE_SIZE) setHasMore(false);
+    if (older.length === 0) return;
+
+    older.forEach((m) => seenIds.current.add(m.id));
+    const prevScrollHeight = el.scrollHeight;
+    const prevScrollTop = el.scrollTop;
+    prependingOlder.current = true;
+    setMessages((current) => [...older, ...current]);
+    // Restore scroll position once the DOM has grown upward, so the
+    // messages the reader was looking at don't jump.
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight - prevScrollHeight + prevScrollTop;
+    });
+  }
 
   async function send() {
     if (empty || overLimit || sending) return;
@@ -137,7 +198,22 @@ export function DmThread({
             This is the very start of your conversation. Even a &ldquo;hey&rdquo; works.
           </p>
         ) : (
-          messages.map((message, index) => {
+          <>
+            <div className="mb-2 flex justify-center">
+              {hasMore ? (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => void loadOlder()}
+                  loading={loadingOlder}
+                >
+                  Load earlier messages
+                </Button>
+              ) : (
+                <p className="text-xs text-ink-muted">Beginning of the conversation</p>
+              )}
+            </div>
+            {messages.map((message, index) => {
             const prev = messages[index - 1];
             const mine = message.sender_id === currentUserId;
             const showDateSeparator =
@@ -171,7 +247,8 @@ export function DmThread({
                 </div>
               </React.Fragment>
             );
-          })
+            })}
+          </>
         )}
       </div>
 
