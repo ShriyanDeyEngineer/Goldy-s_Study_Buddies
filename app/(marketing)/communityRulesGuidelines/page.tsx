@@ -109,10 +109,6 @@ export default function CommunityRulesGuidelinesPage() {
                 <p className="mt-4 text-ink-muted text-left">
                   These guidelines may change as the platform grows and changes. You will see when these rules have been updated when you are logging in or signing up. If something here is unclear, if you think one of these rules is wrong, or if you need to reach us about something that does not fit neatly into a report, email us at:
                 </p>
-
-            <br></br>
-            <br></br>
-
             <a href={`mailto:${CONTACT_EMAIL}`} className="mt-4 text-blue-500 text-left font-bold">
               {CONTACT_EMAIL}
             </a>
