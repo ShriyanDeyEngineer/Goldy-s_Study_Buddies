@@ -39,20 +39,25 @@ export default async function CoursesPage({
   // The whole catalog + group counts in two queries, filtered in code:
   // at university scale this is a few hundred rows, and doing the search
   // here keeps "match code OR number OR name" trivially readable.
-  const [coursesRes, groupsRes] = await Promise.all([
+  const [coursesRes, groupsRes, courseGeneralRes] = await Promise.all([
     supabase
       .from("courses")
       .select("*")
       .eq("is_active", true)
+      .neq("department_code", "GENERAL")
       .order("department_code")
       .order("course_number"),
     // One scan for both counters: the open groups are a subset of the
     // active ones, so asking twice scanned the same table twice.
     supabase.from("study_groups").select("course_id, mode").eq("status", "active"),
+
+    // Extract the data for the general course from supabase
+    supabase.from("courses").select("*").eq("is_active", true).eq("department_code", "GENERAL").order("department_code").order("course_number"),
   ]);
 
   const groupCounts = new Map<string, number>();
   const joinableGroupCounts = new Map<string, number>();
+
   for (const row of groupsRes.data ?? []) {
     groupCounts.set(row.course_id, (groupCounts.get(row.course_id) ?? 0) + 1);
     if (row.mode === "open") {
@@ -66,6 +71,20 @@ export default async function CoursesPage({
   const allCourses = (coursesRes.data ?? []) as CourseRow[];
   const departments = [...new Set(allCourses.map((c) => c.department_code))].sort();
 
+  const courseGeneral = (courseGeneralRes.data ?? []) as CourseRow[];
+  const courseGeneralID = courseGeneral.at(0)?.id;
+  const courseGeneralDeptCode = courseGeneral.at(0)?.department_code;
+  const courseGeneralCourseNum = courseGeneral.at(0)?.course_number;
+  const courseGeneralName = courseGeneral.at(0)?.course_name;
+  let courseGeneralGroupCount;
+  let courseGeneralJoinableGroupCount;
+
+  if(typeof(courseGeneralID) == "string")
+  {
+    courseGeneralGroupCount = groupCounts.get(courseGeneralID) ?? 0;
+    courseGeneralJoinableGroupCount = joinableGroupCounts.get(courseGeneralID) ?? 0;
+  }
+  
   const courses = allCourses.filter((course) => {
     if (deptFilter && course.department_code !== deptFilter) return false;
     if (collegeFilter && collegeForDepartment(course.department_code) !== collegeFilter)
@@ -77,7 +96,7 @@ export default async function CoursesPage({
     }
     return true;
   });
-
+  
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -126,7 +145,36 @@ export default async function CoursesPage({
           Apply Selected Search Filters
         </Button>
       </form>
+      
+      <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+          <li key={courseGeneralID}>
+            <Link href={`/courses/${courseGeneralID}`} className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon">
+              <span className="min-w-0">
+                <span className="font-bold text-ink text-l">{courseGeneralDeptCode + " " + courseGeneralCourseNum}</span>
+                <span className="ml-2 truncate text-sm text-ink-muted">
+                    {courseGeneralName}
+                </span>
+              </span>
+              {typeof courseGeneralGroupCount === "number" &&
+              typeof courseGeneralJoinableGroupCount === "number" && (
+              <span
+                className={
+                  courseGeneralGroupCount > 0
+                    ? "shrink-0 rounded-full bg-gold-light px-2.5 py-1 text-xs font-medium text-maroon"
+                    : "shrink-0 text-xs text-ink-muted"
+                }
+              >
+                {courseGeneralGroupCount > 0
+                  ? pluralize(courseGeneralGroupCount, "Group") + " || " + courseGeneralJoinableGroupCount + " Joinable"
+                  : "No groups yet"}
+              </span>
+            )}
+            </Link>
+          </li>
+      </ul>
 
+      <br></br>
+        
       {courses.length === 0 ? (
         <EmptyState
           title="No courses match"
