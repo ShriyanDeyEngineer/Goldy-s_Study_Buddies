@@ -146,6 +146,7 @@ export default async function CoursesPage({
         </Button>
       </form>
       
+      {/** Create an element that sits above the rest of the course catalog to hold the general "course" which is not part of the courses list that can be filtered */}
       <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
           <li key={courseGeneralID}>
             <Link href={`/courses/${courseGeneralID}`} className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-cream focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-maroon">
