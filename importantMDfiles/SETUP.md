@@ -52,14 +52,65 @@ it. If you ever want it anyway: `brew install libpq` and add its `bin`
 to your PATH.
 
 **Option B — SQL editor (no CLI):** open the dashboard's **SQL Editor**
-and run each file's contents in order: `0001` → `0010`, then `seed.sql`.
-Every file is idempotent — running one twice is harmless.
+and run each file's contents in order: `0001` → the highest number, then
+`seed.sql`. Every file is idempotent — running one twice is harmless.
+
+> ⚠️ **Option B is for the FIRST run against an EMPTY database only.** It
+> does not record anything in `supabase_migrations.schema_migrations`, so
+> the CLI has no idea those files ran. After the initial setup, **never
+> hand-paste a migration into a live database again** — see "Ongoing
+> changes" below. Hand-pasting 0023–0031 is what stranded the migration
+> history at 0022, forced a manual `migration repair` to catch it up, and
+> hid a bug in 0029 that `db push` + a local `db reset` test would have
+> caught before launch (fixed in 0032).
 
 ### Verify
 
 Dashboard → **Table Editor**: you should see `universities` (1 row),
 `courses` (~45 rows), `profiles` (empty), and friends. **Database →
 Functions** should list `join_group`, `approve_join_request`, etc.
+
+If you set the database up with Option B, tell the CLI those files are
+already applied so future pushes don't try to re-run them:
+
+```bash
+npx supabase link --project-ref YOUR-PROJECT-REF
+npx supabase migration list                 # local vs remote, side by side
+npx supabase migration repair --status applied 0001 0002 …   # every file you pasted
+```
+
+### Ongoing changes (after launch)
+
+The migration history on the live database must always match
+`supabase/migrations/`. The only supported way to change the live schema:
+
+```bash
+# 1. write supabase/migrations/NNNN_name.sql on a branch, test it locally
+npx supabase db reset          # replays every migration + seed on the local stack
+npm test && psql "$LOCAL_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/invariants.sql
+
+# 2. open a PR, merge to main
+
+# 3. immediately after the merge, from an up-to-date main:
+git checkout main && git pull
+npx supabase db push           # applies ONLY the new file(s), records them
+
+# 4. confirm remote == local
+npx supabase migration list    # no rows should be "local only" or "remote only"
+```
+
+Rules:
+
+- **One change = one new migration file.** Never edit a migration that has
+  already been pushed — write a new one that alters the previous state.
+- **`db push` after every merge that adds a migration**, before anyone
+  relies on the new schema. Vercel deploys the app on merge; the database
+  does *not* update itself.
+- **Never run migration SQL in the dashboard SQL Editor** against a
+  database the CLI manages. If you must inspect or hot-fix by hand, write
+  it up as a migration file afterward and `migration repair` the history.
+- If `db push` reports drift, stop and reconcile with `migration list` +
+  `migration repair` — do not force past it.
 
 ## 3. Auth settings (dashboard → Authentication)
 
