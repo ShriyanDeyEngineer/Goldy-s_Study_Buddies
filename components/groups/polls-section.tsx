@@ -75,11 +75,16 @@ export function PollsSection({
   const openPolls = polls.filter((p) => p.status === "open");
 
   // Other members' painting appears live (RLS: this table = group members).
-  // availability_votes carries no group_id to filter on, so every vote in
-  // ANY of your groups wakes this subscription — and each wake re-renders
-  // this whole group page. Subscribing only when a poll is actually open
-  // means groups without a live poll stop paying for other groups' votes.
-  useLiveRefresh({ table: "availability_votes", enabled: openPolls.length > 0 });
+  // availability_votes now carries a group_id (migration 0029), so this
+  // filters server-side to just this group — a vote in someone else's
+  // group no longer wakes this subscription at all. Also still gated to
+  // "only while a poll is actually open", so groups with no live poll pay
+  // nothing either way.
+  useLiveRefresh({
+    table: "availability_votes",
+    filter: `group_id=eq.${groupId}`,
+    enabled: openPolls.length > 0,
+  });
 
   return (
     <div className="border-t border-line pt-4">

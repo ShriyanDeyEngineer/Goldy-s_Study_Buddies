@@ -68,6 +68,7 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   // ── Messages ─────────────────────────────────────────────────────────
   EMPTY_MESSAGE: "Type a message first.",
   MESSAGE_TOO_LONG: "Messages max out at 2,000 characters.",
+  RATE_LIMITED: "You're sending messages too fast — wait a few seconds and try again.",
 
   // ── People ───────────────────────────────────────────────────────────
   USER_NOT_FOUND: "We couldn't find that person.",

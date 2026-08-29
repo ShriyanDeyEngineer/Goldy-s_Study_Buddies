@@ -12,8 +12,8 @@
  */
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { courseCode, type CourseRow } from "@/lib/types";
+import { getCourseCatalog } from "@/lib/data/course-catalog";
+import { courseCode } from "@/lib/types";
 import { collegeForDepartment } from "@/lib/courses";
 import { COLLEGES } from "@/lib/constants";
 import { pluralize } from "@/lib/utils";
@@ -35,30 +35,17 @@ export default async function CoursesPage({
   const deptFilter = (params.dept ?? "").trim().toUpperCase();
   const collegeFilter = (params.college ?? "").trim().toLowerCase();
 
-  const supabase = await createClient();
-  // The whole catalog + group counts in two queries, filtered in code:
-  // at university scale this is a few hundred rows, and doing the search
-  // here keeps "match code OR number OR name" trivially readable.
-  const [coursesRes, groupsRes, courseGeneralRes] = await Promise.all([
-    supabase
-      .from("courses")
-      .select("*")
-      .eq("is_active", true)
-      .neq("department_code", "GENERAL")
-      .order("department_code")
-      .order("course_number"),
-    // One scan for both counters: the open groups are a subset of the
-    // active ones, so asking twice scanned the same table twice.
-    supabase.from("study_groups").select("course_id, mode").eq("status", "active"),
-
-    // Extract the data for the general course from supabase
-    supabase.from("courses").select("*").eq("is_active", true).eq("department_code", "GENERAL").order("department_code").order("course_number"),
-  ]);
+  // The whole catalog + group counts, cached — this data is identical for
+  // every student (see lib/data/course-catalog.ts), so it's fetched once
+  // and shared across requests/users instead of re-querying Postgres on
+  // every single /courses visit. Search/department/college filtering
+  // still happens here in code on the (cached) result.
+  const { courses: allActiveCourses, groupRows } = await getCourseCatalog();
 
   const groupCounts = new Map<string, number>();
   const joinableGroupCounts = new Map<string, number>();
 
-  for (const row of groupsRes.data ?? []) {
+  for (const row of groupRows) {
     groupCounts.set(row.course_id, (groupCounts.get(row.course_id) ?? 0) + 1);
     if (row.mode === "open") {
       joinableGroupCounts.set(
@@ -68,14 +55,14 @@ export default async function CoursesPage({
     }
   }
 
-  const allCourses = (coursesRes.data ?? []) as CourseRow[];
+  const courseGeneral = allActiveCourses.find((c) => c.department_code === "GENERAL") ?? null;
+  const allCourses = allActiveCourses.filter((c) => c.department_code !== "GENERAL");
   const departments = [...new Set(allCourses.map((c) => c.department_code))].sort();
 
-  const courseGeneral = (courseGeneralRes.data ?? []) as CourseRow[];
-  const courseGeneralID = courseGeneral.at(0)?.id;
-  const courseGeneralDeptCode = courseGeneral.at(0)?.department_code;
-  const courseGeneralCourseNum = courseGeneral.at(0)?.course_number;
-  const courseGeneralName = courseGeneral.at(0)?.course_name;
+  const courseGeneralID = courseGeneral?.id;
+  const courseGeneralDeptCode = courseGeneral?.department_code;
+  const courseGeneralCourseNum = courseGeneral?.course_number;
+  const courseGeneralName = courseGeneral?.course_name;
   let courseGeneralGroupCount;
   let courseGeneralJoinableGroupCount;
 
@@ -84,7 +71,7 @@ export default async function CoursesPage({
     courseGeneralGroupCount = groupCounts.get(courseGeneralID) ?? 0;
     courseGeneralJoinableGroupCount = joinableGroupCounts.get(courseGeneralID) ?? 0;
   }
-  
+
   const courses = allCourses.filter((course) => {
     if (deptFilter && course.department_code !== deptFilter) return false;
     if (collegeFilter && collegeForDepartment(course.department_code) !== collegeFilter)

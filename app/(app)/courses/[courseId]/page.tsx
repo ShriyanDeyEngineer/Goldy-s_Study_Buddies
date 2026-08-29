@@ -11,7 +11,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Plus, Users } from "lucide-react";
 import { getSessionProfile } from "@/lib/supabase/server";
-import { courseCode, type CourseRow, type StudyGroupRow } from "@/lib/types";
+import { getCourseWithGroups } from "@/lib/data/course-catalog";
+import { courseCode } from "@/lib/types";
 import { getJoinState } from "@/lib/groups/join-state";
 import { JoinButton } from "@/components/groups/join-button";
 import { Badge } from "@/components/ui/badge";
@@ -42,14 +43,12 @@ export default async function CourseDetailPage({
   const { supabase, profile } = await getSessionProfile();
   if (!profile) return null;
   
-  const [courseRes, groupsRes, membershipRes, requestsRes] = await Promise.all([
-    supabase.from("courses").select("*").eq("id", courseId).maybeSingle(),
-    supabase
-      .from("study_groups")
-      .select("*")
-      .eq("course_id", courseId)
-      .eq("status", "active")
-      .order("created_at", { ascending: true }),
+  // Course + its active groups are identical for every viewer, so they're
+  // cached (lib/data/course-catalog.ts) instead of re-querying Postgres on
+  // every visit; only the caller's OWN membership/pending-request state
+  // is genuinely per-user and stays on the normal request-scoped client.
+  const [{ course, groups }, membershipRes, requestsRes] = await Promise.all([
+    getCourseWithGroups(courseId),
     supabase.from("study_group_members").select("group_id").eq("user_id", profile.id),
     supabase
       .from("join_requests")
@@ -58,10 +57,8 @@ export default async function CourseDetailPage({
       .eq("status", "pending"),
   ]);
 
-  const course = courseRes.data as CourseRow | null;
   if (!course) notFound();
 
-  const groups = (groupsRes.data ?? []) as StudyGroupRow[];
   const myGroupIds = new Set((membershipRes.data ?? []).map((m) => m.group_id as string));
   const myPendingIds = new Set((requestsRes.data ?? []).map((r) => r.group_id as string));
 

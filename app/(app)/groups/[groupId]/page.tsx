@@ -237,25 +237,11 @@ export default async function GroupPage({
   // Attendance + poll details depend on the ids we just fetched.
   const meetupIds = meetups.map((m) => m.id);
   const pollIds = polls.map((p) => p.id);
-  const [attendanceRes, slotsRes] = await Promise.all([
-    meetupIds.length
-      ? supabase.from("meetup_attendance").select("*").in("meetup_id", meetupIds)
-      : Promise.resolve({ data: [] }),
-    pollIds.length
-      ? supabase.from("availability_slots").select("*").in("poll_id", pollIds)
-      : Promise.resolve({ data: [] }),
-  ]);
-  const attendance = (attendanceRes.data ?? []) as MeetupAttendanceRow[];
-  const slots = (slotsRes.data ?? []) as AvailabilitySlotRow[];
-
-  const slotIds = slots.map((s) => s.id);
-  const votesRes = slotIds.length
-    ? await supabase.from("availability_votes").select("*").in("slot_id", slotIds)
-    : { data: [] };
-  const votes = (votesRes.data ?? []) as { slot_id: string; user_id: string }[];
-
   // One name/avatar lookup for everyone who appears anywhere on the page
-  // (members, message senders who might have left, requesters).
+  // (members, message senders who might have left, requesters). Batched
+  // alongside attendance/slots below rather than after them — it depends
+  // on none of the three, so awaiting it separately just added a needless
+  // sequential round trip to every group-page load.
   const everyoneIds = [
     ...new Set([
       ...members.map((m) => m.user_id),
@@ -264,11 +250,29 @@ export default async function GroupPage({
       ...resources.map((r) => r.author_id),
     ]),
   ];
-  const profilesRes = everyoneIds.length
-    ? await supabase.from("public_profiles").select("*").in("id", everyoneIds)
-    : { data: [] };
+  const [attendanceRes, slotsRes, profilesRes] = await Promise.all([
+    meetupIds.length
+      ? supabase.from("meetup_attendance").select("*").in("meetup_id", meetupIds)
+      : Promise.resolve({ data: [] }),
+    pollIds.length
+      ? supabase.from("availability_slots").select("*").in("poll_id", pollIds)
+      : Promise.resolve({ data: [] }),
+    everyoneIds.length
+      ? supabase.from("public_profiles").select("*").in("id", everyoneIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const attendance = (attendanceRes.data ?? []) as MeetupAttendanceRow[];
+  const slots = (slotsRes.data ?? []) as AvailabilitySlotRow[];
   const profileList = (profilesRes.data ?? []) as PublicProfile[];
   const profilesById = Object.fromEntries(profileList.map((p) => [p.id, p]));
+
+  // Genuinely sequential: which slots exist depends on the poll ids above,
+  // and which votes exist depends on the slot ids from THIS query.
+  const slotIds = slots.map((s) => s.id);
+  const votesRes = slotIds.length
+    ? await supabase.from("availability_votes").select("*").in("slot_id", slotIds)
+    : { data: [] };
+  const votes = (votesRes.data ?? []) as { slot_id: string; user_id: string }[];
 
   return (
     <div>

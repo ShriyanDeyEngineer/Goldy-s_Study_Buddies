@@ -6,10 +6,11 @@
  */
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { addCourseSchema, courseRequestSchema } from "@/lib/validation/course";
 import { friendlyError } from "@/lib/errors";
+import { COURSE_CATALOG_TAG } from "@/lib/data/course-catalog";
 import type { ActionResult } from "@/lib/actions/types";
 
 export async function createCourseRequestAction(
@@ -62,6 +63,8 @@ export async function approveCourseRequestAction(
   });
   if (error) return { error: friendlyError(error) };
 
+  // A brand-new course just entered the catalog.
+  revalidateTag(COURSE_CATALOG_TAG);
   revalidatePath("/admin/requests");
   return { success: "Approved — the course is in the catalog and the student was notified." };
 }

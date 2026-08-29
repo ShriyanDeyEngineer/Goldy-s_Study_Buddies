@@ -9,7 +9,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
   createGroupSchema,
@@ -17,6 +17,7 @@ import {
   updateGroupSettingsSchema,
 } from "@/lib/validation/group";
 import { friendlyError } from "@/lib/errors";
+import { COURSE_CATALOG_TAG } from "@/lib/data/course-catalog";
 import type { ActionResult } from "@/lib/actions/types";
 
 export async function createGroupAction(
@@ -58,6 +59,8 @@ export async function createGroupAction(
     return { error: message };
   }
 
+  // A new active group changes this course's group count on the catalog.
+  revalidateTag(COURSE_CATALOG_TAG);
   redirect(`/groups/${groupId}`);
 }
 
@@ -124,6 +127,8 @@ export async function createGroupWithCourseAction(
     return { error: message };
   }
 
+  // New course AND a new active group in it — both change the catalog.
+  revalidateTag(COURSE_CATALOG_TAG);
   redirect(`/groups/${groupId}`);
 }
 
@@ -197,6 +202,9 @@ export async function leaveGroupAction(groupId: string): Promise<{ error?: strin
   if (error) return { error: friendlyError(error) };
   // The group page is now the non-member preview; dashboard loses a card.
   revalidatePath(`/groups/${groupId}`);
+  // Rare, but the last member leaving auto-disbands the group (0016),
+  // which drops it from the catalog's active-group count.
+  revalidateTag(COURSE_CATALOG_TAG);
   redirect("/dashboard");
 }
 
@@ -256,6 +264,9 @@ export async function updateGroupSettingsAction(
     return { error: message };
   }
 
+  // Mode can flip open⇄closed here, which changes the catalog's "joinable"
+  // count for this course even though the group count itself didn't move.
+  revalidateTag(COURSE_CATALOG_TAG);
   revalidatePath(`/groups/${parsed.data.group_id}`);
   return { success: "Settings saved." };
 }
@@ -264,5 +275,7 @@ export async function disbandGroupAction(groupId: string): Promise<{ error?: str
   const supabase = await createClient();
   const { error } = await supabase.rpc("disband_group", { p_group_id: groupId });
   if (error) return { error: friendlyError(error) };
+  // The group drops out of every course's active-group count.
+  revalidateTag(COURSE_CATALOG_TAG);
   redirect("/dashboard");
 }
