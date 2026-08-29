@@ -62,6 +62,15 @@ export const MESSAGE_MAX_LENGTH = 2000;
  *  instead of pulling the entire history on every page load. */
 export const CHAT_PAGE_SIZE = 50;
 
+/** Group resources (shared notes + links) load newest-first, capped here.
+ *  There is no "load older" for resources — this ceiling sits far above
+ *  any realistic group's count, so it only ever bounds the pathological
+ *  case (years of accumulation, scripted inserts). The group page and its
+ *  RLS check re-run this query on every member's every visit and every
+ *  post-action refresh, so it cannot be left unbounded. If a real group
+ *  ever hits this, that is the signal to paginate it like the chat. */
+export const GROUP_RESOURCES_LIMIT = 200;
+
 /** Profiles (spec §5.11). */
 export const BIO_MAX_LENGTH = 500;
 export const DISPLAY_NAME_MAX = 50;

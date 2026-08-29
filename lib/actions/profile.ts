@@ -57,11 +57,15 @@ async function uploadAvatar(
   const kind = sniffImageType(bytes);
   if (!kind) return { url: null, error: AVATAR_ERROR };
 
-  // Timestamped name (not a fixed "avatar.png") so browsers can cache
-  // aggressively — a new upload is a new URL, no stale-cache ghosts.
+  // Timestamped name (not a fixed "avatar.png"): a new upload is a new URL,
+  // so the file at any given URL never changes. That immutability is what
+  // lets us set a one-year immutable cache-control below — without it,
+  // Storage's 1-hour default meant every avatar in every list/chat
+  // re-validated against Storage each hour for no reason.
   const path = `${userId}/avatar-${Date.now()}.${kind === "jpeg" ? "jpg" : "png"}`;
   const { error } = await supabase.storage.from("avatars").upload(path, bytes, {
     contentType: kind === "jpeg" ? "image/jpeg" : "image/png",
+    cacheControl: "31536000, immutable",
     upsert: true,
   });
   if (error) return { url: null, error: friendlyError(error) };

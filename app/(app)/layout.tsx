@@ -37,21 +37,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
   if (!typedProfile.display_name) redirect("/onboarding");
 
-  // Initial unread counts for the bell and the Messages badge. Fetched in
-  // parallel, once, here — see AppHeader's header comment for why.
-  const [notificationsRes, messagesRes] = await Promise.all([
-    supabase
-      .from("notifications")
-      .select("id", { count: "exact", head: true })
-      .is("read_at", null),
-    supabase
-      .from("direct_messages")
-      .select("id", { count: "exact", head: true })
-      .eq("recipient_id", typedProfile.id)
-      .eq("is_read", false),
-  ]);
-  const unreadNotifications = notificationsRes.count ?? 0;
-  const unreadMessages = messagesRes.count ?? 0;
+  // Initial unread counts for the bell and the Messages badge. One RPC
+  // (0034) rather than two separate COUNT requests — this layout re-runs
+  // on every navigation and every router.refresh(), so halving its request
+  // count matters under concurrent load. See AppHeader's header comment for
+  // why the counts are fetched here at all.
+  const { data: countRows } = await supabase.rpc("get_unread_counts");
+  const counts = (countRows?.[0] ?? null) as
+    | { unread_notifications: number; unread_messages: number }
+    | null;
+  const unreadNotifications = counts?.unread_notifications ?? 0;
+  const unreadMessages = counts?.unread_messages ?? 0;
 
   return (
     <div className="flex min-h-dvh flex-col">

@@ -18,6 +18,7 @@ import {
   type PublicProfile,
   type StudyGroupRow,
 } from "@/lib/types";
+import { GROUP_RESOURCES_LIMIT } from "@/lib/constants";
 import { adminPersonLabel } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
@@ -69,7 +70,8 @@ export default async function AdminGroupPage({
       .from("group_resources")
       .select("*")
       .eq("group_id", groupId)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .limit(GROUP_RESOURCES_LIMIT),
   ]);
   const messages = ((messagesRes.data ?? []) as GroupMessageRow[]).reverse();
   const members = (membersRes.data ?? []) as GroupMemberRow[];

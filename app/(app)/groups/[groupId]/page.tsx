@@ -14,7 +14,7 @@
 import { notFound } from "next/navigation";
 import { getSessionProfile } from "@/lib/supabase/server";
 import { getJoinState } from "@/lib/groups/join-state";
-import { CHAT_PAGE_SIZE } from "@/lib/constants";
+import { CHAT_PAGE_SIZE, GROUP_RESOURCES_LIMIT } from "@/lib/constants";
 import {
   courseCode,
   type AvailabilityPollRow,
@@ -214,7 +214,8 @@ export default async function GroupPage({
         .from("group_resources")
         .select("*")
         .eq("group_id", groupId)
-        .order("created_at", { ascending: false }),
+        .order("created_at", { ascending: false })
+        .limit(GROUP_RESOURCES_LIMIT),
       isManager
         ? supabase
             .from("join_requests")
