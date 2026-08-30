@@ -149,10 +149,14 @@ export function DmThread({
 
   async function send() {
     if (empty || overLimit || sending) return;
-    // Same masking the server applies, so the optimistic echo is honest.
-    const content = censorProfanity(draft);
+    // Send the RAW text: the database censors authoritatively and logs the
+    // pre-censorship original to the flagged-message log — it can only do
+    // that if it receives the original. Mask locally only for the
+    // optimistic echo, which mirrors the server filter (lib/profanity.ts).
+    const raw = draft;
+    const echo = censorProfanity(raw);
     setSending(true);
-    const { message, error } = await sendDirectMessageAction(other.id, content);
+    const { message, error } = await sendDirectMessageAction(other.id, raw);
     setSending(false);
     if (error) {
       toast.error(error);
@@ -164,7 +168,7 @@ export function DmThread({
         id: message.id,
         sender_id: currentUserId,
         recipient_id: other.id,
-        content,
+        content: echo,
         is_read: false,
         created_at: message.created_at,
       });

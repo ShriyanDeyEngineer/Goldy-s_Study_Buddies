@@ -191,11 +191,15 @@ export function GroupChat({
 
   async function send() {
     if (empty || overLimit || sending) return;
-    // Mask cuss words locally so the optimistic echo matches what the
-    // server stores (the database masks again — lib/profanity.ts).
-    const content = censorProfanity(draft);
+    // Send the RAW text: the database is the authoritative censor, and it
+    // can only log the pre-censorship original to the flagged-message log
+    // if it actually receives it. Mask locally only for the optimistic
+    // echo, so what the sender sees matches what everyone else receives
+    // (lib/profanity.ts mirrors the SQL filter).
+    const raw = draft;
+    const echo = censorProfanity(raw);
     setSending(true);
-    const { message, error } = await sendGroupMessageAction(groupId, content);
+    const { message, error } = await sendGroupMessageAction(groupId, raw);
     setSending(false);
     if (error) {
       toast.error(error);
@@ -209,7 +213,7 @@ export function GroupChat({
         id: message.id,
         group_id: groupId,
         sender_id: currentUserId,
-        content,
+        content: echo,
         created_at: message.created_at,
       });
     }
