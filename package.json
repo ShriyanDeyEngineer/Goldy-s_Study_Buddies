@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "Find study partners and study groups for your University of Minnesota courses.",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

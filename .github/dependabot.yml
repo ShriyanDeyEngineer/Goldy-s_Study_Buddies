@@ -1,0 +1,25 @@
+# Dependency updates for a volunteer team: batch the low-risk stuff into
+# one PR a week, keep majors separate so they get a deliberate review.
+# See docs/MAINTENANCE.md §8.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      # One combined PR for every patch/minor bump — merge behind green CI.
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    # Major bumps still open as individual PRs (Next, React, Supabase, etc.).
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

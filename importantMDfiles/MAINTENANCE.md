@@ -67,14 +67,16 @@ Rules, no exceptions:
 
 ## 3. Phase 0 — set this up once before the plan can run
 
-The project currently has **no monitoring, no CI, and no automated dependency
-updates**. Until these exist, "the system tells you when something is wrong"
-isn't true. This is a one-time backlog, roughly a day of work, split up:
+Until these exist, "the system tells you when something is wrong" isn't
+true. This is a one-time backlog, roughly a day of work, split up. The
+repo-side pieces are done (2026-08-31); the rest are dashboard toggles on
+GitHub, Vercel, Supabase, and Sentry that need an account owner.
 
-- [ ] **CI** — add `.github/workflows/ci.yml` running `npm run typecheck`,
-      `npm test`, and `npm run build` on every PR and every push to `main`.
-      (The README already claims CI runs these; it doesn't yet.)
-- [ ] **Branch protection** on `main` — require CI green + 1 review.
+- [x] **CI** — `.github/workflows/ci.yml` runs `npm run typecheck`,
+      `npm test`, and `npm run build` on every PR and every push to `main`,
+      on the Node version in `.nvmrc`.
+- [ ] **Branch protection** on `main` — GitHub → Settings → Branches:
+      require the `verify` check green + 1 review before merge.
 - [ ] **Uptime monitor** — UptimeRobot or Better Stack (free tier). `GET /`
       every 5 min; alert to the team chat **and** the Caretaker's phone.
 - [ ] **Error tracking** — Sentry (free tier). Add the Next.js SDK; alert on
@@ -85,13 +87,16 @@ isn't true. This is a one-time backlog, roughly a day of work, split up:
 - [ ] **Supabase alerts** — turn on the project-pause warning email and the
       weekly usage email; make sure they go to the shared inbox, not one
       student.
-- [ ] **Dependabot** — add `.github/dependabot.yml` (npm ecosystem, weekly).
-      Enable Dependabot **security alerts** under the repo's
+- [x] **Dependabot** — `.github/dependabot.yml` groups weekly patch/minor
+      npm bumps into one PR; majors and GitHub Actions come separately.
+      Still to do: enable Dependabot **security alerts** under GitHub →
       Settings → Code security.
-- [ ] **Pin Node** — add `.nvmrc` and an `"engines"` field to `package.json`;
-      set the same major version in Vercel's project settings and in CI.
-- [ ] **`LICENSE`** — pick one, or add an explicit "all rights reserved,
-      not for reuse" note. There is currently nothing.
+- [x] **Pin Node** — `.nvmrc` (currently `22`) plus an `"engines"` floor in
+      `package.json`; CI reads `.nvmrc`. Still to do: set Node 22.x in
+      Vercel → Settings → Build so production matches.
+- [x] **`LICENSE.md`** — source-available, all-rights-reserved (public for
+      hosting and collaboration, no licence to reuse or run). Revisit if the
+      project ever takes funding or an institutional relationship.
 - [ ] **Real contact address** — replace the placeholder
       `team@goldysstudybuddies.example` in
       `components/marketing/site-footer.tsx` with the shared inbox.
@@ -178,7 +183,7 @@ lighter pass in **May** (before Summer).
       Vercel / Google Cloud / password-manager access. Remove anyone who has
       graduated, gone inactive, or left the team. Confirm the Backup owner is
       still active and reachable.
-- [ ] **Full QA pass.** Run [QA.md](../importantMDfiles/QA.md) end to end
+- [ ] **Full QA pass.** Run [QA.md](../docs/QA.md) end to end
       against a Vercel **preview** deploy with fresh `you+1@umn.edu`-style
       test accounts. Split the checklist — ~5 sections per person.
 - [ ] **Major dependency upgrades.** Next.js, React, `@supabase/*`, Tailwind,
@@ -320,9 +325,10 @@ not a report.
 
 Students graduate. Plan for it.
 
-- **The manual is:** this file + [SETUP.md](../importantMDfiles/SETUP.md) +
-  [QA.md](../importantMDfiles/QA.md) + everything in `docs/`. Keep it true —
-  update the docs **in the same PR** as the change they describe.
+- **The manual is:** this file + [SETUP.md](SETUP.md) +
+  [QA.md](../docs/QA.md) + [RETENTION.md](RETENTION.md) + everything in
+  `docs/`. Keep it true — update the docs **in the same PR** as the change
+  they describe.
 - **Onboarding a maintainer:** add them to the accounts (§2) → they run the
   app locally start to finish from `SETUP.md` → they do one release with a
   buddy watching → they shadow one full Caretaker month.
