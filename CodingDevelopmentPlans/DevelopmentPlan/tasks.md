@@ -1,8 +1,8 @@
-# Implementation Plan: Goldy's Study Buddies
+# Implementation Plan: Study Buddies
 
 ## Overview
 
-This plan breaks the Goldy's Study Buddies platform into ordered phases, starting with infrastructure
+This plan breaks the Study Buddies platform into ordered phases, starting with infrastructure
 and data models, then authentication, core features, realtime, background workers, and finally
 frontend integration and end-to-end wiring. Each task references specific requirements and design
 correctness properties. Tasks marked `*` are optional (tests/verification) and can be skipped for

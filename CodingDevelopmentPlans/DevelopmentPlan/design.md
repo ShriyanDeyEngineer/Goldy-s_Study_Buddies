@@ -1,8 +1,8 @@
-# Design Document: Goldy's Study Buddies
+# Design Document: Study Buddies
 
 ## Overview
 
-Goldy's Study Buddies is a web platform enabling University of Minnesota students to form study groups, find study buddies, schedule meetups, and communicate in real time. This document describes the technical architecture, data models, API design, frontend structure, real-time messaging, background jobs, security, caching, and multi-university extensibility strategy.
+Study Buddies is a web platform enabling University of Minnesota students to form study groups, find study buddies, schedule meetups, and communicate in real time. This document describes the technical architecture, data models, API design, frontend structure, real-time messaging, background jobs, security, caching, and multi-university extensibility strategy.
 
 The platform is designed for correctness, reliability at scale (5,000+ concurrent users), and future expansion to other universities via configuration alone.
 
