@@ -46,13 +46,11 @@ export function OnboardingWizard({
   suggestedName: string;
 }) {
   const [state, formAction, pending] = useActionState(saveOnboardingAction, {});
-  // Bug report #10: students wanted to get to their courses without first
-  // filling out a form whose one required field (their name) Google
-  // already told us. So when a name arrived with the Google account, the
-  // wizard OPENS on the courses step — the name is prefilled on step 1
-  // and one "Back" away if they want to change it. Nameless accounts
-  // still start at step 1 because the name is genuinely required.
-  const [step, setStep] = React.useState(suggestedName.trim() ? 1 : 0);
+  // Everyone starts on step 1. A name from the Google account is prefilled
+  // there (see the display_name field below), but we still want the
+  // student to see and confirm it — the label nudges them to shorten it to
+  // a first name, and skipping the step meant most never got that far.
+  const [step, setStep] = React.useState(0);
   const [courseQuery, setCourseQuery] = React.useState("");
 
   // Moving between steps swaps a whole fieldset in place with no

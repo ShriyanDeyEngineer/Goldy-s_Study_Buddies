@@ -238,10 +238,10 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       creator at minimum), a link to the group page, and a prefilled
       Google Calendar link. Other notification types keep the one-line
       email.
-- [ ] **Onboarding shortcut**: a Google-named account opens the wizard on
-      "What are you taking?" (step 2); Back shows the prefilled name with
-      the "from your Google account" hint; nameless accounts start at
-      step 1.
+- [ ] **Onboarding start**: every account opens the wizard on step 1
+      ("Tell us about you"). A Google-named account has the display name
+      prefilled there with the "from your Google account" hint; the field
+      is still shown so the student can confirm or shorten it.
 
 ## Availability grid (When2Meet-style) — 2026-08-18
 
