@@ -8,7 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 export const metadata: Metadata = {
   title: "About us",
   description:
-    "The student team behind Goldy's Study Buddies and why we built it.",
+    "The student team behind Study Buddies and why we built it.",
 };
 
 const CONTRIBUTORS = [
@@ -31,7 +31,7 @@ export default function AboutPage() {
           going through the same experiences as us, all of us wanted an easy way to find a study group.
         </p>
         <p className="mt-4 text-ink-muted">
-          Goldy&rsquo;s Study Buddies is our fix: finding people in your course takes
+          Study Buddies is our fix: finding people in your course takes
           two clicks, joining a group doesn&rsquo;t require being outgoing, and
           scheduling a session doesn&rsquo;t take a long text thread. It&rsquo;s
           free, student-run, and built because we wanted it ourselves.
@@ -40,8 +40,10 @@ export default function AboutPage() {
 
       <h2 className="mt-14 text-center font-display text-2xl text-ink">The Team</h2>
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {CONTRIBUTORS.map((contributor) => (
-          <Card key={contributor.name}>
+        {CONTRIBUTORS.map((contributor, index) => (
+          // Key by index: two contributors are listed as "anonymous", so
+          // the name is not unique.
+          <Card key={index}>
             <CardContent className="flex flex-col items-center text-center">
               <Avatar name={contributor.name} size="xl" />
               <h3 className="mt-4 font-medium text-ink">{contributor.name}</h3>

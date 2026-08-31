@@ -57,7 +57,9 @@ export function GoogleButton({
 
       {/* The terms gate: the button stays disabled until this is checked.
           The checkbox posts accept_terms=yes with the form, and the server
-          action re-checks it — the disabled button is UX, not the rule. */}
+          action re-checks it — the disabled button is UX, not the rule.
+          The dated consent record is written at onboarding
+          (record_terms_acceptance, migration 0039). */}
       <div className="flex items-start gap-2">
         <Checkbox
           id="accept-terms"
@@ -77,7 +79,7 @@ export function GoogleButton({
           >
             Terms of Service
           </Link>
-          {" "}&#40;Last Updated: 8/19/26&#41;,{" "}
+          ,{" "}
           <Link
             href="/privacy_policy"
             target="_self"
@@ -86,7 +88,7 @@ export function GoogleButton({
           >
             Privacy Policy
           </Link>
-          {" "}&#40;Last Updated: 8/19/26&#41;, and{" "}
+          , and{" "}
           <Link
             href="/communityRulesGuidelines"
             target="_self"
@@ -95,7 +97,7 @@ export function GoogleButton({
           >
             Community Guidelines
           </Link>
-          {" "}&#40;Last Updated: 8/28/26&#41;.
+          , and I confirm I am at least 13 years old.
         </label>
       </div>
 

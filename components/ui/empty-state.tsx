@@ -31,7 +31,7 @@ export function EmptyState({
         className,
       )}
     >
-      {/* Our gopher doubles as the illustration, in a muted gold circle. */}
+      {/* Our logo mark doubles as the illustration, in a muted gold circle. */}
       <span className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold-light">
         <GopherLogo className="h-9 w-9 text-maroon" />
       </span>

@@ -1,4 +1,4 @@
-# Goldy-s_Study_Buddies
+# Study Buddies
 
 ## Contributors
 ShriyanDeyEngineer (Shriyan Dey), anonymous, aadisharma13 (Aadi Sharma), & ananymous. 

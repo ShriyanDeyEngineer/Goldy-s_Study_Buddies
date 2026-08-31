@@ -26,14 +26,16 @@ export interface ProfileRow {
   social_links: string[];
   privacy: PrivacyFlags;
   is_available_for_buddies: boolean;
-  /** male | female | undisclosed; null = account predates the field. */
-  sex: "male" | "female" | "undisclosed" | null;
   /** Email me about group/friend events (webhook honors this). */
   email_notifications: boolean;
   account_status: "active" | "suspended" | "banned" | "deleted";
   is_admin: boolean;
   onboarded_at: string | null;
   last_login_at: string | null;
+  /** When / which version of the legal terms this user accepted
+   *  (migration 0039). NULL for accounts that onboarded before it. */
+  terms_accepted_at: string | null;
+  terms_version: string | null;
   /** When the account was deleted; drives the retention purge (0035). */
   deleted_at: string | null;
   created_at: string;

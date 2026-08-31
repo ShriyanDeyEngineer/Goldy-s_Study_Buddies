@@ -99,7 +99,7 @@ export default async function PeoplePage({
           description={
             hasActiveFilters(filters) || filters.query
               ? "Try removing a filter or two — smaller nets catch fewer fish."
-              : "Looks like it's quiet in here. Check back as more Gophers join!"
+              : "Looks like it's quiet in here. Check back as more students join!"
           }
           action={
             hasActiveFilters(filters) ? (

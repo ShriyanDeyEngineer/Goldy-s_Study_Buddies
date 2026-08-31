@@ -8,13 +8,15 @@
  * and then click send in gmail once ready.
  */
 
+import { CONTACT_EMAIL } from "@/lib/site";
+
 export type GmailComposeData = {
   department: string;
   course_number: string;
   course_name: string;
 };
 
-const DESTINATION_EMAIL = "goldysstudybuddies@gmail.com";
+const DESTINATION_EMAIL = CONTACT_EMAIL;
 
 type Platform = "ios" | "android" | "desktop";
 

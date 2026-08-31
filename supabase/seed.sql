@@ -1,5 +1,5 @@
 -- ============================================================================
--- Goldy's Study Buddies — Seed data
+-- Study Buddies — Seed data
 -- Run AFTER migrations 0001–0003.
 --
 -- WHAT THIS FILE DOES

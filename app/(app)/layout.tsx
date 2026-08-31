@@ -17,11 +17,13 @@
  */
 import { redirect } from "next/navigation";
 import { getSessionProfile } from "@/lib/supabase/server";
+import { TERMS_VERSION } from "@/lib/site";
 import { AppHeader } from "@/components/app/app-header";
 import { MobileNav } from "@/components/app/app-nav";
 import {
   ProfileMissingScreen,
   SuspendedScreen,
+  TermsUpdatedScreen,
 } from "@/components/app/account-screens";
 import type { ProfileRow } from "@/lib/types";
 
@@ -36,6 +38,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     return <SuspendedScreen status={typedProfile.account_status} />;
   }
   if (!typedProfile.display_name) redirect("/onboarding");
+
+  // Legal terms changed since this user last accepted (or we have no
+  // record) → re-consent screen before anything else in the app. Onboarding
+  // stamps the current version, so a fresh account never sees this.
+  if (typedProfile.terms_version !== TERMS_VERSION) {
+    return <TermsUpdatedScreen />;
+  }
 
   // Initial unread counts for the bell and the Messages badge. One RPC
   // (0034) rather than two separate COUNT requests — this layout re-runs

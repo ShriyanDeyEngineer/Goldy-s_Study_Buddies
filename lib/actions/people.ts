@@ -151,7 +151,7 @@ export async function reportUserAction(
   if (admin) {
     await sendEmail({
       to: admin,
-      subject: `[Goldy's Study Buddies] New ${parsed.data.category} report`,
+      subject: `[Study Buddies] New ${parsed.data.category} report`,
       text:
         `A new report was filed (id ${reportId}).\n\n` +
         `Category: ${parsed.data.category}\n` +

@@ -150,7 +150,7 @@ Two halves: a Google Cloud OAuth client, pasted into Supabase.
 
 1. [console.cloud.google.com](https://console.cloud.google.com) → create
    (or pick) a project → **APIs & Services → OAuth consent screen**:
-   - User type **External**, app name "Goldy's Study Buddies", support
+   - User type **External**, app name "Study Buddies", support
      email = a team address. Scopes: the default `email`, `profile`,
      `openid` are all we use. Publish the app (or add teammates as test
      users while it's in Testing).
@@ -199,7 +199,7 @@ accurate (that IS where auth happens) but it looks like a phishing page to
 a student. Three ways to improve it, cheapest first:
 
 1. **Google brand verification — free.** In the OAuth consent screen set
-   **App name** ("Goldy's Study Buddies"), a logo, and a support email, then
+   **App name** ("Study Buddies"), a logo, and a support email, then
    submit for verification. Once approved, Google shows your name and logo
    instead of the domain. Google emails you to verify ownership of the
    authorized domains; for `supabase.co` reply that it is a third-party

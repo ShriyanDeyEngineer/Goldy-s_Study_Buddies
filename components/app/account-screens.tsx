@@ -11,8 +11,9 @@
  *                            back) — spec pitfall #4 — so we break the
  *                            loop with a sign-out screen instead.
  */
-import { Ban, TriangleAlert } from "lucide-react";
-import { signOutAction } from "@/lib/actions/auth";
+import { Ban, ScrollText, TriangleAlert } from "lucide-react";
+import Link from "next/link";
+import { acceptCurrentTermsAction, signOutAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LogoLockup } from "@/components/gopher-logo";
@@ -33,7 +34,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 const LOCKOUT_COPY = {
   banned: {
     title: "Your account has been banned",
-    body: "A review found activity that breaks our community rules, and this account can no longer use Goldy's Study Buddies. If you would like to attempt to repeal this ban, please contact the email address on our home page footer.",
+    body: "A review found activity that breaks our community rules, and this account can no longer use Study Buddies. If you would like to attempt to repeal this ban, please contact the email address on our home page footer.",
   },
   suspended: {
     title: "Your account is suspended",
@@ -62,6 +63,45 @@ export function SuspendedScreen({
           Sign out
         </Button>
       </form>
+    </Shell>
+  );
+}
+
+export function TermsUpdatedScreen() {
+  return (
+    <Shell>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-maroon/10">
+        <ScrollText aria-hidden className="h-7 w-7 text-maroon" />
+      </span>
+      <h1 className="font-display text-2xl text-ink">We&rsquo;ve updated our terms</h1>
+      <p className="mt-2 text-sm text-ink-muted">
+        Our{" "}
+        <Link href="/terms_of_service" target="_blank" rel="noopener" className="font-medium text-maroon underline underline-offset-2">
+          Terms of Service
+        </Link>
+        ,{" "}
+        <Link href="/privacy_policy" target="_blank" rel="noopener" className="font-medium text-maroon underline underline-offset-2">
+          Privacy Policy
+        </Link>
+        , and{" "}
+        <Link href="/communityRulesGuidelines" target="_blank" rel="noopener" className="font-medium text-maroon underline underline-offset-2">
+          Community Guidelines
+        </Link>{" "}
+        have changed since you last accepted them. Please review them and accept
+        again to keep using Study Buddies.
+      </p>
+      <div className="mt-6 flex flex-col gap-2">
+        <form action={acceptCurrentTermsAction}>
+          <Button type="submit" className="w-full">
+            I agree to the updated terms
+          </Button>
+        </form>
+        <form action={signOutAction}>
+          <Button type="submit" variant="ghost" className="w-full">
+            Sign out
+          </Button>
+        </form>
+      </div>
     </Shell>
   );
 }

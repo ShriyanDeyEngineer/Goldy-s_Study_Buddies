@@ -1,4 +1,4 @@
-# Master Build Prompt — Goldy's Study Buddies
+# Master Build Prompt — Study Buddies
 
 > Copy everything below the line into a fresh AI coding session to have the
 > entire website built from scratch. It is written to be self-contained: an AI
@@ -16,7 +16,7 @@ document states an exact number, limit, or rule, implement it exactly.
 
 ### 1. Product
 
-**Name:** Goldy's Study Buddies
+**Name:** Study Buddies
 
 **One-liner:** A website for University of Minnesota students to find study
 partners and create or join study groups for their specific courses.

@@ -1,8 +1,9 @@
 /**
- * The Goldy's Study Buddies logo — an ORIGINAL, hand-drawn gopher
- * silhouette. This is deliberately NOT the official Goldy Gopher mascot or
- * any University of Minnesota trademark; we are legally required to avoid
- * those, so please never "improve" this by pasting in real UMN artwork.
+ * The Study Buddies logo — an ORIGINAL mark: two abstract figures at a
+ * shared table with an open book. It is deliberately NOT a gopher, not the
+ * University of Minnesota's Goldy Gopher mascot, and not any University
+ * trademark — keep it that way. Never "improve" this by pasting in real
+ * UMN artwork.
  *
  * Used in the public header, the app header, and the footer. Size it with
  * the className prop (it scales like any inline SVG).
@@ -68,8 +69,8 @@ export function GopherLogo({ className }: { className?: string }) {
 
 /**
  * Logo + wordmark lockup used in headers. The `dark` variant is for maroon
- * backgrounds (white text, gold gopher); the default is for light
- * backgrounds (maroon text and gopher).
+ * backgrounds (white text, gold mark); the default is for light
+ * backgrounds (maroon text and mark).
  */
 export function LogoLockup({
   dark = false,
@@ -88,7 +89,7 @@ export function LogoLockup({
     >
       <GopherLogo className={cn("h-[1.35em] w-[1.35em]", dark ? "text-gold" : "text-maroon")} />
       <span>
-        <span className={dark ? "text-gold" : ""}>Goldy&rsquo;s Study Buddies</span>
+        <span className={dark ? "text-gold" : ""}>Study Buddies</span>
       </span>
     </span>
   );

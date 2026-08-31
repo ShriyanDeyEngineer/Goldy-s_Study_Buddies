@@ -51,7 +51,7 @@ export default function WhyPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-14">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="font-display text-4xl text-ink">Why Use Goldy&rsquo;s Study Buddies?</h1>
+        <h1 className="font-display text-4xl text-ink">Why Use Study Buddies?</h1>
         <p className="mt-4 text-ink-muted">
           It's better to study with others than alone to be academically successful.
         </p>

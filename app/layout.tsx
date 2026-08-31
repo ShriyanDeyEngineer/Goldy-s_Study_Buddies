@@ -35,8 +35,8 @@ const dmSerif = DM_Serif_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Goldy's Study Buddies — Find study partners at the U",
-    template: "%s · Goldy's Study Buddies",
+    default: "Study Buddies — Find study partners at the U",
+    template: "%s · Study Buddies",
   },
   description:
     "Never study alone at the U again. Find study partners and join study groups for your University of Minnesota courses.",

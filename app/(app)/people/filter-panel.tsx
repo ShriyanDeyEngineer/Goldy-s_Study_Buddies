@@ -89,12 +89,6 @@ export function FilterPanel({
     ...(filters.buddiesOnly
       ? [{ label: "Study buddies only", onRemove: () => apply({ buddiesOnly: false }) }]
       : []),
-    ...(filters.sex
-      ? [{
-          label: filters.sex === "male" ? "Male" : "Female",
-          onRemove: () => apply({ sex: null }),
-        }]
-      : []),
   ];
 
   return (
@@ -171,21 +165,6 @@ export function FilterPanel({
             onChange={(year) => apply({ gradMax: year })}
           />
         </div>
-
-        {/* Sex filter — male/female only; students who chose "prefer not
-            to say" never appear in these results. */}
-        <Select
-          aria-label="Filter by sex"
-          value={filters.sex ?? ""}
-          onChange={(e) =>
-            apply({ sex: (e.target.value || null) as "male" | "female" | null })
-          }
-          className="w-auto"
-        >
-          <option value="">Any sex</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </Select>
 
         {/* The study-buddy discovery toggle. */}
         <label className="ml-auto flex cursor-pointer items-center gap-2 text-sm text-ink">

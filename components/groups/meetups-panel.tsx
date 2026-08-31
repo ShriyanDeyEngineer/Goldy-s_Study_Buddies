@@ -236,7 +236,7 @@ function MeetupCard({
     startsAt,
     endsAt,
     location: meetup.format === "online" ? (safeMeetingLink ?? "") : (meetup.location ?? ""),
-    details: `Study session for ${courseLabel} with ${groupName} (via Goldy's Study Buddies).`,
+    details: `Study session for ${courseLabel} with ${groupName} (via Study Buddies).`,
   });
 
   return (

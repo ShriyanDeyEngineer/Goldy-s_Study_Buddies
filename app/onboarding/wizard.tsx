@@ -5,7 +5,7 @@
  *            college, major, standing, graduation. Optional fields are
  *            labeled optional and never gate progress.
  *   Step 2 — current courses (searchable multi-select, skippable).
- *   Step 3 — bio + profile picture (both optional) → Finish.
+ *   Step 3 — bio (optional) → Finish.
  *
  * HOW IT STAYS REFRESH-SAFE: it's ONE <form> and nothing saves until
  * Finish. Inactive steps stay mounted but hidden, so their inputs are
@@ -35,9 +35,8 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { AvatarPicker } from "@/components/ui/avatar-picker";
 
-const STEP_TITLES = ["Tell us about you", "What are you taking?", "Add a photo and bio"];
+const STEP_TITLES = ["Tell us about you", "What are you taking?", "Add a bio"];
 
 export function OnboardingWizard({
   courses,
@@ -55,7 +54,6 @@ export function OnboardingWizard({
   // still start at step 1 because the name is genuinely required.
   const [step, setStep] = React.useState(suggestedName.trim() ? 1 : 0);
   const [courseQuery, setCourseQuery] = React.useState("");
-  const [avatarClientError, setAvatarClientError] = React.useState<string | null>(null);
 
   // Moving between steps swaps a whole fieldset in place with no
   // navigation and no visible page change, so a screen-reader user gets
@@ -77,10 +75,9 @@ export function OnboardingWizard({
     if (!state.fieldErrors) return;
     if (
       state.fieldErrors.display_name ||
-      state.fieldErrors.sex ||
       state.fieldErrors.graduation_year
     ) setStep(0);
-    else if (state.fieldErrors.bio || state.fieldErrors.avatar) setStep(2);
+    else if (state.fieldErrors.bio) setStep(2);
   }, [state.fieldErrors]);
 
   const filteredCourses = courses.filter((course) => {
@@ -161,36 +158,12 @@ export function OnboardingWizard({
                 name="display_name"
                 defaultValue={suggestedName}
                 maxLength={50}
-                placeholder="Goldy G."
+                placeholder="Alex R."
                 required
                 aria-invalid={!!state.fieldErrors?.display_name}
                 aria-describedby="display_name-error"
               />
               <FieldError id="display_name-error" error={state.fieldErrors?.display_name} />
-            </div>
-            <div>
-              <Label htmlFor="sex">Sex</Label>
-              <Select
-                id="sex"
-                name="sex"
-                defaultValue=""
-                required
-                aria-invalid={!!state.fieldErrors?.sex}
-                aria-describedby="sex-note sex-error"
-              >
-                <option value="" disabled>
-                  Choose…
-                </option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="undisclosed">Prefer not to say</option>
-              </Select>
-              <p id="sex-note" className="mt-1 text-xs text-ink-muted">
-                Used only for the people filter. Picking Male or Female is
-                permanent — it can&rsquo;t be changed later. &ldquo;Prefer not to
-                say&rdquo; keeps you out of sex-filtered results.
-              </p>
-              <FieldError id="sex-error" error={state.fieldErrors?.sex} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -296,14 +269,9 @@ export function OnboardingWizard({
             </ul>
           </fieldset>
 
-          {/* ── Step 3: bio + picture ────────────────────────────────── */}
+          {/* ── Step 3: bio ──────────────────────────────────────────── */}
           <fieldset hidden={step !== 2} className="space-y-4">
-            <legend className="sr-only">Bio and profile picture</legend>
-            <AvatarPicker
-              label="Profile picture (optional — JPEG/PNG, up to 5 MB, you are not required to use your face)"
-              error={avatarClientError ?? state.fieldErrors?.avatar}
-              onFileCheck={setAvatarClientError}
-            />
+            <legend className="sr-only">Bio</legend>
             <div>
               <Label htmlFor="bio">Bio (optional)</Label>
               <Textarea
@@ -345,7 +313,7 @@ export function OnboardingWizard({
                 <ArrowRight aria-hidden className="h-4 w-4" />
               </Button>
             ) : (
-              <Button key="finish" type="submit" loading={pending} disabled={!!avatarClientError}>
+              <Button key="finish" type="submit" loading={pending}>
                 Finish — take me in
               </Button>
             )}

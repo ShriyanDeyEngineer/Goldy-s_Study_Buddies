@@ -79,11 +79,11 @@ export function buildMeetupEmail(input: MeetupEmailInput): {
     startsAt,
     endsAt,
     location: input.format === "online" ? (input.meetingLink ?? "") : (input.location ?? ""),
-    details: `Study session with ${input.groupName} (via Goldy's Study Buddies).`,
+    details: `Study session with ${input.groupName} (via Study Buddies).`,
   });
 
   return {
-    subject: `Goldy's Study Buddies: New meetup in ${input.groupName} — ${input.title}`,
+    subject: `Study Buddies: New meetup in ${input.groupName} — ${input.title}`,
     text:
       `Hi ${input.recipientName ?? "there"},\n\n` +
       `${creator} scheduled a new meetup for ${input.groupName}:\n\n` +
@@ -93,7 +93,7 @@ export function buildMeetupEmail(input: MeetupEmailInput): {
       `  Attending: ${attending}\n\n` +
       `RSVP and see details: ${input.groupUrl}\n` +
       `Add it to Google Calendar: ${calendarUrl}\n\n` +
-      `— Goldy's Study Buddies\n` +
+      `— Study Buddies\n` +
       `You're getting this because a group or classmate did something that involves you. ` +
       `Turn these emails off any time under Edit profile → Notifications.`,
   };

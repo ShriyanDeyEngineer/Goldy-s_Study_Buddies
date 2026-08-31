@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Testimonials",
-  description: "What UMN students say about Goldy's Study Buddies.",
+  description: "What UMN students say about Study Buddies.",
 };
 
 /** Real quotes only — never marketing-invented ones. Each needs the
@@ -26,7 +26,7 @@ export default function TestimonialsPage() {
     <div className="mx-auto max-w-6xl px-4 py-14">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl text-ink">Testimonials</h1>
-        <p className="mt-4 text-ink-muted">What Students Say about Goldy's Study Buddies</p>
+        <p className="mt-4 text-ink-muted">What Students Say about Study Buddies</p>
       </div>
 
       <div className="mx-auto mt-10 max-w-2xl">
@@ -36,7 +36,7 @@ export default function TestimonialsPage() {
             description="We just launched. If the site helps you, email us and we may feature your words here."
             action={
               <Button asChild variant="secondary">
-                <Link href="/register">Be an early Gopher</Link>
+                <Link href="/register">Be one of the first</Link>
               </Button>
             }
           />

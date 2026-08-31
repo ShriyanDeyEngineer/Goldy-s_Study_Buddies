@@ -1,8 +1,8 @@
 {
-  "name": "goldys-study-buddies",
+  "name": "study-buddies",
   "version": "0.1.0",
   "private": true,
-  "description": "Find study partners and study groups for your UMN courses.",
+  "description": "Find study partners and study groups for your University of Minnesota courses.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

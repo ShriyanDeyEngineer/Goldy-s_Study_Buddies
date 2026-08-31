@@ -17,7 +17,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getSiteUrl, safeInternalPath } from "@/lib/site";
+import { getSiteUrl, safeInternalPath, TERMS_VERSION } from "@/lib/site";
 
 /**
  * The origin the CURRENT request arrived on — not the canonical
@@ -83,4 +83,20 @@ export async function signOutAction(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+/**
+ * "I agree" on the re-consent screen the app layout shows when a signed-in
+ * user's stored terms_version is behind the current TERMS_VERSION (the
+ * legal documents changed since they last accepted). Records the fresh
+ * acceptance and drops them back into the app.
+ */
+export async function acceptCurrentTermsAction(): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  await supabase.rpc("record_terms_acceptance", { p_version: TERMS_VERSION });
+  redirect("/dashboard");
 }

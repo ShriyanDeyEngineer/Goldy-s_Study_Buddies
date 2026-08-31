@@ -20,7 +20,7 @@ import { GopherLogo } from "@/components/gopher-logo";
 const STEPS = [
   {
     title: "Sign in with UMN Google",
-    body: "Users are verified through UMN and Google SSO. Everyone here is a real student.",
+    body: "Sign in with your University of Minnesota Twin Cities Google account (@umn.edu). That's the only way in — there's no separate password.",
   },
   {
     title: "Pick Your Courses",
@@ -60,8 +60,8 @@ const FEATURES = [
   },
   {
     icon: ShieldCheck,
-    title: "Students Only, Privacy First",
-    body: "Only verified UMN students have access. You also have blocking controls.",
+    title: "For the UMN Community",
+    body: "Access requires a University of Minnesota Twin Cities Google account. Per-field privacy settings and blocking controls are built in.",
   },
 ];
 

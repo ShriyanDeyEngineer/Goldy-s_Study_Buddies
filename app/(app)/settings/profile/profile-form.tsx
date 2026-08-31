@@ -27,7 +27,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { AvatarPicker } from "@/components/ui/avatar-picker";
 
 export function ProfileForm({ profile }: { profile: ProfileRow }) {
   const [state, formAction, pending] = useActionState(updateProfileAction, {});
@@ -40,37 +39,12 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
   const [links, setLinks] = React.useState<{ id: number; url: string }[]>(
     profile.social_links.map((url, index) => ({ id: index, url })),
   );
-  // Instant client-side verdict on the chosen file (size/type). The
-  // server still re-checks; this just stops silent failures.
-  const [avatarClientError, setAvatarClientError] = React.useState<string | null>(null);
 
   return (
     <Card>
       <CardContent>
         <h2 className="mb-4 font-display text-xl text-ink">The basics</h2>
         <form action={formAction} noValidate className="space-y-4">
-          <AvatarPicker
-            label="Profile picture (JPEG/PNG, up to 5 MB, you are not required to use your face)"
-            currentUrl={profile.avatar_url}
-            fallbackName={profile.display_name}
-            error={avatarClientError ?? state.fieldErrors?.avatar}
-            onFileCheck={setAvatarClientError}
-          />
-
-          {profile.sex && (
-            <p className="text-sm text-ink-muted">
-              Sex:{" "}
-              <span className="font-medium text-ink">
-                {profile.sex === "male"
-                  ? "Male"
-                  : profile.sex === "female"
-                    ? "Female"
-                    : "Prefer not to say"}
-              </span>
-              {profile.sex !== "undisclosed" && " (permanent — set at sign-up)"}
-            </p>
-          )}
-
           <div>
             <Label htmlFor="display_name">Display name (required, recommended to just use your first name)</Label>
             <Input
@@ -245,7 +219,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
             </p>
           )}
 
-          <Button type="submit" loading={pending} disabled={!!avatarClientError}>
+          <Button type="submit" loading={pending}>
             Save profile
           </Button>
         </form>

@@ -5,11 +5,11 @@
  */
 import Link from "next/link";
 import { LogoLockup } from "@/components/gopher-logo";
+import { CONTACT_EMAIL } from "@/lib/site";
 
-/* The five of us. TEAM: swap in a real shared inbox before launch —
-   the placeholder below is deliberately not a routable address. */
+/* The team. Two contributors asked not to be publicly named (they appear
+   as "anonymous"); respect that. */
 const TEAM = ["Shriyan Dey", "anonymous", "Aadi Sharma", "anonymous"];
-const CONTACT_EMAIL = "goldysstudybuddies@gmail.com";
 
 export function SiteFooter() {
   return (
@@ -33,6 +33,7 @@ export function SiteFooter() {
             <li><Link href="/why" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Why Use it</Link></li>
             <li><Link href="/testimonials" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Testimonials</Link></li>
             <li><Link href="/communityRulesGuidelines" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Community Guidelines</Link></li>
+            <li><Link href="/accessibility" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Accessibility</Link></li>
             <li><Link href="/register" className="rounded text-white/80 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Sign up</Link></li>
           </ul>
         </nav>
@@ -49,7 +50,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60 font-['Times_New_Roman']">
-        Built by UMN students, for UMN students. Not officially affiliated with the University of Minnesota.
+        Built by UMN students, for UMN students. Study Buddies is an independent project and is not affiliated with, sponsored by, or endorsed by the University of Minnesota. &ldquo;University of Minnesota&rdquo; and related names and marks are trademarks of the University of Minnesota, used here only to identify the community this tool serves.
 
         <p className="mt-2 text-center text-xs text-white/60">
           <Link href="/terms_of_service" target="_self" className="rounded text-white/80 hover:text-gold font-['Times_New_Roman'] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Terms & Conditions</Link>
@@ -57,16 +58,9 @@ export function SiteFooter() {
           <Link href="/privacy_policy" target="_self" className="rounded text-white/80 hover:text-gold font-['Times_New_Roman'] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">Privacy Policy</Link>
         </p>
         <p className="mt-2 text-center text-xs text-white/60 font-['Times_New_Roman']">
-          ©2026 Goldy's Study Buddies. All rights reserved.
+          &copy; 2026 Study Buddies
         </p>
       </div>
     </footer>
   );
 }
-
-/**
- Paste the following on line 55 once appropriate to use
- <p className="mt-2 text-center text-xs text-white/60">
-    ©2026 Goldy's Study Buddies. All rights reserved.
-  </p>
- */

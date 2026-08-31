@@ -34,9 +34,9 @@ export function pluralize(count: number, noun: string, plural?: string) {
 }
 
 /**
- * First letter of each of the first two words, uppercased — used for avatar
- * fallbacks when a user has no profile picture ("Goldy Gopher" → "GG").
- * Falls back to "?" for empty names so the avatar never renders blank.
+ * First letter of each of the first two words, uppercased — used for the
+ * avatar shown for every user ("Ada Lovelace" → "AL"). Falls back to "?"
+ * for empty names so the avatar never renders blank.
  */
 export function initials(name: string | null | undefined): string {
   if (!name) return "?";

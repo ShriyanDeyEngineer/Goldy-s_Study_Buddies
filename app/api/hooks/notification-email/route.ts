@@ -123,12 +123,12 @@ export async function POST(request: Request) {
       ? { to: profile.email, subject: rich.subject, text: rich.text }
       : {
           to: profile.email,
-          subject: `Goldy's Study Buddies: ${message}`,
+          subject: `Study Buddies: ${message}`,
           text:
             `Hi ${profile.display_name ?? "there"},\n\n` +
             `${message}\n\n` +
             `Open it here: ${link}\n\n` +
-            `— Goldy's Study Buddies\n` +
+            `— Study Buddies\n` +
             `You're getting this because a group or classmate did something that involves you. ` +
             `Turn these emails off any time under Edit profile → Notifications.`,
         },

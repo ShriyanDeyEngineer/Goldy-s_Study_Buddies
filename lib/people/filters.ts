@@ -35,8 +35,6 @@ export interface PeopleFilters {
   gradMin: number | null;
   gradMax: number | null;
   buddiesOnly: boolean;
-  /** 'male' | 'female' — the only filterable values; null = no filter. */
-  sex: "male" | "female" | null;
   page: number;
 }
 
@@ -98,7 +96,6 @@ export function parsePeopleFilters(
     gradMin,
     gradMax,
     buddiesOnly: first(searchParams.buddies) === "1",
-    sex: (["male", "female"] as const).find((v) => v === first(searchParams.sex)) ?? null,
     page,
   };
 }
@@ -114,7 +111,6 @@ export function filtersToRpcParams(filters: PeopleFilters) {
     p_grad_min: filters.gradMin,
     p_grad_max: filters.gradMax,
     p_buddy_only: filters.buddiesOnly,
-    p_sex: filters.sex,
     p_limit: PAGE_SIZE,
     p_offset: (filters.page - 1) * PAGE_SIZE,
   };
@@ -133,7 +129,6 @@ export function filtersToSearchParams(filters: PeopleFilters): URLSearchParams {
   if (filters.gradMin !== null) params.set("gradMin", String(filters.gradMin));
   if (filters.gradMax !== null) params.set("gradMax", String(filters.gradMax));
   if (filters.buddiesOnly) params.set("buddies", "1");
-  if (filters.sex) params.set("sex", filters.sex);
   return params;
 }
 
@@ -145,7 +140,6 @@ export function hasActiveFilters(filters: PeopleFilters): boolean {
     filters.standings.length > 0 ||
     filters.gradMin !== null ||
     filters.gradMax !== null ||
-    filters.buddiesOnly ||
-    filters.sex !== null
+    filters.buddiesOnly
   );
 }

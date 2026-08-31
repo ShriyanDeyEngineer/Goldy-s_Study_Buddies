@@ -1,6 +1,7 @@
 /** This is the web page that displays our community rules and guidelines for users */
 
 import type { Metadata } from "next";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Community Rules & Guidelines",
@@ -8,18 +9,16 @@ export const metadata: Metadata = {
     "Guidelines that every user must follow in order to be able to use this website.",
 };
 
-const CONTACT_EMAIL = "goldysstudybuddies@gmail.com";
-
 export default function CommunityRulesGuidelinesPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 font-['Times_New_Roman']">
         <div className="mx-auto max-w-2xl">
 
             <h1 className="font-display text-4xl text-ink text-center">COMMUNITY RULES &amp; GUIDELINES</h1>
-            <h3 className="font-display text-1xl text-ink text-center">Last Updated: August 28, 2026</h3>
+            <h3 className="font-display text-1xl text-ink text-center">Last Updated: August 31, 2026</h3>
 
             <p className="mt-4 text-ink-muted text-left">
-              Goldy&rsquo;s Study Buddies works because everyone here is in the same position trying to get through the same courses with a little help. These guidelines describe what we expect from every member. They apply everywhere on the platform: your profile, group chats, direct messages, availability polls, and any meetup you arrange through the site. <strong>Following them is a condition of having an account.</strong> They sit alongside our <a target="_self" href="/terms_of_service" className="text-blue-500 font-bold">Terms of Service</a>, which is the formal agreement between you and us; where the two overlap, the Terms control.
+              Study Buddies works because everyone here is in the same position trying to get through the same courses with a little help. These guidelines describe what we expect from every member. They apply everywhere on the platform: your profile, group chats, direct messages, availability polls, and any meetup you arrange through the site. <strong>Following them is a condition of having an account.</strong> They sit alongside our <a target="_self" href="/terms_of_service" className="text-blue-500 font-bold">Terms of Service</a>, which is the formal agreement between you and us; where the two overlap, the Terms control.
             </p>
 
             <br></br>
@@ -51,7 +50,7 @@ export default function CommunityRulesGuidelinesPage() {
 
             <h2 className="font-display text-2xl text-ink text-left">This is a study platform, not a dating app</h2>
                 <p className="mt-4 text-ink-muted text-left">
-                  Goldy&rsquo;s Study Buddies exists to help you find people to study with. Asking a study partner out, sending romantic or sexual messages, or continuing to message someone who has not written back is not what this is for. If someone tells you they are not interested, in a conversation, in a group, or in anything at all, that is the end of it. If they do not respond at all, treat that as the same answer.
+                  Study Buddies exists to help you find people to study with. Asking a study partner out, sending romantic or sexual messages, or continuing to message someone who has not written back is not what this is for. If someone tells you they are not interested, in a conversation, in a group, or in anything at all, that is the end of it. If they do not respond at all, treat that as the same answer.
                 </p>
 
             <br></br>
