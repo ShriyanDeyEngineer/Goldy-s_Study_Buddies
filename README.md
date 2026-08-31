@@ -1,7 +1,7 @@
 # Goldy-s_Study_Buddies
 
 ## Contributors
-ShriyanDeyEngineer (Shriyan Dey), angadkvirdi20-prog (Angad Virdi), aadisharma13 (Aadi Sharma), & joydeng-code (Joy Deng). 
+ShriyanDeyEngineer (Shriyan Dey), anonymous, aadisharma13 (Aadi Sharma), & ananymous. 
 
 ## Description
 A website that helps students find other students to study with. Students can make and/or join study groups for separate courses.

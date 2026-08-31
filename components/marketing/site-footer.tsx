@@ -8,7 +8,7 @@ import { LogoLockup } from "@/components/gopher-logo";
 
 /* The five of us. TEAM: swap in a real shared inbox before launch —
    the placeholder below is deliberately not a routable address. */
-const TEAM = ["Shriyan Dey", "Angad Virdi", "Aadi Sharma", "Joy Deng"];
+const TEAM = ["Shriyan Dey", "anonymous", "Aadi Sharma", "anonymous"];
 const CONTACT_EMAIL = "goldysstudybuddies@gmail.com";
 
 export function SiteFooter() {

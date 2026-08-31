@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 
 const CONTRIBUTORS = [
   { name: "Shriyan Dey" },
-  { name: "Angad Virdi" },
+  { name: "anonymous" },
   { name: "Aadi Sharma" },
-  { name: "Joy Deng" },
+  { name: "anonymous" },
 ];
 
 export default function AboutPage() {
