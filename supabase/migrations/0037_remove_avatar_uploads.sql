@@ -17,7 +17,16 @@
 --      attacker-controlled avatar_url would render as an <img> on every
 --      page that shows the profile, a tracking-pixel / viewer-
 --      deanonymization vector;
---   3. tears down the `avatars` storage bucket and its policies.
+--   3. drops the "avatars" storage bucket's access policies, so no new
+--      object can be uploaded (or read) even through the Storage API.
+--
+-- NOTE: hosted Supabase forbids `delete from storage.objects` /
+-- `delete from storage.buckets` in SQL (SQLSTATE 42501 — "use the Storage
+-- API instead"). Emptying and deleting the bucket itself is a manual
+-- follow-up step: Supabase dashboard -> Storage -> avatars -> select all
+-- files -> delete, then delete the bucket. Or run scripts/purge-avatars
+-- with the service-role key. Until then, the objects are orphaned (no
+-- avatar_url references them) and unreadable (policies dropped below).
 --
 -- Idempotent. Safe on a live database.
 -- ============================================================================
@@ -28,11 +37,9 @@ update public.profiles set avatar_url = null where avatar_url is not null;
 -- other granted column on public.profiles untouched (see 0001).
 revoke update (avatar_url) on public.profiles from authenticated;
 
--- Supabase Storage is plain Postgres tables. Remove the objects first
--- (FK), then the bucket, then the policies that referenced it.
-delete from storage.objects where bucket_id = 'avatars';
-delete from storage.buckets where id = 'avatars';
-
+-- Policy DDL on storage.objects is permitted (this is how 0009 created
+-- these). With all four gone, the bucket can neither be written to nor
+-- read from through the API.
 drop policy if exists "avatar images are publicly readable" on storage.objects;
 drop policy if exists "users upload own avatar" on storage.objects;
 drop policy if exists "users update own avatar" on storage.objects;
