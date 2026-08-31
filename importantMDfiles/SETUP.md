@@ -356,8 +356,12 @@ under the webhook's history.
 
 ## 10. Moderation basics (until admin tooling exists)
 
-- **Review reports**: Table Editor → `reports` (admins can also query it
-  through the API thanks to the `is_admin` policy).
+- **Review reports**: `/admin` in the app (or Table Editor → `reports`).
+- **Review user-flagged content**: `/admin` → **Flagged content**
+  (`/admin/flags`) — messages, DMs, and resources members flagged as
+  inappropriate, each with a text snapshot and a status you can move
+  through open → reviewing → resolved/dismissed. Flagging is invisible to
+  everyone but the flagger and admins.
 - **Suspend/ban**: set `profiles.account_status` to `suspended` or
   `banned`. The user is locked out on their next request and vanishes
   from search/suggestions.

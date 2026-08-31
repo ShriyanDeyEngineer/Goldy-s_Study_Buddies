@@ -17,6 +17,7 @@ import {
   RESOURCE_TITLE_MAX,
 } from "@/lib/validation/resource";
 import type { GroupResourceRow, PublicProfile } from "@/lib/types";
+import { FlagControl } from "@/components/moderation/flag-control";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
@@ -38,14 +39,21 @@ export function ResourcesPanel({
   isManager,
   resources,
   profiles,
+  flaggedResourceIds = [],
 }: {
   groupId: string;
   currentUserId: string;
   isManager: boolean;
   resources: GroupResourceRow[];
   profiles: Record<string, PublicProfile>;
+  /** Resource ids the current viewer has already flagged (0040). */
+  flaggedResourceIds?: string[];
 }) {
   const router = useRouter();
+  const flaggedIds = React.useMemo(
+    () => new Set(flaggedResourceIds),
+    [flaggedResourceIds],
+  );
   // Deleted rows disappear immediately instead of after a full group-page
   // re-render; restored if the server rejects the delete.
   const [removedIds, setRemovedIds] = React.useState<string[]>([]);
@@ -80,6 +88,7 @@ export function ResourcesPanel({
           {visible.map((resource) => {
             const author = profiles[resource.author_id];
             const canDelete = resource.author_id === currentUserId || isManager;
+            const canFlag = resource.author_id !== currentUserId;
             const Icon = resource.kind === "link" ? Link2 : StickyNote;
             return (
               <li
@@ -112,23 +121,34 @@ export function ResourcesPanel({
                       {format(new Date(resource.created_at), "MMM d, yyyy")}
                     </p>
                   </div>
-                  {canDelete && (
-                    <ConfirmDialog
-                      title="Delete this resource?"
-                      description="It disappears for the whole group. There is no undo."
-                      confirmLabel="Delete"
-                      onConfirm={() => remove(resource.id)}
-                    >
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        aria-label={`Delete resource: ${resource.title}`}
-                        className="shrink-0 text-ink-muted hover:text-danger"
+                  <div className="flex shrink-0 items-center gap-1">
+                    {canFlag && (
+                      <FlagControl
+                        variant="icon"
+                        contentType="group_resource"
+                        contentId={resource.id}
+                        flagged={flaggedIds.has(resource.id)}
+                        label="this resource"
+                      />
+                    )}
+                    {canDelete && (
+                      <ConfirmDialog
+                        title="Delete this resource?"
+                        description="It disappears for the whole group. There is no undo."
+                        confirmLabel="Delete"
+                        onConfirm={() => remove(resource.id)}
                       >
-                        <Trash2 aria-hidden className="h-4 w-4" />
-                      </Button>
-                    </ConfirmDialog>
-                  )}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          aria-label={`Delete resource: ${resource.title}`}
+                          className="shrink-0 text-ink-muted hover:text-danger"
+                        >
+                          <Trash2 aria-hidden className="h-4 w-4" />
+                        </Button>
+                      </ConfirmDialog>
+                    )}
+                  </div>
                 </div>
               </li>
             );

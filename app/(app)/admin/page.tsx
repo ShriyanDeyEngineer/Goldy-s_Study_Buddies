@@ -20,18 +20,23 @@ type NameRow = { id: string; display_name: string | null; account_status: string
 export default async function AdminReportsPage() {
   const { supabase } = await getSessionProfile();
 
-  const [reportsRes, pendingReqRes, flaggedRes, groupsRes] = await Promise.all([
-    supabase.from("reports").select("*").order("created_at", { ascending: false }).limit(100),
-    supabase
-      .from("course_requests")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "pending"),
-    supabase.from("message_originals").select("id", { count: "exact", head: true }),
-    supabase
-      .from("study_groups")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "active"),
-  ]);
+  const [reportsRes, pendingReqRes, flaggedRes, openFlagsRes, groupsRes] =
+    await Promise.all([
+      supabase.from("reports").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase
+        .from("course_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending"),
+      supabase.from("message_originals").select("id", { count: "exact", head: true }),
+      supabase
+        .from("content_flags")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "open"),
+      supabase
+        .from("study_groups")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active"),
+    ]);
   const reports = (reportsRes.data ?? []) as ReportRow[];
 
   const personIds = [
@@ -49,12 +54,13 @@ export default async function AdminReportsPage() {
     { label: "Open reports", value: openCount },
     { label: "Pending course requests", value: pendingReqRes.count ?? 0, href: "/admin/requests" },
     { label: "Flagged messages", value: flaggedRes.count ?? 0, href: "/admin/messages" },
+    { label: "Open content flags", value: openFlagsRes.count ?? 0, href: "/admin/flags" },
     { label: "Active groups", value: groupsRes.count ?? 0, href: "/admin/groups" },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardContent className="p-4">

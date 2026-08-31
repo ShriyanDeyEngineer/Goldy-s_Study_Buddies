@@ -93,6 +93,17 @@ export const REPORT_CATEGORIES = [
 export const REPORT_CATEGORY_VALUES = REPORT_CATEGORIES.map((c) => c.value);
 export const REPORT_DESCRIPTION_MAX = 1000;
 
+/** Content flagging (spec §5.14 companion) — a per-item "a human should
+ *  look at this" signal, mirrored by a DB CHECK. Flagging is invisible to
+ *  everyone but the flagger and admins. */
+export const FLAG_CONTENT_TYPES = [
+  "group_message",
+  "direct_message",
+  "group_resource",
+] as const;
+export type FlagContentType = (typeof FLAG_CONTENT_TYPES)[number];
+export const FLAG_REASON_MAX = 1000;
+
 /** Meetup duration in minutes (bug report #2): 15 min to 8 hours. */
 export const MEETUP_DURATION_MIN = 15;
 export const MEETUP_DURATION_MAX = 480;

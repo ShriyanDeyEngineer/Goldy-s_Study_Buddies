@@ -186,6 +186,25 @@ export interface GroupResourceRow {
   created_at: string;
 }
 
+export interface ContentFlagRow {
+  id: string;
+  flagger_id: string;
+  content_type: "group_message" | "direct_message" | "group_resource";
+  content_id: string;
+  /** Who posted the flagged item; null once that account is deleted. */
+  content_author_id: string | null;
+  /** The group for message/resource flags; null for DM flags. */
+  group_id: string | null;
+  /** The text the flagger saw, captured at flag time (migration 0040). */
+  content_snapshot: string;
+  content_created_at: string | null;
+  reason: string | null;
+  status: "open" | "reviewing" | "resolved" | "dismissed";
+  /** Set when status becomes resolved/dismissed; drives the purge (0035). */
+  resolved_at: string | null;
+  created_at: string;
+}
+
 export interface GroupMessageRow {
   id: string;
   group_id: string;

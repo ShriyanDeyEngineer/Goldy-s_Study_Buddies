@@ -30,3 +30,26 @@ export async function setReportStatusAction(
   revalidatePath("/admin");
   return {};
 }
+
+const FLAG_STATUSES = ["open", "reviewing", "resolved", "dismissed"] as const;
+export type FlagStatus = (typeof FLAG_STATUSES)[number];
+
+/** Move a content flag through its lifecycle. RLS's "admins update content
+ *  flags" policy (0040) is the enforcement; non-admins match zero rows. */
+export async function setContentFlagStatusAction(
+  flagId: string,
+  status: FlagStatus,
+): Promise<{ error?: string }> {
+  if (!FLAG_STATUSES.includes(status)) {
+    return { error: friendlyError(null) };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("content_flags")
+    .update({ status })
+    .eq("id", flagId);
+  if (error) return { error: friendlyError(error) };
+  revalidatePath("/admin/flags");
+  revalidatePath("/admin");
+  return {};
+}

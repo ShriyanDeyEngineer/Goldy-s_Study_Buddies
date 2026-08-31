@@ -10,6 +10,7 @@ import { createGroupSchema } from "@/lib/validation/group";
 import { addCourseSchema, courseRequestSchema } from "@/lib/validation/course";
 import { profileSchema } from "@/lib/validation/profile";
 import { reportSchema } from "@/lib/validation/report";
+import { flagSchema } from "@/lib/validation/flag";
 
 const UUID = "123e4567-e89b-42d3-a456-426614174000";
 
@@ -209,5 +210,29 @@ describe("reports", () => {
         description: "x".repeat(1001),
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("content flags", () => {
+  it("accepts each valid content type; rejects anything else", () => {
+    for (const t of ["group_message", "direct_message", "group_resource"]) {
+      expect(flagSchema.safeParse({ content_type: t, content_id: UUID }).success).toBe(true);
+    }
+    expect(
+      flagSchema.safeParse({ content_type: "profile", content_id: UUID }).success,
+    ).toBe(false);
+  });
+
+  it("requires a UUID content id", () => {
+    expect(
+      flagSchema.safeParse({ content_type: "group_message", content_id: "nope" }).success,
+    ).toBe(false);
+  });
+
+  it("reason is optional; 1,000 passes, 1,001 fails", () => {
+    const base = { content_type: "direct_message", content_id: UUID };
+    expect(flagSchema.safeParse(base).success).toBe(true);
+    expect(flagSchema.safeParse({ ...base, reason: "x".repeat(1000) }).success).toBe(true);
+    expect(flagSchema.safeParse({ ...base, reason: "x".repeat(1001) }).success).toBe(false);
   });
 });

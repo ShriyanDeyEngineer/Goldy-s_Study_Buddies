@@ -467,3 +467,37 @@ Throttle the network (DevTools → Slow 3G) to make failures obvious.
       appears in catalog, student gets an approval notification linking
       to it) or Decline (student notified). Non-admin calling the
       approve/decline RPCs gets NOT_ADMIN.
+
+## Content flagging — migration 0040
+
+- [ ] **Flag a message**: in a group chat, U2 hovers one of U1's
+      messages → a faint flag icon + "Flag" appears next to the
+      timestamp → clicking opens a dialog (optional note) → "Flag for
+      review" → toast, and the control switches to "Flagged — undo". U2's
+      own messages have no flag control. Same on a DM thread (incoming
+      messages only).
+- [ ] **Flag a resource**: in a group's Resources, U2 sees a flag icon on
+      resources they did NOT post; flagging works the same way.
+- [ ] **Invisible to others**: reload as U1 (the author) and as U3
+      (another member) — no flag control state, no badge, chat/resources
+      look identical. Nothing in notifications. No realtime blip.
+- [ ] **Unflag**: U2 clicks "Flagged — undo" / the filled flag icon →
+      confirm → it reverts; flagging again re-adds it (one row, never
+      two).
+- [ ] **Admin queue**: U3 (admin) → /admin shows "Open content flags: N"
+      → /admin/flags lists each flag with the content snapshot, the
+      "group chat / direct message / resource" badge, author + flagger
+      names, the note, "also flagged by N others" when more than one
+      person flagged the same item, and a "View in group" link for group
+      content. Start review / Resolve / Dismiss move the status.
+- [ ] **Admin context**: /admin/groups → the group → flagged messages and
+      resources carry a red "🚩 flagged" badge (open/reviewing only).
+- [ ] **Boundaries**: a non-member RPC-calling `flag_content` on a
+      group's message gets CONTENT_NOT_FOUND; flagging your own content
+      gets SELF_ACTION; a non-admin visiting /admin/flags gets a 404; a
+      non-admin querying `content_flags` through the API sees only their
+      own rows.
+- [ ] **Retention**: `select * from public.preview_stale_purge();` lists
+      a `content_flags` row; a flag resolved over
+      `retention_grace_days_moderation()` days ago is deleted by
+      `purge_stale_rows()`, an open one is kept.

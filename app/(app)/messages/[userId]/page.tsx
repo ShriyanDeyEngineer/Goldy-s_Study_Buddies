@@ -29,7 +29,7 @@ export default async function DmThreadPage({
   // on neither of them, and awaiting it afterwards put a round trip (and
   // a row lock) on the critical path of every render and every refresh of
   // this thread — even when there was nothing unread to mark.
-  const [otherRes, messagesRes] = await Promise.all([
+  const [otherRes, messagesRes, flagsRes] = await Promise.all([
     supabase.from("public_profiles").select("*").eq("id", userId).maybeSingle(),
     // Most recent page only — two people's ENTIRE history otherwise
     // reloads in full every time either one opens the thread. DmThread
@@ -43,6 +43,12 @@ export default async function DmThreadPage({
       )
       .order("created_at", { ascending: false })
       .limit(CHAT_PAGE_SIZE),
+    // Which of my DMs I've flagged (0040) — RLS returns only my own rows.
+    supabase
+      .from("content_flags")
+      .select("content_id")
+      .eq("flagger_id", profile.id)
+      .eq("content_type", "direct_message"),
     // Opening the thread clears its unread badge (spec §5.12).
     markThreadReadAction(userId),
   ]);
@@ -53,6 +59,9 @@ export default async function DmThreadPage({
   // Fetched newest-first (for the .limit() above) — flip back to
   // chronological order for display.
   const messages = ((messagesRes.data ?? []) as DirectMessageRow[]).reverse();
+  const flaggedMessageIds = ((flagsRes.data ?? []) as { content_id: string }[]).map(
+    (f) => f.content_id,
+  );
 
   return (
     <DmThread
@@ -60,6 +69,7 @@ export default async function DmThreadPage({
       other={other}
       initialMessages={messages}
       initialHasMore={messages.length === CHAT_PAGE_SIZE}
+      flaggedMessageIds={flaggedMessageIds}
     />
   );
 }

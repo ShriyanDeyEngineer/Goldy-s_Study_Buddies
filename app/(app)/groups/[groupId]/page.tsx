@@ -178,8 +178,15 @@ export default async function GroupPage({
 
   /* ── Member: the full page ────────────────────────────────────────── */
   // Everything the three panels need, fetched in parallel.
-  const [messagesRes, membersRes, meetupsRes, pollsRes, resourcesRes, requestsRes] =
-    await Promise.all([
+  const [
+    messagesRes,
+    membersRes,
+    meetupsRes,
+    pollsRes,
+    resourcesRes,
+    requestsRes,
+    myFlagsRes,
+  ] = await Promise.all([
       // Most recent page only — an old, active group's chat could run to
       // thousands of rows, and this query (plus its RLS check) re-runs on
       // every member's every page load and every post-action refresh.
@@ -224,6 +231,13 @@ export default async function GroupPage({
             .eq("status", "pending")
             .order("created_at", { ascending: true })
         : Promise.resolve({ data: [] }),
+      // Which of this group's messages / resources the viewer has flagged
+      // (0040). RLS returns only their own rows, so this leaks nothing.
+      supabase
+        .from("content_flags")
+        .select("content_type, content_id")
+        .eq("flagger_id", profile.id)
+        .eq("group_id", groupId),
     ]);
 
   // Fetched newest-first (for the .limit() above) — flip back to
@@ -234,6 +248,17 @@ export default async function GroupPage({
   const polls = (pollsRes.data ?? []) as AvailabilityPollRow[];
   const resources = (resourcesRes.data ?? []) as GroupResourceRow[];
   const pendingRequests = (requestsRes.data ?? []) as JoinRequestRow[];
+
+  const myFlags = (myFlagsRes.data ?? []) as {
+    content_type: string;
+    content_id: string;
+  }[];
+  const flaggedMessageIds = myFlags
+    .filter((f) => f.content_type === "group_message")
+    .map((f) => f.content_id);
+  const flaggedResourceIds = myFlags
+    .filter((f) => f.content_type === "group_resource")
+    .map((f) => f.content_id);
 
   // Attendance + poll details depend on the ids we just fetched.
   const meetupIds = meetups.map((m) => m.id);
@@ -312,6 +337,7 @@ export default async function GroupPage({
           initialMessages={messages}
           initialHasMore={messages.length === CHAT_PAGE_SIZE}
           initialProfiles={profilesById}
+          flaggedMessageIds={flaggedMessageIds}
         />
         <MeetupsPanel
           groupId={group.id}
@@ -361,6 +387,7 @@ export default async function GroupPage({
           isManager={isManager}
           resources={resources}
           profiles={profilesById}
+          flaggedResourceIds={flaggedResourceIds}
         />
       </section>
     </div>

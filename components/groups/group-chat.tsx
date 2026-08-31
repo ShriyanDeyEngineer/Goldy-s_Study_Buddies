@@ -28,6 +28,7 @@ import type { GroupMessageRow, PublicProfile } from "@/lib/types";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { FlagControl } from "@/components/moderation/flag-control";
 import { cn } from "@/lib/utils";
 
 export function GroupChat({
@@ -36,6 +37,7 @@ export function GroupChat({
   initialMessages,
   initialHasMore,
   initialProfiles,
+  flaggedMessageIds = [],
 }: {
   groupId: string;
   currentUserId: string;
@@ -44,7 +46,13 @@ export function GroupChat({
    *  not a guarantee, that older history exists (see loadOlder below). */
   initialHasMore: boolean;
   initialProfiles: Record<string, PublicProfile>;
+  /** Ids of messages the current viewer has already flagged (0040). */
+  flaggedMessageIds?: string[];
 }) {
+  const flaggedIds = React.useMemo(
+    () => new Set(flaggedMessageIds),
+    [flaggedMessageIds],
+  );
   const [messages, setMessages] = React.useState<GroupMessageRow[]>(initialMessages);
   const [draft, setDraft] = React.useState("");
   const [sending, setSending] = React.useState(false);
@@ -273,7 +281,7 @@ export function GroupChat({
                       <span className="h-px flex-1 bg-line" />
                     </div>
                   )}
-                  <div className={cn("mb-2 flex gap-2", mine && "justify-end")}>
+                  <div className={cn("group mb-2 flex gap-2", mine && "justify-end")}>
                     {!mine && (
                       <Avatar
                         src={sender?.avatar_url}
@@ -296,8 +304,16 @@ export function GroupChat({
                       >
                         {message.content}
                       </div>
-                      <p className="mt-0.5 text-[10px] text-ink-muted">
+                      <p className="mt-0.5 flex items-center gap-2 text-[10px] text-ink-muted">
                         {format(new Date(message.created_at), "h:mm a")}
+                        {!mine && (
+                          <FlagControl
+                            contentType="group_message"
+                            contentId={message.id}
+                            flagged={flaggedIds.has(message.id)}
+                            label="this message"
+                          />
+                        )}
                       </p>
                     </div>
                   </div>

@@ -590,6 +590,110 @@ begin
   raise notice 'PASS: hidden fields are stripped and excluded from their filters';
 end $$;
 
+-- ── INVARIANT 11: content flags are private, permission-checked, toggleable ──
+do $$
+declare
+  u1 uuid := '00000000-0000-4000-a000-000000000001';  -- manager + author
+  u2 uuid := '00000000-0000-4000-a000-000000000002';  -- member + flagger
+  u3 uuid := '00000000-0000-4000-a000-000000000003';  -- outsider
+  u4 uuid := '00000000-0000-4000-a000-000000000004';  -- admin
+  v_course uuid;
+  v_group  uuid;
+  v_msg    uuid;
+  v_flag   uuid;
+  v_n      int;
+  v_seen_outsider int;
+  v_seen_author   int;
+  v_seen_flagger  int;
+  v_seen_admin    int;
+begin
+  select course_id into v_course from public.create_course('TEST','1001','x');
+
+  perform pg_temp.impersonate(u1);
+  v_group := public.create_study_group(v_course, 'Flag Test', null, 5, 'open');
+  select id into v_msg from public.send_group_message(v_group, 'look at this');
+
+  perform pg_temp.impersonate(u2);
+  perform public.join_group(v_group);
+
+  -- A non-member cannot flag the group's content — and gets the same
+  -- error as a missing row (no existence probing).
+  perform pg_temp.impersonate(u3);
+  begin
+    perform public.flag_content('group_message', v_msg, null);
+    raise exception 'FAIL: a non-member flagged a group message';
+  exception when others then
+    if sqlerrm not like '%CONTENT_NOT_FOUND%' then raise; end if;
+  end;
+
+  -- You cannot flag your own content.
+  perform pg_temp.impersonate(u1);
+  begin
+    perform public.flag_content('group_message', v_msg, null);
+    raise exception 'FAIL: author flagged their own message';
+  exception when others then
+    if sqlerrm not like '%SELF_ACTION%' then raise; end if;
+  end;
+
+  -- u2 (a member) flags it, with a note.
+  perform pg_temp.impersonate(u2);
+  v_flag := public.flag_content('group_message', v_msg, 'not appropriate');
+  select count(*) into v_n from public.content_flags
+    where content_type = 'group_message' and content_id = v_msg;
+  if v_n <> 1 then
+    raise exception 'FAIL: flag_content did not create exactly one row (got %)', v_n;
+  end if;
+
+  -- Re-flagging is a no-op (unique on flagger + content).
+  perform public.flag_content('group_message', v_msg, 'still not ok');
+  select count(*) into v_n from public.content_flags
+    where content_type = 'group_message' and content_id = v_msg;
+  if v_n <> 1 then
+    raise exception 'FAIL: re-flag created a second row';
+  end if;
+
+  -- RLS: the flag is invisible to a non-flagger non-admin, visible to the
+  -- flagger, visible to an admin. Run the reads as the (non-superuser)
+  -- `authenticated` role so the policies actually apply; capture every
+  -- count first, restore the role, THEN assert — so a failure can never
+  -- strand the session in the switched role.
+  update public.profiles set is_admin = true where id = u4;
+
+  set local role authenticated;
+  perform pg_temp.impersonate(u3);
+  select count(*) into v_seen_outsider from public.content_flags;
+  perform pg_temp.impersonate(u1);  -- the flagged author is not privileged
+  select count(*) into v_seen_author from public.content_flags;
+  perform pg_temp.impersonate(u2);
+  select count(*) into v_seen_flagger from public.content_flags where id = v_flag;
+  perform pg_temp.impersonate(u4);
+  select count(*) into v_seen_admin from public.content_flags where id = v_flag;
+  reset role;
+
+  if v_seen_outsider <> 0 then
+    raise exception 'FAIL: an outsider can see content_flags rows';
+  end if;
+  if v_seen_author <> 0 then
+    raise exception 'FAIL: the flagged author can see the flag on their content';
+  end if;
+  if v_seen_flagger <> 1 then
+    raise exception 'FAIL: the flagger cannot see their own flag';
+  end if;
+  if v_seen_admin <> 1 then
+    raise exception 'FAIL: an admin cannot see the flag';
+  end if;
+
+  -- Unflagging removes it (clean toggle, idempotent).
+  perform pg_temp.impersonate(u2);
+  perform public.unflag_content('group_message', v_msg);
+  perform public.unflag_content('group_message', v_msg);  -- no error second time
+  if exists (select 1 from public.content_flags where id = v_flag) then
+    raise exception 'FAIL: unflag_content left the row behind';
+  end if;
+
+  raise notice 'PASS: content flags are private, permission-checked, and toggleable';
+end $$;
+
 -- ── RETENTION (0035): one grace period governs every bucket ─────────────────
 -- The period is public.retention_grace_days(). These blocks age rows just
 -- past it (or just inside it) and assert purge_stale_rows() acts correctly.

@@ -24,6 +24,7 @@ import type { DirectMessageRow, PublicProfile } from "@/lib/types";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { FlagControl } from "@/components/moderation/flag-control";
 import { cn } from "@/lib/utils";
 
 export function DmThread({
@@ -31,6 +32,7 @@ export function DmThread({
   other,
   initialMessages,
   initialHasMore,
+  flaggedMessageIds = [],
 }: {
   currentUserId: string;
   other: PublicProfile;
@@ -38,7 +40,13 @@ export function DmThread({
   /** Whether the server's initial fetch filled a whole page — a hint,
    *  not a guarantee, that older history exists (see loadOlder below). */
   initialHasMore: boolean;
+  /** Ids of messages the current viewer has already flagged (0040). */
+  flaggedMessageIds?: string[];
 }) {
+  const flaggedIds = React.useMemo(
+    () => new Set(flaggedMessageIds),
+    [flaggedMessageIds],
+  );
   const [messages, setMessages] = React.useState<DirectMessageRow[]>(initialMessages);
   const [draft, setDraft] = React.useState("");
   const [sending, setSending] = React.useState(false);
@@ -234,7 +242,7 @@ export function DmThread({
                     <span className="h-px flex-1 bg-line" />
                   </div>
                 )}
-                <div className={cn("mb-2 flex", mine && "justify-end")}>
+                <div className={cn("group mb-2 flex", mine && "justify-end")}>
                   <div className={cn("max-w-[80%]", mine && "text-right")}>
                     <div
                       className={cn(
@@ -244,8 +252,16 @@ export function DmThread({
                     >
                       {message.content}
                     </div>
-                    <p className="mt-0.5 text-[10px] text-ink-muted">
+                    <p className="mt-0.5 flex items-center gap-2 text-[10px] text-ink-muted">
                       {format(new Date(message.created_at), "h:mm a")}
+                      {!mine && (
+                        <FlagControl
+                          contentType="direct_message"
+                          contentId={message.id}
+                          flagged={flaggedIds.has(message.id)}
+                          label="this message"
+                        />
+                      )}
                     </p>
                   </div>
                 </div>

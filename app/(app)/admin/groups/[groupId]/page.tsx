@@ -48,35 +48,53 @@ export default async function AdminGroupPage({
   const group = groupRes.data as (StudyGroupRow & { courses: CourseRow }) | null;
   if (!group) notFound();
 
-  const [messagesRes, membersRes, meetupsRes, resourcesRes] = await Promise.all([
-    supabase
-      .from("group_messages")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("created_at", { ascending: false })
-      .limit(200),
-    supabase
-      .from("study_group_members")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("joined_at", { ascending: true }),
-    supabase
-      .from("meetups")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("scheduled_at", { ascending: false })
-      .limit(30),
-    supabase
-      .from("group_resources")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("created_at", { ascending: false })
-      .limit(GROUP_RESOURCES_LIMIT),
-  ]);
+  const [messagesRes, membersRes, meetupsRes, resourcesRes, flagsRes] =
+    await Promise.all([
+      supabase
+        .from("group_messages")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: false })
+        .limit(200),
+      supabase
+        .from("study_group_members")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("joined_at", { ascending: true }),
+      supabase
+        .from("meetups")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("scheduled_at", { ascending: false })
+        .limit(30),
+      supabase
+        .from("group_resources")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: false })
+        .limit(GROUP_RESOURCES_LIMIT),
+      // Open/reviewing user flags on this group's content (0040).
+      supabase
+        .from("content_flags")
+        .select("content_type, content_id")
+        .eq("group_id", groupId)
+        .in("status", ["open", "reviewing"]),
+    ]);
   const messages = ((messagesRes.data ?? []) as GroupMessageRow[]).reverse();
   const members = (membersRes.data ?? []) as GroupMemberRow[];
   const meetups = (meetupsRes.data ?? []) as MeetupRow[];
   const resources = (resourcesRes.data ?? []) as GroupResourceRow[];
+
+  const flagRows = (flagsRes.data ?? []) as {
+    content_type: string;
+    content_id: string;
+  }[];
+  const flaggedMessageIds = new Set(
+    flagRows.filter((f) => f.content_type === "group_message").map((f) => f.content_id),
+  );
+  const flaggedResourceIds = new Set(
+    flagRows.filter((f) => f.content_type === "group_resource").map((f) => f.content_id),
+  );
 
   const everyoneIds = [
     ...new Set([
@@ -119,9 +137,12 @@ export default async function AdminGroupPage({
             ) : (
               messages.map((message) => (
                 <div key={message.id} className="mb-3">
-                  <p className="text-xs text-ink-muted">
+                  <p className="flex flex-wrap items-center gap-1.5 text-xs text-ink-muted">
                     <span className="font-medium text-ink">{nameOf(message.sender_id)}</span>{" "}
                     · {format(new Date(message.created_at), "MMM d, h:mm a")}
+                    {flaggedMessageIds.has(message.id) && (
+                      <Badge variant="danger">🚩 flagged</Badge>
+                    )}
                   </p>
                   <p className="whitespace-pre-wrap break-words text-sm text-ink">
                     {message.content}
@@ -192,6 +213,11 @@ export default async function AdminGroupPage({
                   <li key={resource.id} className="min-w-0">
                     <span className="font-medium text-ink">{resource.title}</span>
                     <span className="text-xs text-ink-muted"> — {nameOf(resource.author_id)}</span>
+                    {flaggedResourceIds.has(resource.id) && (
+                      <Badge variant="danger" className="ml-1.5">
+                        🚩 flagged
+                      </Badge>
+                    )}
                     {resource.kind === "link" ? (
                       <a
                         href={resource.content}

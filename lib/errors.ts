@@ -97,6 +97,11 @@ export const FRIENDLY_MESSAGES: Record<string, string> = {
   // ── Reports ──────────────────────────────────────────────────────────
   INVALID_CATEGORY: "Pick the reason that fits best.",
   DESCRIPTION_TOO_LONG: "Keep the description under 1,000 characters.",
+
+  // ── Content flags ────────────────────────────────────────────────────
+  CONTENT_NOT_FOUND: "That content isn't available anymore.",
+  INVALID_CONTENT_TYPE: "That can't be flagged.",
+  REASON_TOO_LONG: "Keep the note under 1,000 characters.",
 };
 
 export const GENERIC_ERROR =
