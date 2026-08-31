@@ -98,7 +98,7 @@ begin
   select course_id into v_course from public.create_course('TEST','1001','x');
 
   perform pg_temp.impersonate(u1);
-  v_group := public.create_study_group(v_course, 'Capacity Test', 2, 'open');
+  v_group := public.create_study_group(v_course, 'Capacity Test', null, 2, 'open');
 
   perform pg_temp.impersonate(u2);
   if public.join_group(v_group) <> 'joined' then
@@ -140,7 +140,7 @@ begin
   select course_id into v_course from public.create_course('TEST','1001','x');
 
   perform pg_temp.impersonate(u1);
-  v_group := public.create_study_group(v_course, 'Approval Test', 2, 'closed');
+  v_group := public.create_study_group(v_course, 'Approval Test', null, 2, 'closed');
 
   perform pg_temp.impersonate(u2);
   if public.join_group(v_group) <> 'requested' then
@@ -208,7 +208,7 @@ begin
   select course_id into v_course from public.create_course('TEST','1001','x');
 
   perform pg_temp.impersonate(u1);
-  v_group := public.create_study_group(v_course, 'Authority Test', 5, 'closed');
+  v_group := public.create_study_group(v_course, 'Authority Test', null, 5, 'closed');
 
   perform pg_temp.impersonate(u2);
   perform public.join_group(v_group);
@@ -263,7 +263,7 @@ begin
   select course_id into v_course from public.create_course('TEST','1001','x');
 
   perform pg_temp.impersonate(u1);
-  v_group := public.create_study_group(v_course, 'Succession Test', 5, 'open');
+  v_group := public.create_study_group(v_course, 'Succession Test', null, 5, 'open');
   perform pg_temp.impersonate(u2);
   perform public.join_group(v_group);
   perform pg_temp.impersonate(u3);
@@ -321,7 +321,7 @@ begin
   select course_id into v_course from public.create_course('TEST','1001','x');
 
   perform pg_temp.impersonate(u1);
-  v_group := public.create_study_group(v_course, 'Disband Test', 5, 'closed');
+  v_group := public.create_study_group(v_course, 'Disband Test', null, 5, 'closed');
 
   perform pg_temp.impersonate(u2);
   perform public.join_group(v_group);
@@ -366,15 +366,24 @@ begin
     raise exception 'FAIL: pending requester was not notified of disband';
   end if;
 
-  -- The seven-day rule (0022): age the tombstone past the window and run
-  -- the purge — the group and EVERY child row must be gone.
+  -- The grace-period rule (0022 window, 0035 duration): a disbanded group
+  -- one day INSIDE the window survives; one day PAST it, the purge deletes
+  -- the group and EVERY child row.
   update public.study_groups
-    set disbanded_at = now() - interval '8 days'
+    set disbanded_at = now() - make_interval(days => public.retention_grace_days() - 1)
+    where id = v_group;
+  perform public.purge_stale_rows();
+  if not exists (select 1 from public.study_groups where id = v_group) then
+    raise exception 'FAIL: purge deleted a disbanded group still inside the grace period';
+  end if;
+
+  update public.study_groups
+    set disbanded_at = now() - make_interval(days => public.retention_grace_days() + 1)
     where id = v_group;
   perform public.purge_stale_rows();
 
   if exists (select 1 from public.study_groups where id = v_group) then
-    raise exception 'FAIL: purge kept a week-old disbanded group';
+    raise exception 'FAIL: purge kept a disbanded group past the grace period';
   end if;
   if exists (select 1 from public.join_requests where group_id = v_group) then
     raise exception 'FAIL: join-request rows survived the purge';
@@ -383,7 +392,7 @@ begin
     raise exception 'FAIL: meetup rows survived the purge';
   end if;
 
-  raise notice 'PASS: disband tombstones for seven days, then the purge deletes everything';
+  raise notice 'PASS: disband tombstones for the grace period, then the purge deletes everything';
 end $$;
 
 -- ── INVARIANT 7: closed→open approves min(pending, space), oldest first ─────
@@ -399,7 +408,7 @@ begin
   select course_id into v_course from public.create_course('TEST','1001','x');
 
   perform pg_temp.impersonate(u1);
-  v_group := public.create_study_group(v_course, 'Mode Switch Test', 3, 'closed');
+  v_group := public.create_study_group(v_course, 'Mode Switch Test', null, 3, 'closed');
 
   perform pg_temp.impersonate(u2); perform public.join_group(v_group);
   perform pg_temp.impersonate(u3); perform public.join_group(v_group);
@@ -446,7 +455,7 @@ declare
 begin
   select course_id into v_course from public.create_course('TEST','1001','x');
   perform pg_temp.impersonate(u1);
-  v_group := public.create_study_group(v_course, 'Message Test', 5, 'open');
+  v_group := public.create_study_group(v_course, 'Message Test', null, 5, 'open');
 
   -- Exactly 2,000 is fine…
   perform public.send_group_message(v_group, repeat('x', 2000));
@@ -579,6 +588,208 @@ begin
   end if;
 
   raise notice 'PASS: hidden fields are stripped and excluded from their filters';
+end $$;
+
+-- ── RETENTION (0035): one grace period governs every bucket ─────────────────
+-- The period is public.retention_grace_days(). These blocks age rows just
+-- past it (or just inside it) and assert purge_stale_rows() acts correctly.
+-- Fresh users u6–u9 so accumulated state above can't interfere.
+
+do $$
+declare
+  ids uuid[] := array[
+    '00000000-0000-4000-a000-000000000006',
+    '00000000-0000-4000-a000-000000000007',
+    '00000000-0000-4000-a000-000000000008',
+    '00000000-0000-4000-a000-000000000009'
+  ];
+  i int;
+begin
+  for i in 1..4 loop
+    insert into auth.users (id, email) values (ids[i], 'invariant-retention-' || i || '@umn.edu');
+    update public.profiles set display_name = 'Retention Student ' || i where id = ids[i];
+  end loop;
+end $$;
+
+-- Bucket 1: content is erased `grace` days after creation — but a meetup
+-- ages off scheduled_at, so a booking made far ahead is never purged early.
+do $$
+declare
+  u6 uuid := '00000000-0000-4000-a000-000000000006';
+  u7 uuid := '00000000-0000-4000-a000-000000000007';
+  v_course uuid;
+  v_group  uuid;
+  v_old_msg uuid;
+  v_new_msg uuid;
+  v_meetup uuid;
+begin
+  select course_id into v_course from public.create_course('TEST','1001','x');
+  perform pg_temp.impersonate(u6);
+  v_group := public.create_study_group(v_course, 'Retention Bucket One', null, 5, 'open');
+  perform pg_temp.impersonate(u7); perform public.join_group(v_group);
+
+  perform pg_temp.impersonate(u6);
+  select id into v_old_msg from public.send_group_message(v_group, 'ancient history');
+  select id into v_new_msg from public.send_group_message(v_group, 'said this today');
+  v_meetup := public.create_meetup(v_group, 'Far-future meetup',
+                now() + interval '30 days', 'in_person', 'Walter Library');
+
+  update public.group_messages
+    set created_at = now() - make_interval(days => public.retention_grace_days() + 5)
+    where id = v_old_msg;
+  update public.meetups
+    set created_at = now() - make_interval(days => public.retention_grace_days() + 5)
+    where id = v_meetup;
+
+  perform public.purge_stale_rows();
+
+  if exists (select 1 from public.group_messages where id = v_old_msg) then
+    raise exception 'FAIL: a year-old group message survived the purge';
+  end if;
+  if not exists (select 1 from public.group_messages where id = v_new_msg) then
+    raise exception 'FAIL: a fresh group message was purged';
+  end if;
+  if not exists (select 1 from public.meetups where id = v_meetup) then
+    raise exception 'FAIL: an upcoming meetup was purged for being created long ago';
+  end if;
+
+  update public.meetups
+    set scheduled_at = now() - make_interval(days => public.retention_grace_days() + 1)
+    where id = v_meetup;
+  perform public.purge_stale_rows();
+  if exists (select 1 from public.meetups where id = v_meetup) then
+    raise exception 'FAIL: a meetup a year past its date survived the purge';
+  end if;
+  if exists (select 1 from public.meetup_attendance where meetup_id = v_meetup) then
+    raise exception 'FAIL: RSVP rows for a purged meetup were left behind';
+  end if;
+
+  raise notice 'PASS: bucket 1 erases old content; meetups age off scheduled_at';
+end $$;
+
+-- Bucket 2: a still-pending request is capped at `grace` days after
+-- creation; a report is erased only after a human resolves it.
+do $$
+declare
+  u6 uuid := '00000000-0000-4000-a000-000000000006';
+  u7 uuid := '00000000-0000-4000-a000-000000000007';
+  v_fr uuid;
+  v_report uuid;
+begin
+  perform pg_temp.impersonate(u6);
+  perform public.send_friend_request(u7);
+  select id into v_fr from public.friend_requests
+    where sender_id = u6 and recipient_id = u7 and status = 'pending';
+
+  update public.friend_requests
+    set created_at = now() - make_interval(days => public.retention_grace_days() + 1)
+    where id = v_fr;
+  perform public.purge_stale_rows();
+  if exists (select 1 from public.friend_requests where id = v_fr) then
+    raise exception 'FAIL: a year-old still-pending friend request survived the purge';
+  end if;
+
+  perform pg_temp.impersonate(u6);
+  v_report := public.report_user(u7, 'harassment', 'test report');
+  update public.reports
+    set created_at = now() - make_interval(days => public.retention_grace_days() + 30)
+    where id = v_report;
+  perform public.purge_stale_rows();
+  if not exists (select 1 from public.reports where id = v_report) then
+    raise exception 'FAIL: an open report was auto-deleted for age';
+  end if;
+
+  update public.reports set status = 'resolved' where id = v_report;
+  if (select resolved_at from public.reports where id = v_report) is null then
+    raise exception 'FAIL: resolved_at not stamped when the report closed';
+  end if;
+  update public.reports
+    set resolved_at = now() - make_interval(days => public.retention_grace_days() + 1)
+    where id = v_report;
+  perform public.purge_stale_rows();
+  if exists (select 1 from public.reports where id = v_report) then
+    raise exception 'FAIL: a report resolved over a year ago survived the purge';
+  end if;
+
+  raise notice 'PASS: bucket 2 caps pending rows at creation; reports wait for resolution';
+end $$;
+
+-- Bucket 3: deleting an account defers its satellite data to the grace
+-- period; the tombstone is swept once the period is up AND nothing else
+-- points at it.
+do $$
+declare
+  u8 uuid := '00000000-0000-4000-a000-000000000008';
+  u9 uuid := '00000000-0000-4000-a000-000000000009';
+  v_course uuid;
+  v_dm uuid;
+begin
+  select course_id into v_course from public.create_course('TEST','1001','x');
+
+  perform pg_temp.impersonate(u8);
+  perform public.send_friend_request(u9);
+  perform pg_temp.impersonate(u9);
+  perform public.respond_friend_request(
+    (select id from public.friend_requests
+       where sender_id = u8 and recipient_id = u9 and status = 'pending'), true);
+  perform pg_temp.impersonate(u8);
+  insert into public.user_courses (user_id, course_id, enrollment_type)
+    values (u8, v_course, 'current') on conflict do nothing;
+  select id into v_dm from public.send_direct_message(u9, 'bye for now');
+
+  perform public.delete_account();
+
+  if (select account_status from public.profiles where id = u8) <> 'deleted' then
+    raise exception 'FAIL: account not marked deleted';
+  end if;
+  if (select deleted_at from public.profiles where id = u8) is null then
+    raise exception 'FAIL: deleted_at not stamped on account deletion';
+  end if;
+  if not exists (select 1 from public.friends
+                 where user_id_a = least(u8,u9) and user_id_b = greatest(u8,u9)) then
+    raise exception 'FAIL: friendship was deleted immediately instead of deferred';
+  end if;
+  if not exists (select 1 from public.user_courses where user_id = u8) then
+    raise exception 'FAIL: course list was deleted immediately instead of deferred';
+  end if;
+  if not exists (select 1 from public.deleted_account_emails where id = u8) then
+    raise exception 'FAIL: retained email row not written on deletion';
+  end if;
+
+  perform public.purge_stale_rows();
+  if not exists (select 1 from public.friends
+                 where user_id_a = least(u8,u9) and user_id_b = greatest(u8,u9)) then
+    raise exception 'FAIL: purge removed a deleted account''s data inside the grace period';
+  end if;
+
+  update public.profiles
+    set deleted_at = now() - make_interval(days => public.retention_grace_days() + 1)
+    where id = u8;
+  perform public.purge_stale_rows();
+
+  if exists (select 1 from public.friends
+             where user_id_a = least(u8,u9) and user_id_b = greatest(u8,u9)) then
+    raise exception 'FAIL: friendship survived past the grace period';
+  end if;
+  if exists (select 1 from public.user_courses where user_id = u8) then
+    raise exception 'FAIL: course list survived past the grace period';
+  end if;
+  if exists (select 1 from public.deleted_account_emails where id = u8) then
+    raise exception 'FAIL: retained email survived past the grace period';
+  end if;
+  if not exists (select 1 from public.profiles where id = u8) then
+    raise exception 'FAIL: tombstone swept while a recent DM still referenced it';
+  end if;
+
+  update public.direct_messages
+    set created_at = now() - make_interval(days => public.retention_grace_days() + 1)
+    where id = v_dm;
+  perform public.purge_stale_rows();
+  if exists (select 1 from public.profiles where id = u8) then
+    raise exception 'FAIL: an unreferenced tombstone survived past the grace period';
+  end if;
+
+  raise notice 'PASS: bucket 3 defers a deleted account''s data, then sweeps the tombstone';
 end $$;
 
 do $$ begin raise notice '=== ALL INVARIANT TESTS PASSED — rolling back ==='; end $$;

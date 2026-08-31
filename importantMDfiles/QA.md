@@ -122,8 +122,8 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       approved, the third cancelled + notified.
 - [ ] Disband requires typing the exact group name; after: members and
       pending requesters notified, meetups cancelled, group page shows
-      unavailable. Seven days later the nightly purge deletes the group
-      and all its content from Supabase (see Data cleanup).
+      unavailable. The nightly purge deletes the group and all its content
+      from Supabase once the retention grace period passes (see Data cleanup).
 - [ ] Manager leaves → longest-tenured member becomes manager (crown
       moves, notification arrives). Last member leaving disbands.
 
@@ -358,41 +358,51 @@ distinct test accounts (use `yourname+1@umn.edu` style aliases).
       navigating; the badge count follows, including from the
       /notifications page (bell recounts via realtime).
 
-## Data cleanup — 2026-08-25
+## Data cleanup — retention grace period (migration 0035)
 
-Checks that "deleted on the website" means deleted in Supabase. These
-need the Supabase dashboard (Table Editor / Storage) open beside the app.
+Checks that "no longer useful" means "deleted in Supabase after the grace
+period" (`retention_grace_days()`, 365 days). These need the Supabase
+dashboard (Table Editor / Storage) open beside the app. See docs/RETENTION.md.
 
+- [ ] **Preview**: `select * from public.preview_stale_purge();` returns a
+      per-table count of what the next purge would delete. On a young
+      database every count is 0.
 - [ ] **Disband**: disband a group with chat, a meetup, a poll, and a
-      resource. Immediately after: the `study_groups` row shows status
-      `disbanded` with `disbanded_at` stamped; members got their "group
-      was disbanded" notification; an admin can still open the group
-      under /admin/groups and read its chat.
-- [ ] **Disband, seven days on**: backdate `disbanded_at` by 8 days in
-      the dashboard and run `select public.purge_stale_rows();` — the
-      `study_groups` row is GONE, and so are its rows in
-      `group_messages`, `meetups`, `meetup_attendance`,
-      `availability_polls`, `availability_slots`, `availability_votes`,
-      `group_resources`, `join_requests`, `group_invitations`.
-- [ ] **Last member leaves**: same tombstone-then-purge path via
-      everyone leaving.
-- [ ] **Close poll**: closing a poll deletes its `availability_polls`
-      row and every slot and vote; the group page stops showing it.
+      resource. Immediately after: `study_groups` shows status `disbanded`
+      with `disbanded_at` stamped; members got their notification; an
+      admin can still open the group under /admin/groups and read its chat.
+- [ ] **Disband, past the grace period**: backdate `disbanded_at` by
+      `retention_grace_days() + 1` days and run
+      `select public.purge_stale_rows();` — the `study_groups` row is GONE,
+      and so are its rows in `group_messages`, `meetups`,
+      `meetup_attendance`, `availability_polls`, `availability_slots`,
+      `availability_votes`, `group_resources`, `join_requests`,
+      `group_invitations`. Backdated by less → still there.
+- [ ] **Old content**: backdate a `direct_messages` / `group_messages` /
+      `group_resources` row's `created_at`, and a `meetups` row's
+      `scheduled_at`, past the grace period → the purge deletes each.
+      A meetup old by `created_at` but still upcoming by `scheduled_at`
+      survives.
+- [ ] **Close poll**: closing a poll still deletes its `availability_polls`
+      row and every slot and vote immediately (unchanged).
+- [ ] **Pending backstop**: a `friend_requests` row with `created_at` past
+      the grace period is purged even while still `pending`.
+- [ ] **Reports**: an `open` report is never purged, however old. Mark it
+      `resolved` (→ `resolved_at` stamped by trigger), backdate `resolved_at`
+      past the grace period → purged.
 - [ ] **Avatar sweep**: change your profile picture three times — the
       Storage `avatars/<your-id>/` folder holds exactly ONE file.
-- [ ] **Delete account (fresh)**: delete a new account that never sent a
-      message — its `profiles` row is GONE entirely, along with its
-      `user_courses` rows and any pending course request.
-- [ ] **Delete account (with history)**: delete an account that has chat
-      messages — a scrubbed `profiles` row remains (name "Deleted User",
-      status `deleted`), old messages still render as "Deleted User",
-      but its `user_courses` rows and pending course requests are gone.
-- [ ] **Stale purge**: `select public.purge_stale_rows();` removes
-      week-old disbanded groups, resolved requests/invitations and read
-      notifications older than 30 days, and tombstones nothing references
-      — and nothing newer; pending rows, unread notifications, and
-      freshly disbanded groups are never touched. (Nightly via pg_cron
-      where available.)
+- [ ] **Delete account (immediate)**: delete an account — its `profiles`
+      row is now a scrubbed "Deleted User" tombstone with `deleted_at`
+      stamped (NOT removed outright, even for a fresh account); its RSVPs,
+      poll votes, notifications, and pending course requests are gone;
+      its `friends`, `user_courses`, and `deleted_account_emails` row
+      REMAIN for now; the Google login is freed (re-signup works).
+- [ ] **Delete account (past grace)**: backdate that profile's `deleted_at`
+      past the grace period and purge → `friends`, `study_buddy_connections`,
+      `blocks`, `user_courses`, `deleted_account_emails` gone; the
+      `profiles` tombstone gone too, UNLESS old chat / a report / created
+      content still references it (then it goes once that ages out).
 
 ## Responsiveness — 2026-08-25
 

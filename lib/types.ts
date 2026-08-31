@@ -34,6 +34,8 @@ export interface ProfileRow {
   is_admin: boolean;
   onboarded_at: string | null;
   last_login_at: string | null;
+  /** When the account was deleted; drives the retention purge (0035). */
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -155,6 +157,8 @@ export interface ReportRow {
   description: string | null;
   status: "open" | "reviewing" | "resolved" | "dismissed";
   resolution: string | null;
+  /** Set when status becomes resolved/dismissed; drives the purge (0035). */
+  resolved_at: string | null;
   created_at: string;
 }
 

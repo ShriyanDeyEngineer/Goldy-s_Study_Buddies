@@ -31,14 +31,15 @@ these words are the contract.
   A hidden field is stripped from API responses in the database itself AND
   excludes the user from that field's search filter — otherwise showing up
   in "major = X" results would leak the hidden major.
-- **Account deletion** — self-service, typed-DELETE-confirmed. Leaves
-  every group (with normal succession/disband), severs the social graph,
-  and removes course lists, RSVPs, votes, notifications, and avatar
-  files. If nothing references the person any more, their profile row is
-  deleted outright; if their messages or shared content still exist, a
-  scrubbed "Deleted User" tombstone row stays behind — hard-deleting it
-  would cascade away OTHER people's chat history. The Google identity is
-  freed either way, so signing in again starts a brand-new account.
+- **Account deletion** — self-service, typed-DELETE-confirmed, irreversible.
+  Immediately: leaves every group (normal succession/disband), cancels
+  pending requests both ways, drops RSVPs, poll votes, the notification
+  inbox and any pending course request, scrubs all profile PII to a
+  "Deleted User" tombstone, and frees the Google identity so signing in
+  again starts a brand-new account. The tombstone plus the account's
+  course list, friendships, buddy connections, blocks, and retained email
+  are then deleted by the nightly purge once the retention grace period
+  has passed (see *data retention*).
 - **Admin** — an account with `is_admin` set (by hand, in the database).
   Admins can read reports. There is no admin UI yet.
 - **Suspended / banned** — account statuses set by the team after reviewing
@@ -75,11 +76,25 @@ these words are the contract.
   becomes manager automatically. Deterministic, never random.
 - **Disband** — the manager's typed-name-confirmed teardown: all members
   removed, future meetups cancelled, pending requests declined, everyone
-  notified — one transaction. The group row stays as a tombstone for
-  SEVEN DAYS (old links explain themselves, and admins can still review
-  the chat if something was reported); then the nightly purge deletes the
-  group and everything inside it — chat, meetups, polls, resources, and
-  request history — from the database for good.
+  notified — one transaction. The group row stays as a tombstone for the
+  retention grace period (old links explain themselves, and admins can
+  still review the chat if something was reported); then the nightly purge
+  deletes the group and everything inside it — chat, meetups, polls,
+  resources, and request history — from the database for good.
+
+## Data retention
+
+- **Retention grace period** — the fixed number of days
+  (`retention_grace_days()`, currently 365) after which every kind of
+  stored data is deleted from the database. One knob governs almost
+  everything; `courses` and `universities` are the only tables kept
+  forever. Enforced nightly by `purge_stale_rows()`. Full rules, and how
+  to change the number, in [RETENTION.md](RETENTION.md).
+- **Tombstone** — a row kept only so something else still renders: a
+  disbanded group (so old links explain themselves), or a scrubbed
+  "Deleted User" profile (so other people's old chat keeps a name on it).
+  Deleted by the nightly purge once the grace period passes and nothing
+  points at it any more.
 
 ## Scheduling
 
