@@ -50,7 +50,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
         <h2 className="mb-4 font-display text-xl text-ink">The basics</h2>
         <form action={formAction} noValidate className="space-y-4">
           <AvatarPicker
-            label="Profile picture (JPEG/PNG, up to 5 MB)"
+            label="Profile picture (JPEG/PNG, up to 5 MB, you are not required to use your face)"
             currentUrl={profile.avatar_url}
             fallbackName={profile.display_name}
             error={avatarClientError ?? state.fieldErrors?.avatar}
@@ -72,7 +72,7 @@ export function ProfileForm({ profile }: { profile: ProfileRow }) {
           )}
 
           <div>
-            <Label htmlFor="display_name">Display name (required)</Label>
+            <Label htmlFor="display_name">Display name (required, recommended to just use your first name)</Label>
             <Input
               id="display_name"
               name="display_name"

@@ -151,7 +151,7 @@ export function OnboardingWizard({
             <legend className="sr-only">About you</legend>
             <div>
               <Label htmlFor="display_name">
-                Display name (required)
+                Display name (required, recommended to set it to just your first name)
                 {suggestedName.trim() && (
                   <span className="ml-1.5 font-normal text-ink-muted">— from your Google account, change it if you like</span>
                 )}
@@ -300,7 +300,7 @@ export function OnboardingWizard({
           <fieldset hidden={step !== 2} className="space-y-4">
             <legend className="sr-only">Bio and profile picture</legend>
             <AvatarPicker
-              label="Profile picture (optional — JPEG/PNG, up to 5 MB)"
+              label="Profile picture (optional — JPEG/PNG, up to 5 MB, you are not required to use your face)"
               error={avatarClientError ?? state.fieldErrors?.avatar}
               onFileCheck={setAvatarClientError}
             />
