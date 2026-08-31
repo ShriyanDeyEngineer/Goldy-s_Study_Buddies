@@ -63,6 +63,27 @@ describe("meetup schema", () => {
     expect(result.error.issues.map((i) => i.path[0])).toContain("meeting_link");
   });
 
+  it("rejects a non-http(s) meeting link (no javascript: XSS link)", () => {
+    for (const link of [
+      "javascript:alert(document.cookie)",
+      "data:text/html,<script>1</script>",
+      "  javascript:alert(1)",
+      "zoommtg://zoom.us/join?confno=123",
+    ]) {
+      const result = meetup({ format: "online", location: undefined, meeting_link: link });
+      expect(result.success).toBe(false);
+      if (result.success) continue;
+      expect(result.error.issues.map((i) => i.path[0])).toContain("meeting_link");
+    }
+    expect(
+      meetup({
+        format: "online",
+        location: undefined,
+        meeting_link: "HTTPS://umn.zoom.us/j/1",
+      }).success,
+    ).toBe(true);
+  });
+
   it("in-person WITHOUT a location fails on location specifically", () => {
     const result = meetup({ location: undefined });
     expect(result.success).toBe(false);

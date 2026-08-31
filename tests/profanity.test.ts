@@ -82,3 +82,25 @@ describe("containsProfanity", () => {
     expect(containsProfanity("CSCI 1133 Study Group")).toBe(false);
   });
 });
+
+describe("no catastrophic backtracking (ReDoS regression)", () => {
+  // The old regex took ~9 s on a 2,000-char run of one character, which
+  // blocked the Node event loop inside server-action validation.
+  const adversarial = [
+    "a".repeat(5000),
+    "*".repeat(5000),
+    "s".repeat(5000),
+    "a*".repeat(2500),
+    "f" + "u".repeat(2000) + "!".repeat(2000),
+    "the quick brown fox ".repeat(300),
+  ];
+
+  it("stays fast on pathological input", () => {
+    for (const input of adversarial) {
+      const start = performance.now();
+      censorProfanity(input);
+      containsProfanity(input);
+      expect(performance.now() - start).toBeLessThan(250);
+    }
+  });
+});

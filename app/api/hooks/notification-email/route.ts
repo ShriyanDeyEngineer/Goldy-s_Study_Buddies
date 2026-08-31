@@ -26,6 +26,7 @@
  * WHAT WE DON'T EMAIL: chat messages and DMs. Those arrive by the second;
  * emailing each one would be spam. The bell/badge handle those live.
  */
+import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
@@ -61,17 +62,18 @@ interface WebhookPayload {
 }
 
 export async function POST(request: Request) {
-  // ── Auth: shared secret, constant-time-ish compare ─────────────────
+  // ── Auth: shared secret, constant-time compare ────────────────────
+  // Both sides are hashed to a fixed 32 bytes first: timingSafeEqual
+  // requires equal-length inputs, and hashing means neither the compare
+  // nor the (removed) length check can leak the real secret's length.
   const expected = process.env.NOTIFICATION_WEBHOOK_SECRET;
   const provided = request.headers.get("x-webhook-secret");
-  if (!expected || !provided || provided.length !== expected.length) {
+  if (!expected || !provided) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  let mismatch = 0;
-  for (let i = 0; i < expected.length; i++) {
-    mismatch |= expected.charCodeAt(i) ^ provided.charCodeAt(i);
-  }
-  if (mismatch !== 0) {
+  const expectedHash = createHash("sha256").update(expected).digest();
+  const providedHash = createHash("sha256").update(provided).digest();
+  if (!timingSafeEqual(expectedHash, providedHash)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

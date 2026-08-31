@@ -38,7 +38,18 @@ export const meetupSchema = z
       errorMap: () => ({ message: "Choose online or in person." }),
     }),
     location: z.string().trim().max(300, "Keep the location under 300 characters.").optional(),
-    meeting_link: z.string().trim().max(500, "Keep the link under 500 characters.").optional(),
+    // Scheme-checked so a `javascript:` (or other non-web) URI can never be
+    // stored and then rendered as the clickable "Join online" link. The
+    // database function re-checks this — see migration 0036.
+    meeting_link: z
+      .string()
+      .trim()
+      .max(500, "Keep the link under 500 characters.")
+      .refine(
+        (v) => v === "" || /^https?:\/\//i.test(v),
+        "Links must start with http:// or https://",
+      )
+      .optional(),
     duration_minutes: z.coerce
       .number({ invalid_type_error: "Pick how long the session runs." })
       .int("Duration must be whole minutes.")

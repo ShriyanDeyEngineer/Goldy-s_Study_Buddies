@@ -223,11 +223,19 @@ function MeetupCard({
   const durationMinutes = meetup.duration_minutes ?? 60;
   const endsAt = new Date(startsAt.getTime() + durationMinutes * 60_000);
 
+  // Only ever render a web URL as an href. Validation + the database
+  // function already enforce this, but a bad row must never become a
+  // `javascript:` link here (defense in depth).
+  const safeMeetingLink =
+    meetup.meeting_link && /^https?:\/\//i.test(meetup.meeting_link)
+      ? meetup.meeting_link
+      : null;
+
   const calendarHref = googleCalendarUrl({
     title: `${groupName} — ${meetup.title}`,
     startsAt,
     endsAt,
-    location: meetup.format === "online" ? (meetup.meeting_link ?? "") : (meetup.location ?? ""),
+    location: meetup.format === "online" ? (safeMeetingLink ?? "") : (meetup.location ?? ""),
     details: `Study session for ${courseLabel} with ${groupName} (via Goldy's Study Buddies).`,
   });
 
@@ -275,11 +283,11 @@ function MeetupCard({
             {meetup.format === "online" ? (
               <>
                 <Video aria-hidden className="h-4 w-4 shrink-0" />
-                {meetup.meeting_link && !meetup.is_cancelled ? (
+                {safeMeetingLink && !meetup.is_cancelled ? (
                   <a
-                    href={meetup.meeting_link}
+                    href={safeMeetingLink}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer nofollow"
                     className="truncate text-maroon underline underline-offset-2"
                   >
                     Join online <ExternalLink aria-hidden className="inline h-3 w-3" />
