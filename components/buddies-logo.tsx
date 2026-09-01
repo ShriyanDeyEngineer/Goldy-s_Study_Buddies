@@ -1,7 +1,7 @@
 /**
  * The Study Buddies logo — an ORIGINAL mark: two abstract figures at a
  * shared table with an open book. It is deliberately NOT a gopher, not the
- * University of Minnesota's Goldy Buddies mascot, and not any University
+ * University of Minnesota's Goldy Gopher mascot, and not any University
  * trademark — keep it that way. Never "improve" this by pasting in real
  * UMN artwork.
  *

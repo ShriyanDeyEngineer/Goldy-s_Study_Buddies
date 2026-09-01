@@ -135,7 +135,7 @@ describe("course request (student-filed — name is optional here)", () => {
 describe("profile", () => {
   function profile(overrides: Record<string, unknown> = {}) {
     return profileSchema.safeParse({
-      display_name: "Goldy",
+      display_name: "RandName",
       college: null,
       major: null,
       class_standing: null,

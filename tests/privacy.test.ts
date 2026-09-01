@@ -9,7 +9,7 @@ import { stripHiddenFields, isHidden } from "@/lib/people/privacy";
 
 const FULL_PROFILE = {
   id: "u1",
-  display_name: "Goldy",
+  display_name: "RandName",
   college: "cse",
   major: "Computer Science",
   class_standing: "sophomore",
@@ -70,7 +70,7 @@ describe("stripHiddenFields", () => {
     });
     // Name/id are not hideable — they're the user's public identity.
     expect(stripped.id).toBe("u1");
-    expect(stripped.display_name).toBe("Goldy");
+    expect(stripped.display_name).toBe("RandName");
     expect(Object.keys(stripped).sort()).toEqual(["display_name", "id"]);
   });
 

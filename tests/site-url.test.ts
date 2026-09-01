@@ -12,14 +12,14 @@ import { normalizeOrigin, safeInternalPath } from "@/lib/site";
 
 describe("normalizeOrigin", () => {
   it("adds https:// when the scheme is missing — the bug that broke sign-in", () => {
-    expect(normalizeOrigin("goldy-s-study-buddies.vercel.app")).toBe(
-      "https://goldy-s-study-buddies.vercel.app",
+    expect(normalizeOrigin("studybuddiesmn.vercel.app")).toBe(
+      "https://studybuddiesmn.vercel.app",
     );
   });
 
   it("leaves a correct origin untouched", () => {
-    expect(normalizeOrigin("https://goldy-s-study-buddies.vercel.app")).toBe(
-      "https://goldy-s-study-buddies.vercel.app",
+    expect(normalizeOrigin("https://studybuddiesmn.vercel.app")).toBe(
+      "https://studybuddiesmn.vercel.app",
     );
   });
 

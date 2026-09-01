@@ -23,7 +23,7 @@ const OTHER_UUID = "223e4567-e89b-42d3-a456-426614174000";
 describe("parsePeopleFilters", () => {
   it("parses a fully-loaded URL", () => {
     const filters = parsePeopleFilters({
-      q: "goldy",
+      q: "randName",
       course: `${REAL_UUID},${OTHER_UUID}`,
       major: "Computer Science,Math",
       college: "cse,cla",
@@ -33,7 +33,7 @@ describe("parsePeopleFilters", () => {
       buddies: "1",
       page: "2",
     });
-    expect(filters.query).toBe("goldy");
+    expect(filters.query).toBe("randName");
     expect(filters.courseIds).toEqual([REAL_UUID, OTHER_UUID]);
     expect(filters.majors).toEqual(["Computer Science", "Math"]);
     expect(filters.colleges).toEqual(["cse", "cla"]);
@@ -118,7 +118,7 @@ describe("filtersToRpcParams", () => {
 describe("URL round-trip (chips and clear-all depend on this)", () => {
   it("parse → serialize → parse is lossless", () => {
     const original = parsePeopleFilters({
-      q: "goldy",
+      q: "randName",
       course: REAL_UUID,
       college: "cse",
       gradMin: "2026",
@@ -133,7 +133,7 @@ describe("URL round-trip (chips and clear-all depend on this)", () => {
 
 describe("hasActiveFilters", () => {
   it("query alone is not a 'filter' (it has its own chip)", () => {
-    expect(hasActiveFilters(parsePeopleFilters({ q: "goldy" }))).toBe(false);
+    expect(hasActiveFilters(parsePeopleFilters({ q: "randName" }))).toBe(false);
     expect(hasActiveFilters(parsePeopleFilters({ college: "cse" }))).toBe(true);
     expect(hasActiveFilters(parsePeopleFilters({}))).toBe(false);
   });
