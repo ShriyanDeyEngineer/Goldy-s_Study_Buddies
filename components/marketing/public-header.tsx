@@ -7,7 +7,7 @@
  * component reflowed with CSS, no separate mobile copy.
  */
 import Link from "next/link";
-import { LogoLockup } from "@/components/gopher-logo";
+import { LogoLockup } from "@/components/buddies-logo";
 import { Button } from "@/components/ui/button";
 
 const NAV_LINKS = [

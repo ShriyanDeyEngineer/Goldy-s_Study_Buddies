@@ -16,7 +16,7 @@ import Link from "next/link";
 import { acceptCurrentTermsAction, signOutAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { LogoLockup } from "@/components/gopher-logo";
+import { LogoLockup } from "@/components/buddies-logo";
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (

@@ -4,7 +4,7 @@
  * HERE, so if this page were inside that layout the redirect would chase
  * its own tail.
  */
-import { LogoLockup } from "@/components/gopher-logo";
+import { LogoLockup } from "@/components/buddies-logo";
 
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   return (

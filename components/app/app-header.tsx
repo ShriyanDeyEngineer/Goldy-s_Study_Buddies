@@ -9,7 +9,7 @@
  * same query twice per page. Realtime keeps both live after first paint.
  */
 import Link from "next/link";
-import { LogoLockup } from "@/components/gopher-logo";
+import { LogoLockup } from "@/components/buddies-logo";
 import { AppNavLinks } from "@/components/app/app-nav";
 import { NotificationBell } from "@/components/app/notification-bell";
 import { UserMenu } from "@/components/app/user-menu";

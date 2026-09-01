@@ -9,7 +9,7 @@ import Link from "next/link";
 import { RotateCcw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogoLockup } from "@/components/gopher-logo";
+import { LogoLockup } from "@/components/buddies-logo";
 
 export const metadata: Metadata = { title: "Sign-in problem" };
 

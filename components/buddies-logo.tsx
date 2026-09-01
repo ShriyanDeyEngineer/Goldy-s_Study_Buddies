@@ -1,7 +1,7 @@
 /**
  * The Study Buddies logo — an ORIGINAL mark: two abstract figures at a
  * shared table with an open book. It is deliberately NOT a gopher, not the
- * University of Minnesota's Goldy Gopher mascot, and not any University
+ * University of Minnesota's Goldy Buddies mascot, and not any University
  * trademark — keep it that way. Never "improve" this by pasting in real
  * UMN artwork.
  *
@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
  * read as whiskers and were the first thing to break down at favicon
  * size. Two people + an open book already carries the meaning.
  */
-export function GopherLogo({ className }: { className?: string }) {
+export function BuddiesLogo({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 64 64"
@@ -87,7 +87,7 @@ export function LogoLockup({
         className,
       )}
     >
-      <GopherLogo className={cn("h-[1.35em] w-[1.35em]", dark ? "text-gold" : "text-maroon")} />
+      <BuddiesLogo className={cn("h-[1.35em] w-[1.35em]", dark ? "text-gold" : "text-maroon")} />
       <span>
         <span className={dark ? "text-gold" : ""}>Study Buddies</span>
       </span>

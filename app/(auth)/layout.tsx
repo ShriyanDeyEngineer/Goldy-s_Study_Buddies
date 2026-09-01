@@ -4,7 +4,7 @@
  * nav — the only job here is finishing the sign-in at hand.
  */
 import Link from "next/link";
-import { LogoLockup } from "@/components/gopher-logo";
+import { LogoLockup } from "@/components/buddies-logo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

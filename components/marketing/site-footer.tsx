@@ -4,7 +4,7 @@
  * the design system (gold/white text both clear WCAG AA on it).
  */
 import Link from "next/link";
-import { LogoLockup } from "@/components/gopher-logo";
+import { LogoLockup } from "@/components/buddies-logo";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 /* The team. Two contributors asked not to be publicly named (they appear

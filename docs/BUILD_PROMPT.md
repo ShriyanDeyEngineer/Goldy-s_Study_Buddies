@@ -166,8 +166,8 @@ anything that looks redundant but is not.
 ### 4. Design system
 
 Build a University of Minnesota–themed design system. Do not use the official
-UMN logo, the Goldy Gopher mascot artwork, or any university trademark — use
-the school colors and an original simple gopher-silhouette SVG instead. Include
+UMN logo, the Goldy Buddies mascot artwork, or any university trademark — use
+the school colors and an original simple buddies-silhouette SVG instead. Include
 a visible footer disclaimer: "Not officially affiliated with the University of
 Minnesota."
 
