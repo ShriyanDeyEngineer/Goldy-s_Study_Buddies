@@ -3,7 +3,7 @@
 # the dashboard instead; SETUP.md walks through matching these settings
 # there. Keys here mirror the auth rules the app depends on.
 
-project_id = "goldys-study-buddies"
+project_id = "study_buddies"
 
 [api]
 enabled = true

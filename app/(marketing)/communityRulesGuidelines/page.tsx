@@ -26,7 +26,7 @@ export default function CommunityRulesGuidelinesPage() {
 
             <h2 className="font-display text-2xl text-ink text-left">Be the student you say you are</h2>
                 <p className="mt-4 text-ink-muted text-left">
-                  Your account is yours alone. Use a name your classmates would actually recognize, keep your listed courses, major, and graduation year accurate, and do not create a second account or sign in on someone else&rsquo;s behalf. People decide whether to join your group or meet you in person based on what your profile says. Inaccurate information is not a small thing here, it is the basis of someone else&rsquo;s decision.
+                  Your account is yours alone. Use a display name your classmates would actually recognize, keep your listed courses, major, and graduation year accurate, and do not create a second account or sign in on someone else&rsquo;s behalf. People decide whether to join your group or meet you in person based on what your profile says. Inaccurate information is not a small thing here, it is the basis of someone else&rsquo;s decision.
                 </p>
 
             <br></br>
