@@ -15,7 +15,7 @@ A website that helps students find other students to study with. Students can ma
 
 
 ## Features
-1. Home page leading to other sections (ie. About Us, Why You Should Use Goldy’s Study Buddies, Testimonies page when applicable, etc.). Place buttons at the top including sign in/sign up.
+1. Home page leading to other sections (ie. About Us, Why You Should Use Study Buddies, Testimonies page when applicable, etc.). Place buttons at the top including sign in/sign up.
 
 2. Account connected by UMN email and user chosen password (password must meet certain criteria). Perhaps we should look to integrate an already existing service that deals with these security things and storing user account data.
 
