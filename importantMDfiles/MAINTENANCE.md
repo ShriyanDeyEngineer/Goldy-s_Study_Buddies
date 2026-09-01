@@ -98,7 +98,7 @@ GitHub, Vercel, Supabase, and Sentry that need an account owner.
       hosting and collaboration, no licence to reuse or run). Revisit if the
       project ever takes funding or an institutional relationship.
 - [ ] **Real contact address** — replace the placeholder
-      `team@goldysstudybuddies.example` in
+      `team@studybuddies.example` in
       `components/marketing/site-footer.tsx` with the shared inbox.
 - [ ] **Backups** — confirm Supabase's automated daily backups are on for the
       plan you're on; enable Point-in-Time Recovery if the budget allows.

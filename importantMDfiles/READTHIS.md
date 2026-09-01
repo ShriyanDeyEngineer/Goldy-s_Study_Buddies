@@ -153,7 +153,7 @@ Decisions we made and why — each is also commented at the code site:
     allows matching as a server-side convenience; output columns simply
     don't include email.
 14. **Footer contact address is a placeholder** —
-    `team@goldysstudybuddies.example` isn't routable; swap in the team's
+    `team@studybuddies.example` isn't routable; swap in the team's
     real shared inbox before launch (`components/marketing/site-footer.tsx`).
 
 ## Documentation

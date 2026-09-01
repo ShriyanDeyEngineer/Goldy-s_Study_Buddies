@@ -10,7 +10,7 @@ independently re-runnable.
 ## 1. Create the Supabase project
 
 1. Sign in at [supabase.com](https://supabase.com) → **New project**.
-2. Pick the team, name it (e.g. `goldys-study-buddies`), choose a strong
+2. Pick the team, name it (e.g. `study-buddies`), choose a strong
    database password (save it — you'll need it for `db push` and the
    invariant tests), region `us-east-1` or similar.
 3. When it finishes provisioning, collect three values. The **Connect**
@@ -205,9 +205,9 @@ a student. Three ways to improve it, cheapest first:
    authorized domains; for `supabase.co` reply that it is a third-party
    service you integrate with. Review takes days to weeks, so start early.
 2. **Vanity subdomain — needs a paid Supabase plan.** Turns the host into
-   something readable like `goldys-study-buddies.supabase.co`. No DNS work.
+   something readable like `study-buddies.supabase.co`. No DNS work.
 3. **Custom domain — paid Supabase add-on + a domain you own.** Auth runs at
-   e.g. `auth.goldysstudybuddies.com`. After enabling it, add the new
+   e.g. `auth.studybuddies.com`. After enabling it, add the new
    callback URL to the Google OAuth client (keep the old one during the
    switchover).
 
@@ -272,7 +272,7 @@ database. Against the local stack, run it through the container's own
 `psql` — again, nothing to install:
 
 ```bash
-docker exec -i supabase_db_goldys-study-buddies \
+docker exec -i supabase_db_study-buddies \
   psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/invariants.sql
 ```
 
