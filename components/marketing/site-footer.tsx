@@ -47,6 +47,17 @@ export function SiteFooter() {
               {CONTACT_EMAIL}
             </a>
           </p>
+          <p className="mt-3 text-white/80 font-['Times_New_Roman']">
+            <span className="font-bold">Socials: &#8200;</span>
+            <ul>
+              <li>
+                Instagram: &#8200;
+                <a href="https://www.instagram.com/studybuddiesmn?igsi=MXB6dzg3MHEyaGJubA==" target="_blank" rel="noopener noreferrer" className="rounded text-white/80 underline underline-offset-2 hover:text-gold font-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
+                  @studybuddiesmn
+                </a>
+              </li>
+            </ul>
+          </p>
         </div>
       </div>
       <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60 font-['Times_New_Roman']">
