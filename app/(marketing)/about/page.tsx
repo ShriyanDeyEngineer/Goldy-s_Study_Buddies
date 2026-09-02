@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 };
 
 const CONTRIBUTORS = [
-  { name: "Shriyan Dey" },
   { name: "anonymous" },
-  { name: "Aadi Sharma" },
+  { name: "anonymous" },
+  { name: "anonymous" },
   { name: "anonymous" },
 ];
 
