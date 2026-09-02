@@ -42,8 +42,7 @@ export default function AccessibilityPage() {
         <h2 className="mt-10 font-display text-2xl text-ink">Known limitations</h2>
         <p className="mt-3 text-ink-muted">
           We are a small student team and this is an ongoing effort. Some areas
-          may not yet fully meet our goal. If you hit a barrier, please tell us
-          &mdash; it helps us prioritize.
+          may not yet fully meet our goal. If you hit a barrier, please tell us, as it helps us prioritize.
         </p>
 
         <h2 className="mt-10 font-display text-2xl text-ink">Tell us about a problem</h2>
