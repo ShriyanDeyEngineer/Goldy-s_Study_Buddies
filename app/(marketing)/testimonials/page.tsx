@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Testimonials",
@@ -19,7 +20,10 @@ export const metadata: Metadata = {
 
 /** Real quotes only — never marketing-invented ones. Each needs the
  *  student's permission before it ships. */
-const TESTIMONIALS: { quote: string; attribution: string }[] = [];
+const TESTIMONIALS: { quote: string; attribution: string }[] = [
+  //{ quote: "quote 1", attribution: "attributor 1"},
+  //{ quote: "quote 2", attribution: "attributor 2"},
+];
 
 export default function TestimonialsPage() {
   return (
@@ -36,7 +40,7 @@ export default function TestimonialsPage() {
             description="We just launched. If the site helps you, email us and we may feature your words here."
             action={
               <Button asChild variant="secondary">
-                <Link href="/register">Be one of the first</Link>
+                <Link href={`mailto:${CONTACT_EMAIL}`}>Be the First</Link>
               </Button>
             }
           />
@@ -50,6 +54,9 @@ export default function TestimonialsPage() {
                 </CardContent>
               </Card>
             ))}
+            <Button asChild variant="secondary">
+              <Link href={`mailto:${CONTACT_EMAIL}`}>Submit a Testimonial</Link>
+            </Button>
           </div>
         )}
       </div>
