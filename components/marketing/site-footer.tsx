@@ -9,7 +9,7 @@ import { CONTACT_EMAIL } from "@/lib/site";
 
 /* The team. Two contributors asked not to be publicly named (they appear
    as "anonymous"); respect that. */
-const TEAM = ["anonymous", "anonymous", "anonymous", "anonymous"];
+const TEAM = ["Shriyan Dey", "anonymous", "Aadi Sharma", "anonymous"];
 
 export function SiteFooter() {
   return (
