@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 };
 
 const CONTRIBUTORS = [
-  { name: "Shriyan Dey", role: "Co-founder/Developer", major: "Major: Computer Engineering" },
+  { name: "Shriyan Dey", role: "Co-founder & Developer (Full-Stack)", major: "Major: Computer Engineering" },
   { name: "anonymous", role: "---------------------", major: "---------------------" },
-  { name: "Aadi Sharma", role: "Developer", major: "Major: Electrical Engineering" },
+  { name: "Aadi Sharma", role: "Developer (Full-Stack)", major: "Major: Electrical Engineering" },
   { name: "anonymous", role: "---------------------", major: "---------------------" },
 ];
 
